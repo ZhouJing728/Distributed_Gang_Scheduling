@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/Laucher.dir/laucher.cc.o  -o Laucher  libLIBLAUCHER.a 

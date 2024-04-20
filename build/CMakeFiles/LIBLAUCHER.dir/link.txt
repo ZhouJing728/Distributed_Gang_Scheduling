@@ -1,0 +1,2 @@
+/usr/bin/ar qc libLIBLAUCHER.a  CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o CMakeFiles/LIBLAUCHER.dir/client.cc.o
+/usr/bin/ranlib libLIBLAUCHER.a

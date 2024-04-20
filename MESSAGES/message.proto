@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package Message.protobuf;
+
+message Scheduling
+{
+    repeated Job_gang tasks = 1;
+    int32 local_id=2;
+}
+
+message Job_gang
+{
+    int32 job_id =8;
+    int32 requested_processors = 3;
+    string job_path = 4;
+}
+
+message Message_from_Local
+{
+    int32 job_id = 5;
+    int32 local_id = 6;
+    string status = 7;
+}
