@@ -192,6 +192,33 @@ MESSAGES/message.pb.cc.s:
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.s
 .PHONY : MESSAGES/message.pb.cc.s
 
+SCHED_STRATEGY/strategies.o: SCHED_STRATEGY/strategies.cc.o
+
+.PHONY : SCHED_STRATEGY/strategies.o
+
+# target to build an object file
+SCHED_STRATEGY/strategies.cc.o:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o
+.PHONY : SCHED_STRATEGY/strategies.cc.o
+
+SCHED_STRATEGY/strategies.i: SCHED_STRATEGY/strategies.cc.i
+
+.PHONY : SCHED_STRATEGY/strategies.i
+
+# target to preprocess a source file
+SCHED_STRATEGY/strategies.cc.i:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.i
+.PHONY : SCHED_STRATEGY/strategies.cc.i
+
+SCHED_STRATEGY/strategies.s: SCHED_STRATEGY/strategies.cc.s
+
+.PHONY : SCHED_STRATEGY/strategies.s
+
+# target to generate assembly for a file
+SCHED_STRATEGY/strategies.cc.s:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s
+.PHONY : SCHED_STRATEGY/strategies.cc.s
+
 client.o: client.cc.o
 
 .PHONY : client.o
@@ -273,6 +300,33 @@ laucher.cc.s:
 	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/laucher.cc.s
 .PHONY : laucher.cc.s
 
+ntp-master/ntp-master/server.o: ntp-master/ntp-master/server.c.o
+
+.PHONY : ntp-master/ntp-master/server.o
+
+# target to build an object file
+ntp-master/ntp-master/server.c.o:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o
+.PHONY : ntp-master/ntp-master/server.c.o
+
+ntp-master/ntp-master/server.i: ntp-master/ntp-master/server.c.i
+
+.PHONY : ntp-master/ntp-master/server.i
+
+# target to preprocess a source file
+ntp-master/ntp-master/server.c.i:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.i
+.PHONY : ntp-master/ntp-master/server.c.i
+
+ntp-master/ntp-master/server.s: ntp-master/ntp-master/server.c.s
+
+.PHONY : ntp-master/ntp-master/server.s
+
+# target to generate assembly for a file
+ntp-master/ntp-master/server.c.s:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.s
+.PHONY : ntp-master/ntp-master/server.c.s
+
 server.o: server.cc.o
 
 .PHONY : server.o
@@ -315,6 +369,9 @@ help:
 	@echo "... MESSAGES/message.pb.o"
 	@echo "... MESSAGES/message.pb.i"
 	@echo "... MESSAGES/message.pb.s"
+	@echo "... SCHED_STRATEGY/strategies.o"
+	@echo "... SCHED_STRATEGY/strategies.i"
+	@echo "... SCHED_STRATEGY/strategies.s"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
@@ -324,6 +381,9 @@ help:
 	@echo "... laucher.o"
 	@echo "... laucher.i"
 	@echo "... laucher.s"
+	@echo "... ntp-master/ntp-master/server.o"
+	@echo "... ntp-master/ntp-master/server.i"
+	@echo "... ntp-master/ntp-master/server.s"
 	@echo "... server.o"
 	@echo "... server.i"
 	@echo "... server.s"

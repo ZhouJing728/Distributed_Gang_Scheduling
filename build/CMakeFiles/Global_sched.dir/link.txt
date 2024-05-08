@@ -1,1 +1,1 @@
-/usr/bin/c++     CMakeFiles/Global_sched.dir/global_scheduler.cc.o  -o Global_sched  libLIBGLOBAL.a 
+/usr/bin/c++     CMakeFiles/Global_sched.dir/global_scheduler.cc.o  -o Global_sched  libLIBGLOBAL.a /usr/lib/x86_64-linux-gnu/libprotobuf.so -lpthread 

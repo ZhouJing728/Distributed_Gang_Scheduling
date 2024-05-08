@@ -35,7 +35,7 @@ class Server
     epoll_event ev;
     epoll_event events[128];
     //Message_type server_to_client;
-    Scheduling scheduling;
+    //Scheduling scheduling;
     //Job_gang job_gang;
 
     typedef struct databuf

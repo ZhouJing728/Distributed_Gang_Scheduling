@@ -85,7 +85,7 @@ CMakeFiles/Global_sched.dir/all: CMakeFiles/LIBGLOBAL.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/Global_sched.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Global_sched.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
 .PHONY : CMakeFiles/Global_sched.dir/rule
@@ -107,7 +107,7 @@ CMakeFiles/Global_sched.dir/clean:
 CMakeFiles/Laucher.dir/all: CMakeFiles/LIBLAUCHER.dir/all
 	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/depend
 	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=9,10 "Built target Laucher"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=11,12 "Built target Laucher"
 .PHONY : CMakeFiles/Laucher.dir/all
 
 # Build rule for subdir invocation for target.
@@ -134,12 +134,12 @@ CMakeFiles/Laucher.dir/clean:
 CMakeFiles/LIBGLOBAL.dir/all:
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/depend
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=3,4,5 "Built target LIBGLOBAL"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=3,4,5,6,7 "Built target LIBGLOBAL"
 .PHONY : CMakeFiles/LIBGLOBAL.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/LIBGLOBAL.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 5
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LIBGLOBAL.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
 .PHONY : CMakeFiles/LIBGLOBAL.dir/rule
@@ -161,7 +161,7 @@ CMakeFiles/LIBGLOBAL.dir/clean:
 CMakeFiles/LIBLAUCHER.dir/all:
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/depend
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=6,7,8 "Built target LIBLAUCHER"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=8,9,10 "Built target LIBLAUCHER"
 .PHONY : CMakeFiles/LIBLAUCHER.dir/all
 
 # Build rule for subdir invocation for target.

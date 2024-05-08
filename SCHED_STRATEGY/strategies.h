@@ -1,9 +1,24 @@
 #include <iostream>
-#include <list>
+#include <queue>
+#include"../jobQueue.h"
+#include"../taskQueue.h"
 #include <cstring>
+#include "../MESSAGES/message.pb.h"
 using namespace std;
+using namespace Message::protobuf;
+
+/*****************************************************************
+ * For now, the strategy can only generate one schedule for all
+ * local_nodes. it doesn't consider cpu number or resuse of a free
+ * cpu.
+ * 
+ * for now task id = job id. but in the furture it should be distinct
+ * in different machines.
+******************************************************************/
 
 class Strategy{
+
+    public:
 
     enum strategies {
         Roundrobin,
@@ -11,13 +26,16 @@ class Strategy{
 
     };
 
-    typedef struct jobs
-    {
-    int job_id;
-    int requested_processors;
-    string job_path;
-    }job;
+    // typedef struct jobs
+    // {
+    // int job_id;
+    // int requested_processors;
+    // string job_path;
+    // }job;
 
-    int roundRobin(list <job> joblist);
+    queue<task> schedule_tasks;
+
+    /* (five) seconds for each job(task at a local node) in turn*/
+    queue<task> roundRobin(queue<Job_gang> jobQueue);
 
 };

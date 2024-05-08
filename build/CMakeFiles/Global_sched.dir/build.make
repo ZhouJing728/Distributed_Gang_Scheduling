@@ -80,6 +80,7 @@ Global_sched_EXTERNAL_OBJECTS =
 Global_sched: CMakeFiles/Global_sched.dir/global_scheduler.cc.o
 Global_sched: CMakeFiles/Global_sched.dir/build.make
 Global_sched: libLIBGLOBAL.a
+Global_sched: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 Global_sched: CMakeFiles/Global_sched.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Global_sched"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Global_sched.dir/link.txt --verbose=$(VERBOSE)

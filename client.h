@@ -24,7 +24,7 @@ class Client
     char receive_buffer[1024];
     //Message_type server_to_client;
     //Message_type client_to_server;
-    Scheduling scheduling;
+    schedule scheduling;
 
     int sock_create();
 
@@ -35,6 +35,8 @@ class Client
     //int sock_connect(char ip, int port);
 
     int sock_connect();//give addr from command line OR define it
+
+    int sock_connect(string host,int port);
 
     int send_to_server(char send_buffer[1024]);
 

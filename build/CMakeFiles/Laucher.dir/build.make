@@ -80,6 +80,7 @@ Laucher_EXTERNAL_OBJECTS =
 Laucher: CMakeFiles/Laucher.dir/laucher.cc.o
 Laucher: CMakeFiles/Laucher.dir/build.make
 Laucher: libLIBLAUCHER.a
+Laucher: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 Laucher: CMakeFiles/Laucher.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Laucher"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Laucher.dir/link.txt --verbose=$(VERBOSE)

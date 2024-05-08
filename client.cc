@@ -91,6 +91,28 @@ int Client::sock_connect()
 
     return 0;
 }
+
+int Client::sock_connect(string host,int port){
+
+    memset(&server_addr,0,sizeof(server_addr));
+    ip = host.c_str();
+    server_port = port;
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(server_port); // server's port
+    server_addr.sin_addr.s_addr=inet_addr(ip);//server's ip
+
+    if (connect(client, (struct sockaddr *)&server_addr,sizeof(server_addr)) != 0)  // send request to server for connection
+    { 
+        cout<<"failed to connect with server"<<endl;
+        close(client); 
+        return -1; 
+    }else{
+        cout<<"successfully to connect"<<endl;
+    }
+
+    return 0;
+}
  
 int Client::send_to_server(char send_buffer[1024])//for each send a new buffer, don't need to reset
 {
