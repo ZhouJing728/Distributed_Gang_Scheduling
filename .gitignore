@@ -9,3 +9,5 @@ chain_job.h
 chain_task.h
 jobQueue*
 taskQueue*
+build/
+.vscode/

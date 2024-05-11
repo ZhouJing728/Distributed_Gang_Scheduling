@@ -3,9 +3,7 @@
 
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../MESSAGES/message.pb.h
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../SCHED_STRATEGY/strategies.h
-CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../chain.h
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../global_scheduler.cc
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../ntp-master/ntp-master/server.h
-CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../queue.h
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../server.h
 

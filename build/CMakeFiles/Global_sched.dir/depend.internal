@@ -4,8 +4,6 @@
 CMakeFiles/Global_sched.dir/global_scheduler.cc.o
  /root/DGS/MESSAGES/message.pb.h
  /root/DGS/SCHED_STRATEGY/strategies.h
- /root/DGS/chain.h
  /root/DGS/global_scheduler.cc
  /root/DGS/ntp-master/ntp-master/server.h
- /root/DGS/queue.h
  /root/DGS/server.h

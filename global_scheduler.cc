@@ -2,7 +2,8 @@
 //#include "jobQueue.h"
 #include "server.h"
 //#include <list>
-#include <queue>
+//#include <queue>
+#include<vector>
 #include <sys/timerfd.h>
 #include "SCHED_STRATEGY/strategies.h"
 #include "MESSAGES/message.pb.h"
@@ -27,7 +28,9 @@ int timer_fd;
 
 start_time next_Starttime;
 
-queue<Job_gang> job_queue;
+//queue<Job_gang> job_queue;
+
+vector<Job_gang> job_list;
 
 Job_gang **ousterhaut_table = new Job_gang *[2];//MATRIX FOR SCHED FOR ALL PROCESSORS (assume we only have two local scheduler now
 
@@ -72,7 +75,7 @@ int ntp_reply(
 	socklen_t saddrlen,
 	unsigned char recv_buf[],
 	uint32_t recv_time[]);
-void log_ntp_event(char *msg);
+void log_ntp_event(const char *msg);
 void log_request_arrive(uint32_t *ntp_time);
 int die(const char *msg);
 void gettime64(uint32_t ts[]);
@@ -145,9 +148,12 @@ int handle_event()
         //Fist situation: send_timer is triggered
         if(fd_temp == timer_fd)
         {
-            log_ntp_event("\n==============================\n"
-                    "TIMER TRIGGERED,BEGIN SCHEDULE\n"
-                    "==============================\n");
+            string s ="\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n";
+            const char* cs = s.c_str();
+            // log_ntp_event("\n==============================\n"
+            //         "TIMER TRIGGERED,BEGIN SCHEDULE\n"
+            //         "==============================\n");
+            log_ntp_event(cs);
             if(timer_handler()<0)
             {
                 printf("-----Schedule Generate and send process failed------\n");
@@ -226,7 +232,8 @@ int acceptNewJob(int fd)
         cout<<"received wrong job, discarded it~"<<endl;
         return -1;
     }
-    job_queue.push(job_accept);
+    //job_queue.push(job_accept);
+    job_list.push_back(job_accept);
     cout<<"received a new job, added to job list"<<endl;
     //sched();
     // if(global_scheduler.left_child==-1){
@@ -351,7 +358,7 @@ void update_nst()
 
 int timer_handler()
 {
-    if(job_queue.size()==0)
+    if(job_list.size()==0)
     {
         printf("there is no job received \n");
     }else{
@@ -381,7 +388,7 @@ int timer_handler()
 void get_schedule()
 {
     Strategy mysched;
-    queue<task> tasks = mysched.roundRobin(job_queue);
+    vector<task> tasks = mysched.roundRobin(job_list);
 
     printf("successfully got schedule_Tasks(without start time)\n");
 
@@ -391,27 +398,16 @@ void get_schedule()
     printf("successfully set nst\n");
     int size = tasks.size();
     printf("sched_tasks has size: %d\n",size);
-    for(int i=0;i<size;i++)
+    for(vector<task>::iterator it = tasks.begin();it!=tasks.end();it++)
     {
-        // task task_Temp = tasks.front();
-        // printf("got the first task from tasks\n");
-        // schedule_Temp.add_durations(task_Temp.duration_ms());
-        // schedule_Temp.add_paths(task_Temp.paths());
-        // schedule_Temp.add_tasks_ids(task_Temp.task_id());
-        // printf("successfully add task info\n");
-        // tasks.pop();
-        // tasks.push(task_Temp);
         task* common_task = common_sched.add_tasks();
         printf("create a new task for sched_Tasks\n");
-        *common_task = tasks.front();
+        *common_task = *it;
         printf("added to sched_tasks\n");
-        tasks.pop();
-        printf("arrived here\n");
-        printf("sched_task has size:%d\n",common_sched.tasks_size());
     }
     printf("arrived outside for loop\n");
     memset(global_scheduler.send_buffer,'\0',1024);
-    printf("here???\n");
+    printf("reset send buffer\n");
     common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
     printf("send buffer is ready\n");
 }
@@ -483,7 +479,7 @@ void log_request_arrive(uint32_t *ntp_time)
 }
 
 
-void log_ntp_event(char *msg)
+void log_ntp_event(const char *msg)
 {
 	puts(msg);
 }
@@ -503,7 +499,9 @@ int ntp_reply(
  	/* do not use 0xC7 because the LI can be `unsynchronized` */
 	if ((recv_buf[0] & 0x07/*0xC7*/) != 0x3) {
 		/* LI VN Mode stimmt nicht */
-		log_ntp_event("Invalid request: found error at the first byte");
+        string s ="Invalid request: found error at the first byte";
+        const char* cs= s.c_str();
+		log_ntp_event(cs);
 		return 1;
 	}
 
@@ -628,11 +626,12 @@ int ntp_server(struct sockaddr_in bind_addr)
 		perror("Bind error");
 		die(NULL);
 	}
-
-	log_ntp_event(	"\n========================================\n"
-			"= Server started, waiting for requests =\n"
-			"========================================\n");
-
+    string str = "\n========================================\n""= Server started, waiting for requests =\n""========================================\n";
+    const char* cs = str.c_str();
+	// log_ntp_event(	"\n========================================\n"
+	// 		"= Server started, waiting for requests =\n"
+	// 		"========================================\n");
+    log_ntp_event(cs);
 
 	return s;
 	//request_process_loop(s);

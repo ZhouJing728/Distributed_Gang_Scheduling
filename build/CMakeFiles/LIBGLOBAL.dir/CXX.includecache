@@ -41,7 +41,7 @@ strategies.h
 /root/DGS/SCHED_STRATEGY/strategies.h
 iostream
 -
-queue
+vector
 -
 cstring
 -

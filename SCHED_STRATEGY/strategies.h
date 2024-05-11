@@ -1,7 +1,8 @@
 #include <iostream>
-#include <queue>
-#include"../jobQueue.h"
-#include"../taskQueue.h"
+//#include <queue>
+// #include"../jobQueue.h"
+// #include"../taskQueue.h"
+#include<vector>
 #include <cstring>
 #include "../MESSAGES/message.pb.h"
 using namespace std;
@@ -33,9 +34,9 @@ class Strategy{
     // string job_path;
     // }job;
 
-    queue<task> schedule_tasks;
+    vector<task> schedule_tasks;
 
     /* (five) seconds for each job(task at a local node) in turn*/
-    queue<task> roundRobin(queue<Job_gang> jobQueue);
+    vector<task> roundRobin(vector<Job_gang> job_list);
 
 };

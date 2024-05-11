@@ -3,33 +3,25 @@
 
 Strategy strategy;
 
-typedef struct jobs
+vector<task> Strategy::roundRobin(vector<Job_gang> job_list){
+
+    int queueSize = job_list.size();
+    cout<<"job list has size:"<<queueSize<<endl;
+    
+    printf("in RR functions:\n");
+    for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
     {
-    int job_id;
-    int requested_processors;
-    string job_path;
-    }job;
-
-
-queue<task> Strategy::roundRobin(queue<Job_gang> jobQueue){
-
-    int queueSize = jobQueue.size();
-    for( int i = 0;i<queueSize;i++)
-    {
-        printf("in RR functions:\n");
-        Job_gang job = jobQueue.front();
-        printf("successfully dequeue job message\n");
+        Job_gang job = *it;
+        printf("successfully dequeue job message,");
         cout<<"with job_id:"<< job.job_id()<<endl;
         task task;
         task.set_duration_ms(5);
-        task.set_paths(job.job_path());
+        //task.set_paths(job.job_path());
         task.set_task_id(job.job_id());
-        strategy.schedule_tasks.push(task);
-        jobQueue.pop();//pop from begin
-        jobQueue.push(job);//push back to end
-
+        strategy.schedule_tasks.push_back(task);
     }
-    printf("task size in strategy function is %d\n",strategy.schedule_tasks.size());
+    
+    printf("task size in strategy function is %ld\n",strategy.schedule_tasks.size());
     return strategy.schedule_tasks;
 
 }
