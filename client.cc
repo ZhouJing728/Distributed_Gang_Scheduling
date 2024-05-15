@@ -126,6 +126,27 @@ int Client::send_to_server(char send_buffer[1024])//for each send a new buffer, 
     return 0;
 }
 
+int Client::epoll_initialisation()
+{
+    epoll_fd = epoll_create(128);//maximum size for listening, since linux 2.6.8 is ignored,but need to be greater than 0
+
+    if(epoll_fd<0)
+    {
+        cout<<"epoll_create"<<endl;
+        return -1;
+    }
+
+    ev.events=EPOLLIN;
+    ev.data.fd=client;
+
+    if(epoll_ctl(epoll_fd,EPOLL_CTL_ADD,client,&ev)<0)
+    {
+        cout<<"epoll_ctl"<<endl;
+        return -1;
+    }
+
+    return 0;
+}
 // int Client::send_to_server()//use send_buffer of client structure,need to reset 
 // {
 //     memset(send_buffer,'\0',sizeof(send_buffer));

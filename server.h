@@ -27,6 +27,8 @@ class Server
     int left_child = -1;// always for the first came true client
     int right_child = -1;
     int laucher = -1;
+    bool left_free=false;
+    bool right_free=false;
 
     char send_buffer[1024];
     char read_buffer[1024];

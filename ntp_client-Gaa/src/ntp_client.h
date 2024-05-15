@@ -103,6 +103,9 @@ x_int32_t ntpcli_config(
 xtime_vnsec_t ntpcli_req_time(
                 xntp_cliptr_t xntp_this,
                 x_uint32_t xut_tmout);
+x_int64_t ntpcli_req_time_by_Jing(
+                xntp_cliptr_t xntp_this,
+                x_uint32_t xut_tmout);
 
 ////////////////////////////////////////////////////////////////////////////////
 

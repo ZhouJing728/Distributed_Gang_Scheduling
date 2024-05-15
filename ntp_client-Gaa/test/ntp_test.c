@@ -8,7 +8,7 @@
  * @brief   : 使用 NTP 协议获取网络时间戳的测试程序。
  */
 
-#include "ntp_client.h"
+#include "../src/ntp_client.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
@@ -261,7 +261,8 @@ int main(int argc, char * argv[])
                        xtm_local.ctx_minute,
                        xtm_local.ctx_second,
                        xtm_local.ctx_msec  );
-
+                x_int64_t deviation = ntpcli_req_time_by_Jing(xntp_this, xopt_args.xut_tmout);
+                printf("Jing's deviation:%lld us\n",deviation/10LL);
                 printf("\tDeviation    : %lld us\n",
                        ((x_int64_t)(xtm_ltime - xtm_vnsec)) / 10LL);
             }

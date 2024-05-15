@@ -1,9 +1,5 @@
 #include <iostream>
-//#include <queue>
-// #include"../jobQueue.h"
-// #include"../taskQueue.h"
 #include<vector>
-#include <cstring>
 #include "../MESSAGES/message.pb.h"
 using namespace std;
 using namespace Message::protobuf;
@@ -27,16 +23,16 @@ class Strategy{
 
     };
 
-    // typedef struct jobs
-    // {
-    // int job_id;
-    // int requested_processors;
-    // string job_path;
-    // }job;
+    Strategy()
+    {
+        ousterhaut_table.resize(2);
+    }
 
     vector<task> schedule_tasks;
 
+    vector<vector<task>> ousterhaut_table;
+
     /* (five) seconds for each job(task at a local node) in turn*/
-    vector<task> roundRobin(vector<Job_gang> job_list);
+    vector<vector<task>> roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free);
 
 };

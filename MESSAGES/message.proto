@@ -11,8 +11,9 @@ message schedule
 
 message task
 {
-    int32 task_id=2;
+    string task_id=2;
     int32 duration_ms = 3;
+    string path = 22;
 }
 
 message start_time

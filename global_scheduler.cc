@@ -1,20 +1,18 @@
-// #include"taskQueue.h"
-//#include "jobQueue.h"
 #include "server.h"
-//#include <list>
-//#include <queue>
 #include<vector>
 #include <sys/timerfd.h>
 #include "SCHED_STRATEGY/strategies.h"
 #include "MESSAGES/message.pb.h"
-/* from ntp server*/
+/*******************************************/
+/* from ntp server*************************/
 #include <sys/time.h> /* gettimeofday() */
 #include <sys/wait.h>
 #include <time.h> /* for time() and ctime() */
 
 #define UTC_NTP 2208988800U /* 1970 - 1900 */
- #include "ntp-master/ntp-master/server.h"
+#include "ntp-master/ntp-master/server.h"
 /* end from ntp server*/
+/********************************************/
 using namespace std;
 using namespace Message::protobuf;
 
@@ -26,15 +24,18 @@ int ntp_fd;
 
 int timer_fd;
 
-start_time next_Starttime;
+bool need_schedule = false;
 
+struct itimerspec send_timer;
+
+start_time next_Starttime;
 //queue<Job_gang> job_queue;
 
 vector<Job_gang> job_list;
 
-Job_gang **ousterhaut_table = new Job_gang *[2];//MATRIX FOR SCHED FOR ALL PROCESSORS (assume we only have two local scheduler now
+vector<vector<task>> ousterhaut_table;//MATRIX FOR SCHED FOR ALL PROCESSORS (assume we only have two local scheduler now
 
-Job_gang sched[4];//ARRAY FOR TRANSMIT TO SINGLE LOCAL(4 timeslice as a round)
+//Job_gang sched[4];//ARRAY FOR TRANSMIT TO SINGLE LOCAL(4 timeslice as a round)
 
 int global_scheduler_port = 1234;
 //********FUNCTIONS********//
@@ -47,14 +48,14 @@ int handle_event();
 
 int readByevent(int i);
 
-int send_schedules_periodically();
+//int send_schedules_periodically();
 
 /*triggered every hyperperiode(60s) after first trigger(30s after the this program started)*/
 int epoll_timer();
 
 int timer_handler();
 
-void get_schedule();
+int get_and_send_schedule();
 
 int epoll_ntpServer();
 
@@ -64,6 +65,8 @@ void initialise_nst();
 /*nst =last_nst + one hyperperiode (1min)*/
 void update_nst();
 
+/********************************************/
+/*from ntp server*/
 void ntpServer_reply();
 
 void request_process_loop(int fd);
@@ -146,14 +149,15 @@ int handle_event()
     {
         int fd_temp = global_scheduler.events[i].data.fd;
         //Fist situation: send_timer is triggered
-        if(fd_temp == timer_fd)
+        if(fd_temp == timer_fd&&(global_scheduler.events[i].events&EPOLLIN))
         {
-            string s ="\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n";
-            const char* cs = s.c_str();
+            //string s ="\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n";
+            //const char* cs = s.c_str();
             // log_ntp_event("\n==============================\n"
             //         "TIMER TRIGGERED,BEGIN SCHEDULE\n"
             //         "==============================\n");
-            log_ntp_event(cs);
+            //log_ntp_event(cs);
+            printf("\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n");
             if(timer_handler()<0)
             {
                 printf("-----Schedule Generate and send process failed------\n");
@@ -223,25 +227,18 @@ int acceptNewJob(int fd)
 {
     Job_gang job_accept;
     job_accept.ParseFromArray(global_scheduler.read_buffer,1024);
-    // job job_accept;
-    // job_accept.job_id=job_gang.job_id();
-    // job_accept.job_path=job_gang.job_path();
-    // job_accept.requested_processors=job_gang.requested_processors();
-    if(job_accept.requested_processors()>2)
+
+    if(job_accept.requested_processors()>2||(job_accept.requested_processors()==0))
     {
         cout<<"received wrong job, discarded it~"<<endl;
         return -1;
     }
-    //job_queue.push(job_accept);
     job_list.push_back(job_accept);
+
+    need_schedule = true;
+
     cout<<"received a new job, added to job list"<<endl;
-    //sched();
-    // if(global_scheduler.left_child==-1){
-    //     cout<<"we have no client connected yet.."<<endl;
-    // }else{
-        
-    // }
-    // send_schedules();
+
     return 0;
 
 }
@@ -280,14 +277,14 @@ int epoll_timer()
         printf("epoll_timer create failed!\n");
         return -1;
     }
-    struct itimerspec send_timer;
+    //struct itimerspec send_timer;
     //---------------------------------------//
     //triggered every 60s after first trigger
     //(30s after the this program started)
-    send_timer.it_interval.tv_sec=60;
+    send_timer.it_interval.tv_sec=60;//this doesn't work
     send_timer.it_interval.tv_nsec=0;
     send_timer.it_value.tv_nsec=0;
-    send_timer.it_value.tv_sec=30;
+    send_timer.it_value.tv_sec=30;//this works
 
     if(timerfd_settime(timer_fd,0,&send_timer,NULL)<0)
     {
@@ -335,10 +332,6 @@ void initialise_nst()
     next_Starttime.set_min(timeinfo->tm_min+1);
     next_Starttime.set_sec(timeinfo->tm_sec);
     printf("arrived here\n");
-
-    // long long tv_ms = tv->tv_usec/1000;
-    // int ms=(int)tv_ms;
-    // printf("arrived type convert\n ");
     next_Starttime.set_ms(0);
 }
 
@@ -358,91 +351,118 @@ void update_nst()
 
 int timer_handler()
 {
-    if(job_list.size()==0)
+    if(!need_schedule)
     {
-        printf("there is no job received \n");
+        printf("there is no new job received or finished \n");
     }else{
         printf("trying to get schedule using RR\n");
-        get_schedule();
-    
-        printf("SUCESSFULLY GOT SCHEDULE\n");
 
-        if(send_schedules_periodically<0)
+        if(get_and_send_schedule()<0)
         {
-            printf("-----SEND SCHEDULE FAILED------\n");
+            printf("failed to get and send schedules\n");
+            update_nst();
             return -1;
         }
 
         printf("SUCCESSFULLY SEND SCHEDULE OR NO CLIENTS YET\n");
-
     }
-    
-    update_nst();
 
+    update_nst();
     printf("SUCCESSFULLY UPDATED NST\n");
     
     return 0;
     
 }
 
-void get_schedule()
+int get_and_send_schedule()
 {
+    if(!(global_scheduler.left_free||global_scheduler.right_free))
+    {
+        printf("there is no clients available now, will reschedule and retry in next round~\n");
+        return 0;
+    }
     Strategy mysched;
-    vector<task> tasks = mysched.roundRobin(job_list);
+    ousterhaut_table.clear();
+    ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.left_free,global_scheduler.right_free);
 
     printf("successfully got schedule_Tasks(without start time)\n");
 
     schedule common_sched;
     //schedule_temp schedule_Temp;
-    common_sched.set_allocated_start_time(&next_Starttime);
+    common_sched.mutable_start_time()->CopyFrom(next_Starttime);
     printf("successfully set nst\n");
-    int size = tasks.size();
-    printf("sched_tasks has size: %d\n",size);
-    for(vector<task>::iterator it = tasks.begin();it!=tasks.end();it++)
+
+    vector<task>left = ousterhaut_table[0];
+
+    for(vector<task>::iterator it = left.begin();it!=left.end();it++)
     {
         task* common_task = common_sched.add_tasks();
-        printf("create a new task for sched_Tasks\n");
         *common_task = *it;
-        printf("added to sched_tasks\n");
     }
-    printf("arrived outside for loop\n");
     memset(global_scheduler.send_buffer,'\0',1024);
     printf("reset send buffer\n");
     common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
-    printf("send buffer is ready\n");
-}
-
-int send_schedules_periodically()
-{
-    printf("program is in send_schedules_periodically function!\n");
-    if(global_scheduler.right_child>0)
+    printf("send buffer for left child is ready\n");
+    if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
     {
-        if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
-        {
-            printf("failed to send schedule to left child\n");
-            return -1;
-        }
-    
-        if(write(global_scheduler.right_child,global_scheduler.send_buffer,1024)<0)
-        {
-            printf("failed to send schedule to right child\n");
-            return -1;
-        }
-    }else if(global_scheduler.left_child>0)
-    {
-        if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
-        {
-            printf("failed to send schedule to left child\n");
-            return -1;
-        }
-    }else
-    {
-        printf("there is no clients available now, will reschedule and retry in next round~\n");
-        return 0;
+        printf("failed to send schedule to left child\n");
+        return -1;
     }
 
+    common_sched.clear_tasks();
+    vector<task>right = ousterhaut_table[1];
+    for(vector<task>::iterator it = right.begin();it!=right.end();it++)
+    {
+        task* common_task = common_sched.add_tasks();
+        *common_task = *it;
+    }
+    memset(global_scheduler.send_buffer,'\0',1024);
+    printf("reset send buffer\n");
+    common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
+    printf("send buffer for right child is ready\n");
+    if(write(global_scheduler.right_child,global_scheduler.send_buffer,1024)<0)
+    {
+        printf("failed to send schedule to right child\n");
+        return -1;
+    }
+
+    need_schedule = false;
+
     return 0;
+
 }
+
+// int send_schedules_periodically()
+// {
+
+//     if(global_scheduler.right_child>0)
+//     {
+//         if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
+//         {
+//             printf("failed to send schedule to left child\n");
+//             return -1;
+//         }
+    
+//         if(write(global_scheduler.right_child,global_scheduler.send_buffer,1024)<0)
+//         {
+//             printf("failed to send schedule to right child\n");
+//             return -1;
+//         }
+//     }else if(global_scheduler.left_child>0)
+//     {
+//         if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
+//         {
+//             printf("failed to send schedule to left child\n");
+//             return -1;
+//         }
+//     }else
+//     {
+//         printf("there is no clients available now, will reschedule and retry in next round~\n");
+//         return 0;
+//     }
+
+//     return 0;
+// }
 
 
 /****************************************************/

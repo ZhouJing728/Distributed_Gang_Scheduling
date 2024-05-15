@@ -287,11 +287,33 @@ class task : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
 
   // accessors -------------------------------------------------------
 
-  // int32 task_id = 2;
+  // string task_id = 2;
   void clear_task_id();
   static const int kTaskIdFieldNumber = 2;
-  ::google::protobuf::int32 task_id() const;
-  void set_task_id(::google::protobuf::int32 value);
+  const ::std::string& task_id() const;
+  void set_task_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_task_id(::std::string&& value);
+  #endif
+  void set_task_id(const char* value);
+  void set_task_id(const char* value, size_t size);
+  ::std::string* mutable_task_id();
+  ::std::string* release_task_id();
+  void set_allocated_task_id(::std::string* task_id);
+
+  // string path = 22;
+  void clear_path();
+  static const int kPathFieldNumber = 22;
+  const ::std::string& path() const;
+  void set_path(const ::std::string& value);
+  #if LANG_CXX11
+  void set_path(::std::string&& value);
+  #endif
+  void set_path(const char* value);
+  void set_path(const char* value, size_t size);
+  ::std::string* mutable_path();
+  ::std::string* release_path();
+  void set_allocated_path(::std::string* path);
 
   // int32 duration_ms = 3;
   void clear_duration_ms();
@@ -303,7 +325,8 @@ class task : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::int32 task_id_;
+  ::google::protobuf::internal::ArenaStringPtr task_id_;
+  ::google::protobuf::internal::ArenaStringPtr path_;
   ::google::protobuf::int32 duration_ms_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_MESSAGES_2fmessage_2eproto::TableStruct;
@@ -774,18 +797,57 @@ inline void schedule::set_allocated_start_time(::Message::protobuf::start_time* 
 
 // task
 
-// int32 task_id = 2;
+// string task_id = 2;
 inline void task::clear_task_id() {
-  task_id_ = 0;
+  task_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::google::protobuf::int32 task::task_id() const {
+inline const ::std::string& task::task_id() const {
   // @@protoc_insertion_point(field_get:Message.protobuf.task.task_id)
-  return task_id_;
+  return task_id_.GetNoArena();
 }
-inline void task::set_task_id(::google::protobuf::int32 value) {
+inline void task::set_task_id(const ::std::string& value) {
   
-  task_id_ = value;
+  task_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:Message.protobuf.task.task_id)
+}
+#if LANG_CXX11
+inline void task::set_task_id(::std::string&& value) {
+  
+  task_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Message.protobuf.task.task_id)
+}
+#endif
+inline void task::set_task_id(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  task_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Message.protobuf.task.task_id)
+}
+inline void task::set_task_id(const char* value, size_t size) {
+  
+  task_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Message.protobuf.task.task_id)
+}
+inline ::std::string* task::mutable_task_id() {
+  
+  // @@protoc_insertion_point(field_mutable:Message.protobuf.task.task_id)
+  return task_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* task::release_task_id() {
+  // @@protoc_insertion_point(field_release:Message.protobuf.task.task_id)
+  
+  return task_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void task::set_allocated_task_id(::std::string* task_id) {
+  if (task_id != NULL) {
+    
+  } else {
+    
+  }
+  task_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), task_id);
+  // @@protoc_insertion_point(field_set_allocated:Message.protobuf.task.task_id)
 }
 
 // int32 duration_ms = 3;
@@ -800,6 +862,59 @@ inline void task::set_duration_ms(::google::protobuf::int32 value) {
   
   duration_ms_ = value;
   // @@protoc_insertion_point(field_set:Message.protobuf.task.duration_ms)
+}
+
+// string path = 22;
+inline void task::clear_path() {
+  path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& task::path() const {
+  // @@protoc_insertion_point(field_get:Message.protobuf.task.path)
+  return path_.GetNoArena();
+}
+inline void task::set_path(const ::std::string& value) {
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Message.protobuf.task.path)
+}
+#if LANG_CXX11
+inline void task::set_path(::std::string&& value) {
+  
+  path_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Message.protobuf.task.path)
+}
+#endif
+inline void task::set_path(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Message.protobuf.task.path)
+}
+inline void task::set_path(const char* value, size_t size) {
+  
+  path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Message.protobuf.task.path)
+}
+inline ::std::string* task::mutable_path() {
+  
+  // @@protoc_insertion_point(field_mutable:Message.protobuf.task.path)
+  return path_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* task::release_path() {
+  // @@protoc_insertion_point(field_release:Message.protobuf.task.path)
+  
+  return path_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void task::set_allocated_path(::std::string* path) {
+  if (path != NULL) {
+    
+  } else {
+    
+  }
+  path_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), path);
+  // @@protoc_insertion_point(field_set_allocated:Message.protobuf.task.path)
 }
 
 // -------------------------------------------------------------------

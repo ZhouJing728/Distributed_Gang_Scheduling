@@ -12,7 +12,6 @@
 #include <pthread.h>
 #include "ntp_client-Gaa/src/ntp_client.c"
 #include "ntp_client-Gaa/src/xtime.c"//time.h also in there
-
 #define MINIMUM_TIME_UNIT 5
 #define NUM_THREADS 2
 #define CGROUP_PATH "./cgroup"
@@ -259,6 +258,7 @@ void *pthread_ntp(void *arg){
         xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);
         if (XTMVNSEC_IS_VALID(xtm_vnsec))
         {
+            printf("arrived 1\n");
             xtm_ltime = time_vnsec();
             xtm_descr = time_vtod(xtm_vnsec);
             xtm_local = time_vtod(xtm_ltime);
@@ -289,6 +289,7 @@ void *pthread_ntp(void *arg){
                     xtm_local.ctx_msec  );
 
             deviation_in_microsecond = ((x_int64_t)(xtm_ltime - xtm_vnsec)) / 10LL;
+            //deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
             printf("\tDeviation    : %lld us\n",
                     deviation_in_microsecond);
             printf("============================================\n");

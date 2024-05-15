@@ -137,9 +137,11 @@ int Server::new_connection(int i)
     }else if(left_child>0)
     {
         right_child = server_accept;
+        right_free = true;
         cout<<"new client comes as right child for this server"<<endl;
     }else{
         left_child = server_accept;
+        left_free = true;
         cout<<"new client comes as left child for this server"<<endl;
     }
 

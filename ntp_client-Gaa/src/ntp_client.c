@@ -549,11 +549,36 @@ static x_void_t ntp_hton_packet(xntp_pack_t * xnpt_nptr)
  */
 static xtime_vnsec_t ntp_calc_4T(xtime_vnsec_t xtm_4time[4])
 {
+    printf("arrived 4\n");
     x_int64_t xtm_T21 = ((x_int64_t)xtm_4time[1]) - ((x_int64_t)xtm_4time[0]);
     x_int64_t xtm_T34 = ((x_int64_t)xtm_4time[2]) - ((x_int64_t)xtm_4time[3]);
     x_int64_t xtm_TXX = ((x_int64_t)xtm_4time[3]) + ((xtm_T21 + xtm_T34) / 2);
 
     return (xtime_vnsec_t)xtm_TXX;
+
+}
+/**************************************************************/
+/***
+*@brief calculating the deviation between client and server,
+*using the Formula : t = ((T2 - T1) + (T3 - T4)) / 2;
+*same as t= t = ((T2 - T1) - (T4 - T3)) / 2 = T-T4;
+*@note 
+*
+t1 is the client's timestamp of the request packet transmission,
+t2 is the server's timestamp of the request packet reception,
+t3 is the server's timestamp of the response packet transmission and
+t4 is the client's timestamp of the response packet reception.[1]: 19 
+
+*/
+static x_int64_t ntp_calc_4T_by_Jing(xtime_vnsec_t xtm_4time[4])
+{
+    printf("arrived 3\n");
+    x_int64_t xtm_T21 = ((x_int64_t)xtm_4time[1]) - ((x_int64_t)xtm_4time[0]);
+    x_int64_t xtm_T34 = ((x_int64_t)xtm_4time[2]) - ((x_int64_t)xtm_4time[3]);
+    x_int64_t xtm_TXX = ((xtm_T21 + xtm_T34) /2);
+    
+    return xtm_TXX;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -595,6 +620,7 @@ static x_int32_t ntpcli_get_4T(
                     x_cstring_t xszt_host,
                     x_uint32_t xut_tmout)
 {
+    printf("arrived 9\n");
     x_int32_t xit_errno = EPERM;
 
     xntp_pack_t        xnpt_pack;
@@ -674,7 +700,7 @@ static x_int32_t ntpcli_get_4T(
             xtm_value.tv_sec  = (xut_tmout / 1000);
             xtm_value.tv_usec = (xut_tmout % 1000) * 1000;
         }
-
+        printf("arrived 12\n");
         xit_errno = select(
                         (x_int32_t)(xntp_this->xfdt_sockfd + 1),
                         &xfds_rset,
@@ -694,7 +720,7 @@ static x_int32_t ntpcli_get_4T(
         }
 
         //======================================
-
+        printf("arrived 10\n");
         memset(&xnpt_pack, 0, sizeof(xntp_pack_t));
 
         // 接收应答
@@ -752,6 +778,7 @@ static x_int32_t ntpcli_get_4T(
         //======================================
         xit_errno = 0;
     } while (0);
+    printf("arrived 11 \n");
 
     return xit_errno;
 }
@@ -970,6 +997,43 @@ x_int32_t ntpcli_config(
  */
 xtime_vnsec_t ntpcli_req_time(xntp_cliptr_t xntp_this, x_uint32_t xut_tmout)
 {
+    printf("arrived 5\n");
+    x_int32_t xit_errno = EPERM;
+
+    //======================================
+    // 参数验证
+
+    if (X_NULL == xntp_this)
+    {
+        errno = EINVAL;
+        return XTIME_INVALID_VNSEC;
+    }
+    printf("arrived 6\n");
+    //======================================
+
+    if (name_is_ipv4(xntp_this->xszt_host, X_NULL))
+        xit_errno = ntpcli_get_4T(xntp_this, xntp_this->xszt_host, xut_tmout);
+    else
+        xit_errno = ntpcli_get_4T_by_name(xntp_this, xut_tmout);
+
+    printf("arrived 7\n");
+
+    if (0 != xit_errno)
+    {
+        printf("arrived 8\n");
+        errno = xit_errno;
+        return XTIME_INVALID_VNSEC;
+    }
+
+    //======================================
+    printf("arrived 2\n");
+    return ntp_calc_4T(xntp_this->xtm_4time);
+
+    //======================================
+}
+
+x_int64_t ntpcli_req_time_by_Jing(xntp_cliptr_t xntp_this, x_uint32_t xut_tmout)
+{
     x_int32_t xit_errno = EPERM;
 
     //======================================
@@ -996,7 +1060,7 @@ xtime_vnsec_t ntpcli_req_time(xntp_cliptr_t xntp_this, x_uint32_t xut_tmout)
 
     //======================================
 
-    return ntp_calc_4T(xntp_this->xtm_4time);
+    return ntp_calc_4T_by_Jing(xntp_this->xtm_4time);
 
     //======================================
 }

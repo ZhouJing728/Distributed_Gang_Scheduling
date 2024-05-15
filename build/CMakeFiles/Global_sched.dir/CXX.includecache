@@ -39,8 +39,6 @@ iostream
 -
 vector
 -
-cstring
--
 ../MESSAGES/message.pb.h
 /root/DGS/MESSAGES/message.pb.h
 
