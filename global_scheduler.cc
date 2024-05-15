@@ -10,7 +10,7 @@
 #include <time.h> /* for time() and ctime() */
 
 #define UTC_NTP 2208988800U /* 1970 - 1900 */
-#include "ntp-master/ntp-master/server.h"
+//#include "ntp-master/ntp-master/server.h"
 /* end from ntp server*/
 /********************************************/
 using namespace std;
@@ -67,6 +67,7 @@ void update_nst();
 
 /********************************************/
 /*from ntp server*/
+extern "C"{
 void ntpServer_reply();
 
 void request_process_loop(int fd);
@@ -82,7 +83,7 @@ void log_ntp_event(const char *msg);
 void log_request_arrive(uint32_t *ntp_time);
 int die(const char *msg);
 void gettime64(uint32_t ts[]);
-
+}
 
 int main()
 {
@@ -151,12 +152,6 @@ int handle_event()
         //Fist situation: send_timer is triggered
         if(fd_temp == timer_fd&&(global_scheduler.events[i].events&EPOLLIN))
         {
-            //string s ="\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n";
-            //const char* cs = s.c_str();
-            // log_ntp_event("\n==============================\n"
-            //         "TIMER TRIGGERED,BEGIN SCHEDULE\n"
-            //         "==============================\n");
-            //log_ntp_event(cs);
             printf("\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n");
             if(timer_handler()<0)
             {
@@ -351,6 +346,13 @@ void update_nst()
 
 int timer_handler()
 {
+    uint64_t exp;
+    if(read(timer_fd,&exp,sizeof(uint64_t))<0)
+    {
+        cout<<"failed read from timer"<<endl;
+        return -1;
+    }
+
     if(!need_schedule)
     {
         printf("there is no new job received or finished \n");
@@ -467,193 +469,193 @@ int get_and_send_schedule()
 
 /****************************************************/
 /******************from ntp server*******************/
-void gettime64(uint32_t ts[])
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
+// void gettime64(uint32_t ts[])
+// {
+// 	struct timeval tv;
+// 	gettimeofday(&tv, NULL);
 
-	ts[0] = tv.tv_sec + UTC_NTP;
-	ts[1] = (4294*(tv.tv_usec)) + ((1981*(tv.tv_usec))>>11);
-}
-
-
-int die(const char *msg)
-{
-	if (msg) {
-		fputs(msg, stderr);
-	}
-	exit(-1);
-}
+// 	ts[0] = tv.tv_sec + UTC_NTP;
+// 	ts[1] = (4294*(tv.tv_usec)) + ((1981*(tv.tv_usec))>>11);
+// }
 
 
-void log_request_arrive(uint32_t *ntp_time)
-{
-	time_t t; 
-
-	if (ntp_time) {
-		t = *ntp_time - UTC_NTP;
-	} else {
-		t = time(NULL);
-	}
-	printf("A request comes at: %s", ctime(&t));
-}
+// int die(const char *msg)
+// {
+// 	if (msg) {
+// 		fputs(msg, stderr);
+// 	}
+// 	exit(-1);
+// }
 
 
-void log_ntp_event(const char *msg)
-{
-	puts(msg);
-}
+// void log_request_arrive(uint32_t *ntp_time)
+// {
+// 	time_t t; 
+
+// 	if (ntp_time) {
+// 		t = *ntp_time - UTC_NTP;
+// 	} else {
+// 		t = time(NULL);
+// 	}
+// 	printf("A request comes at: %s", ctime(&t));
+// }
 
 
-int ntp_reply(
-	int socket_fd,
-	struct sockaddr *saddr_p,
-	socklen_t saddrlen,
-	unsigned char recv_buf[],
-	uint32_t recv_time[])
-{
-	/* Assume that recv_time is in local endian ! */
-	unsigned char send_buf[48];
-	uint32_t *u32p;
-
- 	/* do not use 0xC7 because the LI can be `unsynchronized` */
-	if ((recv_buf[0] & 0x07/*0xC7*/) != 0x3) {
-		/* LI VN Mode stimmt nicht */
-        string s ="Invalid request: found error at the first byte";
-        const char* cs= s.c_str();
-		log_ntp_event(cs);
-		return 1;
-	}
-
-	/* füllt LI VN Mode aus
-	   	LI   = 0
-		VN   = Version Nummer aus dem Client
-		Mode = 4
-	 */
-	send_buf[0] = (recv_buf[0] & 0x38) + 4;
-
-	/* Stratum = 1 (primary reference)
-	   Reference ID = 'LOCL"
-
-	       (falscher) Bezug auf der lokalen Uhr.
-	 */
-	/* Stratum */
-	send_buf[1] = 0x01;
-	/* Reference ID = "LOCL" */
-	*(uint32_t*)&send_buf[12] = htonl(0x4C4F434C);
-
-	/* Copy Poll */
-	send_buf[2] = recv_buf[2];
-
-	/* Precision in Microsecond ( from API gettimeofday() ) */
-	send_buf[3] = (signed char)(-6);  /* 2^(-6) sec */
-
-	/* danach sind alle Werte DWORD aligned  */
-	u32p = (uint32_t *)&send_buf[4];
-	/* zur Vereinfachung , Root Delay = 0, Root Dispersion = 0 */
-	*u32p++ = 0;
-	*u32p++ = 0;
-
-	/* Reference ID ist vorher eingetragen */
-	u32p++;
-
-	/* falscher Reference TimeStamp,
-	 * wird immer vor eine minute synchronisiert,
-	 * damit die Überprüfung in Client zu belügen */
-	gettime64(u32p);
-	*u32p = htonl(*u32p - 60);   /* -1 Min.*/
-	u32p++;
-	*u32p = htonl(*u32p);   /* -1 Min.*/
-	u32p++;
-
-	/* Originate Time = Transmit Time @ Client */
-	*u32p++ = *(uint32_t *)&recv_buf[40];
-	*u32p++ = *(uint32_t *)&recv_buf[44];
-
-	/* Receive Time @ Server */
-	*u32p++ = htonl(recv_time[0]);
-	*u32p++ = htonl(recv_time[1]);
-
-	/* zum Schluss: Transmit Time*/
-	gettime64(u32p);
-	*u32p = htonl(*u32p);   /* -1 Min.*/
-	u32p++;
-	*u32p = htonl(*u32p);   /* -1 Min.*/
-
-	if ( sendto( socket_fd,
-		     send_buf,
-		     sizeof(send_buf), 0,
-		     saddr_p, saddrlen)
-	     < 48) {
-		perror("sendto error");
-		return 1;
-	}
-
-	return 0;
-}
+// void log_ntp_event(const char *msg)
+// {
+// 	puts(msg);
+// }
 
 
-void request_process_loop(int fd)
-{
-	struct sockaddr src_addr;
-	socklen_t src_addrlen = sizeof(src_addr);
-	unsigned char buf[48];
-	uint32_t recv_time[2];
-	//pid_t pid;
+// int ntp_reply(
+// 	int socket_fd,
+// 	struct sockaddr *saddr_p,
+// 	socklen_t saddrlen,
+// 	unsigned char recv_buf[],
+// 	uint32_t recv_time[])
+// {
+// 	/* Assume that recv_time is in local endian ! */
+// 	unsigned char send_buf[48];
+// 	uint32_t *u32p;
 
-	//while (1) {
-		while (recvfrom(fd, buf,
-				48, 0,
-				&src_addr,
-				&src_addrlen)
-			< 48 );  /* invalid request */
+//  	/* do not use 0xC7 because the LI can be `unsynchronized` */
+// 	if ((recv_buf[0] & 0x07/*0xC7*/) != 0x3) {
+// 		/* LI VN Mode stimmt nicht */
+//         string s ="Invalid request: found error at the first byte";
+//         const char* cs= s.c_str();
+// 		log_ntp_event(cs);
+// 		return 1;
+// 	}
 
-		gettime64(recv_time);
-		/* recv_time in local endian */
-		log_request_arrive(recv_time);
+// 	/* füllt LI VN Mode aus
+// 	   	LI   = 0
+// 		VN   = Version Nummer aus dem Client
+// 		Mode = 4
+// 	 */
+// 	send_buf[0] = (recv_buf[0] & 0x38) + 4;
 
-		//pid = fork();
-		//if (pid == 0) {
-			/* Child */
-			ntp_reply(fd, &src_addr , src_addrlen, buf, recv_time);
-			//exit(0);
-		//} else if (pid == -1) {
-			//perror("fork() error");
-			//die(NULL);
-		//}
-		/* return to parent */
-	//}
-}
+// 	/* Stratum = 1 (primary reference)
+// 	   Reference ID = 'LOCL"
+
+// 	       (falscher) Bezug auf der lokalen Uhr.
+// 	 */
+// 	/* Stratum */
+// 	send_buf[1] = 0x01;
+// 	/* Reference ID = "LOCL" */
+// 	*(uint32_t*)&send_buf[12] = htonl(0x4C4F434C);
+
+// 	/* Copy Poll */
+// 	send_buf[2] = recv_buf[2];
+
+// 	/* Precision in Microsecond ( from API gettimeofday() ) */
+// 	send_buf[3] = (signed char)(-6);  /* 2^(-6) sec */
+
+// 	/* danach sind alle Werte DWORD aligned  */
+// 	u32p = (uint32_t *)&send_buf[4];
+// 	/* zur Vereinfachung , Root Delay = 0, Root Dispersion = 0 */
+// 	*u32p++ = 0;
+// 	*u32p++ = 0;
+
+// 	/* Reference ID ist vorher eingetragen */
+// 	u32p++;
+
+// 	/* falscher Reference TimeStamp,
+// 	 * wird immer vor eine minute synchronisiert,
+// 	 * damit die Überprüfung in Client zu belügen */
+// 	gettime64(u32p);
+// 	*u32p = htonl(*u32p - 60);   /* -1 Min.*/
+// 	u32p++;
+// 	*u32p = htonl(*u32p);   /* -1 Min.*/
+// 	u32p++;
+
+// 	/* Originate Time = Transmit Time @ Client */
+// 	*u32p++ = *(uint32_t *)&recv_buf[40];
+// 	*u32p++ = *(uint32_t *)&recv_buf[44];
+
+// 	/* Receive Time @ Server */
+// 	*u32p++ = htonl(recv_time[0]);
+// 	*u32p++ = htonl(recv_time[1]);
+
+// 	/* zum Schluss: Transmit Time*/
+// 	gettime64(u32p);
+// 	*u32p = htonl(*u32p);   /* -1 Min.*/
+// 	u32p++;
+// 	*u32p = htonl(*u32p);   /* -1 Min.*/
+
+// 	if ( sendto( socket_fd,
+// 		     send_buf,
+// 		     sizeof(send_buf), 0,
+// 		     saddr_p, saddrlen)
+// 	     < 48) {
+// 		perror("sendto error");
+// 		return 1;
+// 	}
+
+// 	return 0;
+// }
 
 
-int ntp_server(struct sockaddr_in bind_addr)
-{
-	int s;
-	struct sockaddr_in sinaddr;
+// void request_process_loop(int fd)
+// {
+// 	struct sockaddr src_addr;
+// 	socklen_t src_addrlen = sizeof(src_addr);
+// 	unsigned char buf[48];
+// 	uint32_t recv_time[2];
+// 	//pid_t pid;
 
-	s = socket(AF_INET, SOCK_DGRAM, 0);
-	if (s == -1) {
-		perror("Can not create socket.");
-		die(NULL);
-	}
+// 	//while (1) {
+// 		while (recvfrom(fd, buf,
+// 				48, 0,
+// 				&src_addr,
+// 				&src_addrlen)
+// 			< 48 );  /* invalid request */
 
-	memset(&sinaddr, 0, sizeof(sinaddr));
-	sinaddr.sin_family = AF_INET;
-	sinaddr.sin_port = htons(123);
-	sinaddr.sin_addr.s_addr = bind_addr.sin_addr.s_addr;
+// 		gettime64(recv_time);
+// 		/* recv_time in local endian */
+// 		log_request_arrive(recv_time);
 
-	if (0 != bind(s, (struct sockaddr *)&sinaddr, sizeof(sinaddr))) {
-		perror("Bind error");
-		die(NULL);
-	}
-    string str = "\n========================================\n""= Server started, waiting for requests =\n""========================================\n";
-    const char* cs = str.c_str();
-	// log_ntp_event(	"\n========================================\n"
-	// 		"= Server started, waiting for requests =\n"
-	// 		"========================================\n");
-    log_ntp_event(cs);
+// 		//pid = fork();
+// 		//if (pid == 0) {
+// 			/* Child */
+// 			ntp_reply(fd, &src_addr , src_addrlen, buf, recv_time);
+// 			//exit(0);
+// 		//} else if (pid == -1) {
+// 			//perror("fork() error");
+// 			//die(NULL);
+// 		//}
+// 		/* return to parent */
+// 	//}
+// }
 
-	return s;
-	//request_process_loop(s);
-	//close(s);
-}
+
+// int ntp_server(struct sockaddr_in bind_addr)
+// {
+// 	int s;
+// 	struct sockaddr_in sinaddr;
+
+// 	s = socket(AF_INET, SOCK_DGRAM, 0);
+// 	if (s == -1) {
+// 		perror("Can not create socket.");
+// 		die(NULL);
+// 	}
+
+// 	memset(&sinaddr, 0, sizeof(sinaddr));
+// 	sinaddr.sin_family = AF_INET;
+// 	sinaddr.sin_port = htons(123);
+// 	sinaddr.sin_addr.s_addr = bind_addr.sin_addr.s_addr;
+
+// 	if (0 != bind(s, (struct sockaddr *)&sinaddr, sizeof(sinaddr))) {
+// 		perror("Bind error");
+// 		die(NULL);
+// 	}
+//     string str = "\n========================================\n""= Server started, waiting for requests =\n""========================================\n";
+//     const char* cs = str.c_str();
+// 	// log_ntp_event(	"\n========================================\n"
+// 	// 		"= Server started, waiting for requests =\n"
+// 	// 		"========================================\n");
+//     log_ntp_event(cs);
+
+// 	return s;
+// 	//request_process_loop(s);
+// 	//close(s);
+// }
