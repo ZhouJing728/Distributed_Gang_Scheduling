@@ -6,5 +6,5 @@ CXX_FLAGS =
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/root/DGS -I/root/DGS/MESSAGES -I/root/DGS/JOBS -I/root/DGS/SCHED_STRATEGY -I/root/DGS/ntp-master/ntp-master 
+CXX_INCLUDES = -I/root/DGS -I/root/DGS/MESSAGES -I/root/DGS/JOBS -I/root/DGS/SCHED_STRATEGY -I/root/DGS/ntp-master/ntp-master -I/root/DGS/ntp_client-Gaa 
 

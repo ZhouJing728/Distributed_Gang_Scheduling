@@ -156,8 +156,6 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::start_time, hour_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::start_time, min_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::start_time, sec_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::start_time, ms_),
   ~0u,  // no _has_bits_
@@ -180,8 +178,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 0, -1, sizeof(::Message::protobuf::schedule)},
   { 7, -1, sizeof(::Message::protobuf::task)},
   { 15, -1, sizeof(::Message::protobuf::start_time)},
-  { 24, -1, sizeof(::Message::protobuf::Job_gang)},
-  { 32, -1, sizeof(::Message::protobuf::Message_from_Local)},
+  { 22, -1, sizeof(::Message::protobuf::Job_gang)},
+  { 30, -1, sizeof(::Message::protobuf::Message_from_Local)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -218,15 +216,14 @@ void AddDescriptorsImpl() {
       "protobuf.task\0220\n\nstart_time\030\t \001(\0132\034.Mess"
       "age.protobuf.start_time\":\n\004task\022\017\n\007task_"
       "id\030\002 \001(\t\022\023\n\013duration_ms\030\003 \001(\005\022\014\n\004path\030\026 "
-      "\001(\t\"@\n\nstart_time\022\014\n\004hour\030\004 \001(\005\022\013\n\003min\030\005"
-      " \001(\005\022\013\n\003sec\030\006 \001(\005\022\n\n\002ms\030\007 \001(\003\"J\n\010Job_gan"
-      "g\022\016\n\006job_id\030\n \001(\005\022\034\n\024requested_processor"
-      "s\030\013 \001(\005\022\020\n\010job_path\030\014 \001(\t\"5\n\022Message_fro"
-      "m_Local\022\017\n\007task_id\030\r \001(\005\022\016\n\006status\030\016 \001(\t"
-      "b\006proto3"
+      "\001(\t\"%\n\nstart_time\022\013\n\003sec\030\006 \001(\003\022\n\n\002ms\030\007 \001"
+      "(\003\"J\n\010Job_gang\022\016\n\006job_id\030\n \001(\005\022\034\n\024reques"
+      "ted_processors\030\013 \001(\005\022\020\n\010job_path\030\014 \001(\t\"5"
+      "\n\022Message_from_Local\022\017\n\007task_id\030\r \001(\005\022\016\n"
+      "\006status\030\016 \001(\tb\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 408);
+      descriptor, 381);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "MESSAGES/message.proto", &protobuf_RegisterTypes);
 }
@@ -868,8 +865,6 @@ void task::InternalSwap(task* other) {
 void start_time::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int start_time::kHourFieldNumber;
-const int start_time::kMinFieldNumber;
 const int start_time::kSecFieldNumber;
 const int start_time::kMsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -885,16 +880,16 @@ start_time::start_time(const start_time& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::memcpy(&hour_, &from.hour_,
+  ::memcpy(&sec_, &from.sec_,
     static_cast<size_t>(reinterpret_cast<char*>(&ms_) -
-    reinterpret_cast<char*>(&hour_)) + sizeof(ms_));
+    reinterpret_cast<char*>(&sec_)) + sizeof(ms_));
   // @@protoc_insertion_point(copy_constructor:Message.protobuf.start_time)
 }
 
 void start_time::SharedCtor() {
-  ::memset(&hour_, 0, static_cast<size_t>(
+  ::memset(&sec_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&ms_) -
-      reinterpret_cast<char*>(&hour_)) + sizeof(ms_));
+      reinterpret_cast<char*>(&sec_)) + sizeof(ms_));
 }
 
 start_time::~start_time() {
@@ -925,9 +920,9 @@ void start_time::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&hour_, 0, static_cast<size_t>(
+  ::memset(&sec_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&ms_) -
-      reinterpret_cast<char*>(&hour_)) + sizeof(ms_));
+      reinterpret_cast<char*>(&sec_)) + sizeof(ms_));
   _internal_metadata_.Clear();
 }
 
@@ -941,41 +936,13 @@ bool start_time::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 hour = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &hour_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int32 min = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &min_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int32 sec = 6;
+      // int64 sec = 6;
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
                  input, &sec_)));
         } else {
           goto handle_unusual;
@@ -1023,19 +990,9 @@ void start_time::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 hour = 4;
-  if (this->hour() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->hour(), output);
-  }
-
-  // int32 min = 5;
-  if (this->min() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->min(), output);
-  }
-
-  // int32 sec = 6;
+  // int64 sec = 6;
   if (this->sec() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->sec(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(6, this->sec(), output);
   }
 
   // int64 ms = 7;
@@ -1057,19 +1014,9 @@ void start_time::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 hour = 4;
-  if (this->hour() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->hour(), target);
-  }
-
-  // int32 min = 5;
-  if (this->min() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->min(), target);
-  }
-
-  // int32 sec = 6;
+  // int64 sec = 6;
   if (this->sec() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->sec(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(6, this->sec(), target);
   }
 
   // int64 ms = 7;
@@ -1094,24 +1041,10 @@ size_t start_time::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // int32 hour = 4;
-  if (this->hour() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->hour());
-  }
-
-  // int32 min = 5;
-  if (this->min() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->min());
-  }
-
-  // int32 sec = 6;
+  // int64 sec = 6;
   if (this->sec() != 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->sec());
   }
 
@@ -1149,12 +1082,6 @@ void start_time::MergeFrom(const start_time& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.hour() != 0) {
-    set_hour(from.hour());
-  }
-  if (from.min() != 0) {
-    set_min(from.min());
-  }
   if (from.sec() != 0) {
     set_sec(from.sec());
   }
@@ -1187,8 +1114,6 @@ void start_time::Swap(start_time* other) {
 }
 void start_time::InternalSwap(start_time* other) {
   using std::swap;
-  swap(hour_, other->hour_);
-  swap(min_, other->min_);
   swap(sec_, other->sec_);
   swap(ms_, other->ms_);
   _internal_metadata_.Swap(&other->_internal_metadata_);

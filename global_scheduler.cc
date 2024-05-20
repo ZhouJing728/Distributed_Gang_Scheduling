@@ -24,6 +24,8 @@ int ntp_fd;
 
 int timer_fd;
 
+int hyperperiode_ms;
+
 bool need_schedule = false;
 
 struct itimerspec send_timer;
@@ -38,6 +40,27 @@ vector<vector<task>> ousterhaut_table;//MATRIX FOR SCHED FOR ALL PROCESSORS (ass
 //Job_gang sched[4];//ARRAY FOR TRANSMIT TO SINGLE LOCAL(4 timeslice as a round)
 
 int global_scheduler_port = 1234;
+
+/********************************************/
+/*from ntp server*/
+extern "C"{
+    void ntpServer_reply();
+
+    void request_process_loop(int fd);
+    int ntp_server(struct sockaddr_in bind_addr);
+    void wait_wrapper();
+    int ntp_reply(
+        int socket_fd,
+        struct sockaddr *saddr_p,
+        socklen_t saddrlen,
+        unsigned char recv_buf[],
+        uint32_t recv_time[]);
+    void log_ntp_event(const char *msg);
+    void log_request_arrive(uint32_t *ntp_time);
+    int die(const char *msg);
+    void gettime64(uint32_t ts[]);
+}
+
 //********FUNCTIONS********//
 
 int acceptNewJob(int fd);
@@ -65,25 +88,6 @@ void initialise_nst();
 /*nst =last_nst + one hyperperiode (1min)*/
 void update_nst();
 
-/********************************************/
-/*from ntp server*/
-extern "C"{
-void ntpServer_reply();
-
-void request_process_loop(int fd);
-int ntp_server(struct sockaddr_in bind_addr);
-void wait_wrapper();
-int ntp_reply(
-	int socket_fd,
-	struct sockaddr *saddr_p,
-	socklen_t saddrlen,
-	unsigned char recv_buf[],
-	uint32_t recv_time[]);
-void log_ntp_event(const char *msg);
-void log_request_arrive(uint32_t *ntp_time);
-int die(const char *msg);
-void gettime64(uint32_t ts[]);
-}
 
 int main()
 {
@@ -313,6 +317,7 @@ int epoll_ntpServer()
     return 0;
 }
 
+//current time + 1s
 void initialise_nst()
 {
     time_t current_time;
@@ -323,25 +328,41 @@ void initialise_nst()
     printf("got current time in us\n");
     tm* timeinfo = localtime(&current_time);
     printf("converted time structure\n");
-    next_Starttime.set_hour(timeinfo->tm_hour);
-    next_Starttime.set_min(timeinfo->tm_min+1);
-    next_Starttime.set_sec(timeinfo->tm_sec);
+    next_Starttime.set_sec(tv->tv_sec+1);
     printf("arrived here\n");
-    next_Starttime.set_ms(0);
+    next_Starttime.set_ms(tv->tv_usec/1000);
 }
 
 void update_nst()
 {
-    if(next_Starttime.min()<59)
+    // if(next_Starttime.min()<59)
+    // {
+    //     next_Starttime.set_min(next_Starttime.min()+1);
+    // }else if(next_Starttime.hour()<23){
+    //     next_Starttime.set_hour(next_Starttime.hour()+1);
+    //     next_Starttime.set_min(0);
+    // }else{
+    //     next_Starttime.set_hour(0);
+    //     next_Starttime.set_min(0);
+    // }
+    //set 1ms for interval between two schedules,cause it could be a few time through code lines.
+    Strategy Strategy;
+    int interval_ms=1;
+    int hyperperiode_ms = Strategy.get_hyperperiode_ms();
+    if(!hyperperiode_ms)//none schedule yet
     {
-        next_Starttime.set_min(next_Starttime.min()+1);
-    }else if(next_Starttime.hour()<23){
-        next_Starttime.set_hour(next_Starttime.hour()+1);
-        next_Starttime.set_min(0);
+        initialise_nst();
     }else{
-        next_Starttime.set_hour(0);
-        next_Starttime.set_min(0);
+        int64_t final_ms= next_Starttime.ms()+interval_ms+hyperperiode_ms;
+        if(final_ms>=1000)
+        {
+            next_Starttime.set_sec(next_Starttime.sec()+(final_ms/1000));
+            next_Starttime.set_ms(final_ms%1000);
+        }else{
+            next_Starttime.set_ms(final_ms);
+        }
     }
+
 }
 
 int timer_handler()

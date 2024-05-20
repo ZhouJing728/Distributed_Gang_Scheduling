@@ -15,6 +15,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../JOBS"
   "../SCHED_STRATEGY"
   "../ntp-master/ntp-master"
+  "../ntp_client-Gaa"
   )
 
 # Targets to which this target links.

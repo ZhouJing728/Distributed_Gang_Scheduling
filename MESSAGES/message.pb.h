@@ -420,23 +420,11 @@ class start_time : public ::google::protobuf::Message /* @@protoc_insertion_poin
 
   // accessors -------------------------------------------------------
 
-  // int32 hour = 4;
-  void clear_hour();
-  static const int kHourFieldNumber = 4;
-  ::google::protobuf::int32 hour() const;
-  void set_hour(::google::protobuf::int32 value);
-
-  // int32 min = 5;
-  void clear_min();
-  static const int kMinFieldNumber = 5;
-  ::google::protobuf::int32 min() const;
-  void set_min(::google::protobuf::int32 value);
-
-  // int32 sec = 6;
+  // int64 sec = 6;
   void clear_sec();
   static const int kSecFieldNumber = 6;
-  ::google::protobuf::int32 sec() const;
-  void set_sec(::google::protobuf::int32 value);
+  ::google::protobuf::int64 sec() const;
+  void set_sec(::google::protobuf::int64 value);
 
   // int64 ms = 7;
   void clear_ms();
@@ -448,9 +436,7 @@ class start_time : public ::google::protobuf::Message /* @@protoc_insertion_poin
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::int32 hour_;
-  ::google::protobuf::int32 min_;
-  ::google::protobuf::int32 sec_;
+  ::google::protobuf::int64 sec_;
   ::google::protobuf::int64 ms_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_MESSAGES_2fmessage_2eproto::TableStruct;
@@ -921,43 +907,15 @@ inline void task::set_allocated_path(::std::string* path) {
 
 // start_time
 
-// int32 hour = 4;
-inline void start_time::clear_hour() {
-  hour_ = 0;
-}
-inline ::google::protobuf::int32 start_time::hour() const {
-  // @@protoc_insertion_point(field_get:Message.protobuf.start_time.hour)
-  return hour_;
-}
-inline void start_time::set_hour(::google::protobuf::int32 value) {
-  
-  hour_ = value;
-  // @@protoc_insertion_point(field_set:Message.protobuf.start_time.hour)
-}
-
-// int32 min = 5;
-inline void start_time::clear_min() {
-  min_ = 0;
-}
-inline ::google::protobuf::int32 start_time::min() const {
-  // @@protoc_insertion_point(field_get:Message.protobuf.start_time.min)
-  return min_;
-}
-inline void start_time::set_min(::google::protobuf::int32 value) {
-  
-  min_ = value;
-  // @@protoc_insertion_point(field_set:Message.protobuf.start_time.min)
-}
-
-// int32 sec = 6;
+// int64 sec = 6;
 inline void start_time::clear_sec() {
-  sec_ = 0;
+  sec_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int32 start_time::sec() const {
+inline ::google::protobuf::int64 start_time::sec() const {
   // @@protoc_insertion_point(field_get:Message.protobuf.start_time.sec)
   return sec_;
 }
-inline void start_time::set_sec(::google::protobuf::int32 value) {
+inline void start_time::set_sec(::google::protobuf::int64 value) {
   
   sec_ = value;
   // @@protoc_insertion_point(field_set:Message.protobuf.start_time.sec)

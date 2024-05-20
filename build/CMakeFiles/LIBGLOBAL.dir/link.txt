@@ -1,2 +1,2 @@
-/usr/bin/ar qc libLIBGLOBAL.a  CMakeFiles/LIBGLOBAL.dir/server.cc.o CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o
+/usr/bin/ar qc libLIBGLOBAL.a  CMakeFiles/LIBGLOBAL.dir/server.cc.o CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o ../ntp-master/ntp-master/server.o
 /usr/bin/ranlib libLIBGLOBAL.a

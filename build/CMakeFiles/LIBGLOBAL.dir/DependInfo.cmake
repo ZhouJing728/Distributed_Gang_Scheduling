@@ -1,22 +1,8 @@
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "C"
   "CXX"
   )
 # The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_C
-  "/root/DGS/ntp-master/ntp-master/server.c" "/root/DGS/build/CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o"
-  )
-set(CMAKE_C_COMPILER_ID "GNU")
-
-# The include file search paths:
-set(CMAKE_C_TARGET_INCLUDE_PATH
-  "../"
-  "../MESSAGES"
-  "../JOBS"
-  "../SCHED_STRATEGY"
-  "../ntp-master/ntp-master"
-  )
 set(CMAKE_DEPENDS_CHECK_CXX
   "/root/DGS/MESSAGES/message.pb.cc" "/root/DGS/build/CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o"
   "/root/DGS/SCHED_STRATEGY/strategies.cc" "/root/DGS/build/CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o"
@@ -31,6 +17,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../JOBS"
   "../SCHED_STRATEGY"
   "../ntp-master/ntp-master"
+  "../ntp_client-Gaa"
   )
 
 # Targets to which this target links.

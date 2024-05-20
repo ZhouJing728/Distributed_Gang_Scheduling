@@ -17,6 +17,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
         {
             task task;
             task.set_duration_ms(5);
+            hypperperiode_ms=hypperperiode_ms+5;
             Job_gang job = *it;
             task.set_path(job.job_path());
             if(job.requested_processors()==1)
@@ -52,4 +53,9 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
     }
     return ousterhaut_table;
 
+}
+
+int get_hyperperiode_ms()
+{
+    return strategy.hypperperiode_ms;
 }

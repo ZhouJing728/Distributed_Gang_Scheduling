@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named Local_sched
+
+# Build rule for target.
+Local_sched: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Local_sched
+.PHONY : Local_sched
+
+# fast build rule for target.
+Local_sched/fast:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/build
+.PHONY : Local_sched/fast
+
+#=============================================================================
 # Target rules for targets named Global_sched
 
 # Build rule for target.
@@ -135,6 +148,19 @@ Laucher: cmake_check_build_system
 Laucher/fast:
 	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/build
 .PHONY : Laucher/fast
+
+#=============================================================================
+# Target rules for targets named LIBLOCAL
+
+# Build rule for target.
+LIBLOCAL: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 LIBLOCAL
+.PHONY : LIBLOCAL
+
+# fast build rule for target.
+LIBLOCAL/fast:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/build
+.PHONY : LIBLOCAL/fast
 
 #=============================================================================
 # Target rules for targets named LIBGLOBAL
@@ -168,6 +194,7 @@ MESSAGES/message.pb.o: MESSAGES/message.pb.cc.o
 
 # target to build an object file
 MESSAGES/message.pb.cc.o:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.o
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o
 .PHONY : MESSAGES/message.pb.cc.o
@@ -178,6 +205,7 @@ MESSAGES/message.pb.i: MESSAGES/message.pb.cc.i
 
 # target to preprocess a source file
 MESSAGES/message.pb.cc.i:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.i
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.i
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.i
 .PHONY : MESSAGES/message.pb.cc.i
@@ -188,6 +216,7 @@ MESSAGES/message.pb.s: MESSAGES/message.pb.cc.s
 
 # target to generate assembly for a file
 MESSAGES/message.pb.cc.s:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.s
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.s
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.s
 .PHONY : MESSAGES/message.pb.cc.s
@@ -225,6 +254,7 @@ client.o: client.cc.o
 
 # target to build an object file
 client.cc.o:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.o
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.o
 .PHONY : client.cc.o
 
@@ -234,6 +264,7 @@ client.i: client.cc.i
 
 # target to preprocess a source file
 client.cc.i:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.i
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.i
 .PHONY : client.cc.i
 
@@ -243,6 +274,7 @@ client.s: client.cc.s
 
 # target to generate assembly for a file
 client.cc.s:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.s
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.s
 .PHONY : client.cc.s
 
@@ -300,32 +332,32 @@ laucher.cc.s:
 	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/laucher.cc.s
 .PHONY : laucher.cc.s
 
-ntp-master/ntp-master/server.o: ntp-master/ntp-master/server.c.o
+local_scheduler.o: local_scheduler.cc.o
 
-.PHONY : ntp-master/ntp-master/server.o
+.PHONY : local_scheduler.o
 
 # target to build an object file
-ntp-master/ntp-master/server.c.o:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o
-.PHONY : ntp-master/ntp-master/server.c.o
+local_scheduler.cc.o:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.o
+.PHONY : local_scheduler.cc.o
 
-ntp-master/ntp-master/server.i: ntp-master/ntp-master/server.c.i
+local_scheduler.i: local_scheduler.cc.i
 
-.PHONY : ntp-master/ntp-master/server.i
+.PHONY : local_scheduler.i
 
 # target to preprocess a source file
-ntp-master/ntp-master/server.c.i:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.i
-.PHONY : ntp-master/ntp-master/server.c.i
+local_scheduler.cc.i:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.i
+.PHONY : local_scheduler.cc.i
 
-ntp-master/ntp-master/server.s: ntp-master/ntp-master/server.c.s
+local_scheduler.s: local_scheduler.cc.s
 
-.PHONY : ntp-master/ntp-master/server.s
+.PHONY : local_scheduler.s
 
 # target to generate assembly for a file
-ntp-master/ntp-master/server.c.s:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.s
-.PHONY : ntp-master/ntp-master/server.c.s
+local_scheduler.cc.s:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.s
+.PHONY : local_scheduler.cc.s
 
 server.o: server.cc.o
 
@@ -362,8 +394,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... Local_sched"
 	@echo "... Global_sched"
 	@echo "... Laucher"
+	@echo "... LIBLOCAL"
 	@echo "... LIBGLOBAL"
 	@echo "... LIBLAUCHER"
 	@echo "... MESSAGES/message.pb.o"
@@ -381,9 +415,9 @@ help:
 	@echo "... laucher.o"
 	@echo "... laucher.i"
 	@echo "... laucher.s"
-	@echo "... ntp-master/ntp-master/server.o"
-	@echo "... ntp-master/ntp-master/server.i"
-	@echo "... ntp-master/ntp-master/server.s"
+	@echo "... local_scheduler.o"
+	@echo "... local_scheduler.i"
+	@echo "... local_scheduler.s"
 	@echo "... server.o"
 	@echo "... server.i"
 	@echo "... server.s"

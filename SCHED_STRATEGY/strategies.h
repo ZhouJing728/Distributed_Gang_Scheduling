@@ -26,13 +26,18 @@ class Strategy{
     Strategy()
     {
         ousterhaut_table.resize(2);
+        hypperperiode_ms = 0;
     }
 
-    vector<task> schedule_tasks;
+    //vector<task> schedule_tasks;
+
+    int hypperperiode_ms;
 
     vector<vector<task>> ousterhaut_table;
 
     /* (five) seconds for each job(task at a local node) in turn*/
     vector<vector<task>> roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free);
+
+    int get_hyperperiode_ms();
 
 };

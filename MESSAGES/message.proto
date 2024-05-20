@@ -18,9 +18,7 @@ message task
 
 message start_time
 {
-    int32 hour = 4;
-    int32 min = 5;
-    int32 sec = 6;
+    int64 sec = 6;
     int64 ms = 7;
 }
 

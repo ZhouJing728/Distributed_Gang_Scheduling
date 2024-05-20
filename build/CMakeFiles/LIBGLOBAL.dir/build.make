@@ -96,36 +96,23 @@ CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/SCHED_STRATEGY/strategies.cc -o CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s
 
-CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o: CMakeFiles/LIBGLOBAL.dir/flags.make
-CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o: ../ntp-master/ntp-master/server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o   -c /root/DGS/ntp-master/ntp-master/server.c
-
-CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /root/DGS/ntp-master/ntp-master/server.c > CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.i
-
-CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /root/DGS/ntp-master/ntp-master/server.c -o CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.s
-
 # Object files for target LIBGLOBAL
 LIBGLOBAL_OBJECTS = \
 "CMakeFiles/LIBGLOBAL.dir/server.cc.o" \
 "CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o" \
-"CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o" \
-"CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o"
+"CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o"
 
 # External object files for target LIBGLOBAL
-LIBGLOBAL_EXTERNAL_OBJECTS =
+LIBGLOBAL_EXTERNAL_OBJECTS = \
+"/root/DGS/ntp-master/ntp-master/server.o"
 
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/server.cc.o
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o
-libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/ntp-master/ntp-master/server.c.o
+libLIBGLOBAL.a: ../ntp-master/ntp-master/server.o
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/build.make
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libLIBGLOBAL.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libLIBGLOBAL.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/LIBGLOBAL.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/LIBGLOBAL.dir/link.txt --verbose=$(VERBOSE)
 
