@@ -18,8 +18,8 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
         for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
         {
             task task;
-            task.set_duration_ms(5);
-            hypperperiode_ms=hypperperiode_ms+5;
+            task.set_duration_ms(5000);
+            hypperperiode_ms=hypperperiode_ms+5000;
             Job_gang job = *it;
             task.set_path(job.job_path());
             if(job.requested_processors()==1)

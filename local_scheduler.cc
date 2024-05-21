@@ -305,7 +305,9 @@ int organize_current_schedule()
     for(int i =0;i<size;i++)
     {
         task task = schedule_current.tasks(i);
-        given_time.tv_usec= given_time.tv_usec+task.duration_ms()*1000;
+        given_time.tv_sec=given_time.tv_sec+task.duration_ms()/1000;
+        given_time.tv_usec= given_time.tv_usec+(task.duration_ms()%1000)*1000;
+        diff_usec = time_diff_microseconds(current_time,given_time);
         if(diff_usec<0)
         {
             cout<<"start time(not the first) is already passed!"<<endl;

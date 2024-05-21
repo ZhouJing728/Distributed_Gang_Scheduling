@@ -323,20 +323,20 @@ int update_timer()
     given_time.tv_sec=next_Starttime.sec();
     given_time.tv_usec=next_Starttime.ms()*1000;
 
-    printf("NST time: %ld seconds and %ld microseconds\n", given_time.tv_sec, given_time.tv_usec);
+    printf("NST time: %ld seconds and %ld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
 
-    long long diff_usec = time_diff_microseconds(given_time, current_time);
+    long long diff_usec = time_diff_microseconds(current_time,given_time);
 
-    printf("Time difference: %lld microseconds\n", diff_usec);
+    printf("Time difference: %lld milliseconds\n", diff_usec/1000LL);
 
-    if(diff_usec>0)
+    if(diff_usec<0)
     {
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
 
     timer.it_value.tv_sec = diff_usec/1000000LL;
-    timer.it_value.tv_nsec = (diff_usec%1000000LL)*1000LL;
+    timer.it_value.tv_nsec = (diff_usec%1000000LL)*1000LL-10*1000000LL;
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
 
