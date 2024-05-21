@@ -61,7 +61,7 @@ int job_initialise()
     Job_gang job1,job2;
     int requested_processors1=1,requested_processors2=2;
     int job_id1=2,job_id2=1;
-    string path1="./JOBS/Job1",path2="./JOBS/Job2";
+    string path1="../JOBS/Job1",path2="../JOBS/Job2";
 
     job1.set_job_id(job_id1);
     job1.set_job_path(path1);

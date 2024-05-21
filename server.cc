@@ -126,9 +126,10 @@ int Server::new_connection(int i)
         return -1;
     }
 
-    if(client_addr.sin_port = htons(1235))
+    if(client_addr.sin_port == htons(1235))
     {
         laucher = server_accept;
+        cout<<"laucher has been connected"<<endl;
     }else if((left_child>0)&&(right_child>0))
     {
         cout<<"already two client has connected! new connection close...."<<endl;

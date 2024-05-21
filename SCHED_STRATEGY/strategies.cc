@@ -5,6 +5,8 @@ Strategy strategy;
 
 vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free){
 
+    ousterhaut_table.resize(2);//previous data will be reserved.
+
     ousterhaut_table[0].clear();
     ousterhaut_table[1].clear();
     int queueSize = job_list.size();
@@ -27,7 +29,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
                     int job_id = job.job_id();
                     char buffer[128];
                     sprintf(buffer,"0%d",job_id);
-                    printf("task id is %s ",buffer);
+                    //printf("task id is %s ",buffer);
                     task.set_task_id(buffer);
                     ousterhaut_table[0].push_back(task);
                 }
@@ -51,11 +53,13 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
             }
         }
     }
+    cout<<"in strategies.cc , hyperperiode_ms:"<<hypperperiode_ms<<endl;
     return ousterhaut_table;
 
 }
 
-int get_hyperperiode_ms()
+int Strategy:: get_hyperperiode_ms()
 {
-    return strategy.hypperperiode_ms;
+    cout<<"in strategies.cc , hyperperiode_ms:"<<hypperperiode_ms<<endl;
+    return hypperperiode_ms;
 }

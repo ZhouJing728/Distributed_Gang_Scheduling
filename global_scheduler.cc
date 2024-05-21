@@ -20,12 +20,14 @@ using namespace Message::protobuf;
 
 Server global_scheduler;
 
+Strategy mysched;
+
 int ntp_fd;
 
 int timer_fd;
 
 int hyperperiode_ms;
-
+//true,when still has schedule to be send or job status changed
 bool need_schedule = false;
 
 struct itimerspec send_timer;
@@ -86,7 +88,7 @@ void ntpServer();
 /*initialise the first nst as current_time + one hyperperiode(1 min)*/
 void initialise_nst();
 /*nst =last_nst + one hyperperiode (1min)*/
-void update_nst();
+int update_nst();
 
 
 int main()
@@ -195,7 +197,7 @@ int readByevent(int i)
     size_t size = read(fd,global_scheduler.read_buffer,sizeof(global_scheduler.read_buffer));
     if(size>0)
     {//************JOB FROM LAUCHER*************//
-        if(fd=global_scheduler.laucher)
+        if(fd==global_scheduler.laucher)
         {
             if(acceptNewJob(fd)<0)return -1;
             return 0;
@@ -280,10 +282,10 @@ int epoll_timer()
     //---------------------------------------//
     //triggered every 60s after first trigger
     //(30s after the this program started)
-    send_timer.it_interval.tv_sec=60;//this doesn't work
+    send_timer.it_interval.tv_sec=20;
     send_timer.it_interval.tv_nsec=0;
     send_timer.it_value.tv_nsec=0;
-    send_timer.it_value.tv_sec=30;//this works
+    send_timer.it_value.tv_sec=10;//this works
 
     if(timerfd_settime(timer_fd,0,&send_timer,NULL)<0)
     {
@@ -298,6 +300,52 @@ int epoll_timer()
         return -1;
     }
     printf("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
+    return 0;
+}
+
+long long time_diff_microseconds(struct timeval start, struct timeval end) {
+    long long start_usec = start.tv_sec * 1000000LL + start.tv_usec;
+    long long end_usec = end.tv_sec * 1000000LL + end.tv_usec;
+    return end_usec - start_usec;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//send timer need to be triggered (about)10s before new nst.
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+int update_timer()
+{
+    struct itimerspec timer;
+
+    struct timeval current_time;
+    gettimeofday(&current_time, NULL);
+
+    struct timeval given_time;
+    given_time.tv_sec=next_Starttime.sec();
+    given_time.tv_usec=next_Starttime.ms()*1000;
+
+    printf("NST time: %ld seconds and %ld microseconds\n", given_time.tv_sec, given_time.tv_usec);
+
+    long long diff_usec = time_diff_microseconds(given_time, current_time);
+
+    printf("Time difference: %lld microseconds\n", diff_usec);
+
+    if(diff_usec>0)
+    {
+        cout<<"start time is already passed!"<<endl;
+        return -1;
+    }
+
+    timer.it_value.tv_sec = diff_usec/1000000LL;
+    timer.it_value.tv_nsec = (diff_usec%1000000LL)*1000LL;
+    timer.it_interval.tv_nsec = 0;
+    timer.it_interval.tv_sec =0;
+
+    if(timerfd_settime(timer_fd,0,&timer,NULL)<0)
+    {
+        printf("send_timer settime failed!\n");
+        return -1;
+    }
+    cout<<"timer has been updated!"<<endl;
     return 0;
 }
 
@@ -317,42 +365,30 @@ int epoll_ntpServer()
     return 0;
 }
 
-//current time + 1s
+//current time +20s
 void initialise_nst()
 {
-    time_t current_time;
-    timeval* tv;
-    time(&current_time);
-    printf("got current time\n");
-    gettimeofday(tv,NULL);
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
     printf("got current time in us\n");
-    tm* timeinfo = localtime(&current_time);
-    printf("converted time structure\n");
-    next_Starttime.set_sec(tv->tv_sec+1);
-    printf("arrived here\n");
-    next_Starttime.set_ms(tv->tv_usec/1000);
+    next_Starttime.set_sec(tv.tv_sec+20);
+    next_Starttime.set_ms(tv.tv_usec/1000);
+    printf("finished with nst\n");
 }
 
-void update_nst()
+int update_nst()
 {
-    // if(next_Starttime.min()<59)
-    // {
-    //     next_Starttime.set_min(next_Starttime.min()+1);
-    // }else if(next_Starttime.hour()<23){
-    //     next_Starttime.set_hour(next_Starttime.hour()+1);
-    //     next_Starttime.set_min(0);
-    // }else{
-    //     next_Starttime.set_hour(0);
-    //     next_Starttime.set_min(0);
-    // }
     //set 1ms for interval between two schedules,cause it could be a few time through code lines.
-    Strategy Strategy;
     int interval_ms=1;
-    int hyperperiode_ms = Strategy.get_hyperperiode_ms();
-    if(!hyperperiode_ms)//none schedule yet
+    hyperperiode_ms = mysched.get_hyperperiode_ms();
+    //cout<<"in global_sched, hyperperiode_ms"<<hyperperiode_ms<<endl;
+    //*******none schedule yet or has not been sent(no client)********//
+    if(!hyperperiode_ms)
     {
-        initialise_nst();
-    }else{
+        next_Starttime.set_sec(next_Starttime.sec()+20);//to be more determinted
+        //initialise_nst();
+        cout<<"no need to update timer,interval stays 20s"<<endl;
+    }else{//********has repeated schedule or new schedule********//
         int64_t final_ms= next_Starttime.ms()+interval_ms+hyperperiode_ms;
         if(final_ms>=1000)
         {
@@ -361,8 +397,11 @@ void update_nst()
         }else{
             next_Starttime.set_ms(final_ms);
         }
+        if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
     }
-
+    cout<<"nst has been updated"<<endl;
+    printf("NST : %ld seconds and %ld microseconds\n",next_Starttime.sec(),next_Starttime.ms());
+    return 0;
 }
 
 int timer_handler()
@@ -390,7 +429,7 @@ int timer_handler()
         printf("SUCCESSFULLY SEND SCHEDULE OR NO CLIENTS YET\n");
     }
 
-    update_nst();
+    if(update_nst()<0)return -1;
     printf("SUCCESSFULLY UPDATED NST\n");
     
     return 0;
@@ -402,9 +441,9 @@ int get_and_send_schedule()
     if(!(global_scheduler.left_free||global_scheduler.right_free))
     {
         printf("there is no clients available now, will reschedule and retry in next round~\n");
+        need_schedule=true;
         return 0;
     }
-    Strategy mysched;
     ousterhaut_table.clear();
     ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.left_free,global_scheduler.right_free);
 
@@ -432,6 +471,11 @@ int get_and_send_schedule()
         return -1;
     }
 
+    if(global_scheduler.right_child<0)
+    {
+        need_schedule = false;
+        return 0;
+    }
     common_sched.clear_tasks();
     vector<task>right = ousterhaut_table[1];
     for(vector<task>::iterator it = right.begin();it!=right.end();it++)

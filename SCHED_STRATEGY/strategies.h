@@ -23,15 +23,15 @@ class Strategy{
 
     };
 
-    Strategy()
-    {
-        ousterhaut_table.resize(2);
-        hypperperiode_ms = 0;
-    }
+    // Strategy()
+    // {
+    //     ousterhaut_table.resize(2);
+    //     //hypperperiode_ms = 0;
+    // }
 
     //vector<task> schedule_tasks;
 
-    int hypperperiode_ms;
+    int hypperperiode_ms=0;
 
     vector<vector<task>> ousterhaut_table;
 

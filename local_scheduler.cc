@@ -14,7 +14,7 @@ using namespace std;
 
 
 #define server_port 1234
-#define CGROUP_PATH "./cgroup"
+#define CGROUP_PATH "../cgroup"
 
 string server = "127.0.0.1";
 
@@ -35,8 +35,8 @@ schedule schedule_new;
 bool dispatching=false;
 //schedule received during execution of current schedule
 bool new_schedule=false;
-
-x_int64_t deviation_in_microsecond;
+//standard server time - client time
+x_int64_t deviation_in_microsecond=0;
 
 /************************************************/
 //ntp responsible parameters
@@ -160,6 +160,13 @@ int ntp_timer()
 //ntp_timer_handler() request time deviation for once, save it in deviation in microsecons
 int ntp_timer_handler()
 {
+    uint64_t exp;
+    if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
+    {
+        cout<<"failed read from timer"<<endl;
+        return -1;
+    }
+
     xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);
     if (XTMVNSEC_IS_VALID(xtm_vnsec))
     {
@@ -241,6 +248,9 @@ int task_timer(itimerspec timer)
     return 0;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//second time value - first time value;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`//
 long long time_diff_microseconds(struct timeval start, struct timeval end) {
     long long start_usec = start.tv_sec * 1000000LL + start.tv_usec;
     long long end_usec = end.tv_sec * 1000000LL + end.tv_usec;
@@ -269,21 +279,24 @@ int organize_current_schedule()
     given_time.tv_usec=schedule_current.start_time().ms()*1000;
 
     printf("Given time: %ld seconds and %ld microseconds\n", given_time.tv_sec, given_time.tv_usec);
+    printf("Current time : %ld seconds and %ld microseconds\n",current_time.tv_sec,current_time.tv_usec);
 
-    long long diff_usec = time_diff_microseconds(given_time, current_time);
+    long long diff_usec = time_diff_microseconds(current_time,given_time);
 
-    printf("Time difference: %lld microseconds\n", diff_usec);
+    printf("Time difference(nst-current): %lld microseconds\n", diff_usec);
 
     if(diff_usec<0)
     {
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
-
-    timer.it_value.tv_sec = diff_usec;
-    timer.it_value.tv_nsec = -deviation_in_microsecond*1000L;
+    //timer interval = nst- (standard)server time= nst- (client time + deviation)
+    timer.it_value.tv_sec = diff_usec/1000000LL;
+    timer.it_value.tv_nsec = (-deviation_in_microsecond+(diff_usec%1000000LL))*1000LL;
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
+
+    printf("timer sec:%ld, nsec:%ld\n",timer.it_value.tv_sec,timer.it_value.tv_nsec);
 
     if(task_timer(timer)<0)return -1;
     cout<<"successful to set the first timer of a schedule"<<endl;
@@ -308,7 +321,7 @@ int organize_current_schedule()
         cout<<"successful to set the timer"<<endl;
 
     }
-
+    return 0;
 }
 
 void write_to_cgroup_file(const char *file_path, const char *value) {
@@ -360,8 +373,19 @@ bool check_task_initialised()
     return false;
 }
 
-int task_timer_handler()
+int task_timer_handler(int fd)
 {
+    uint64_t exp;
+    if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
+    {
+        cout<<"failed read from timer"<<endl;
+        return -1;
+    }
+
+    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_DEL,fd,nullptr)<0)
+    {
+        cout<<"failed to remove temp task timerfd from epoll"<<endl;
+    }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
     if(position>0){
         task last_task = schedule_current.tasks(position-1);
@@ -369,7 +393,7 @@ int task_timer_handler()
         {
             char buffer[128];
             string id = last_task.task_id().substr(1);
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id,"freezer.state");
+            sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
         }
     }
@@ -407,8 +431,10 @@ int task_timer_handler()
     /*********thaw the next task********************/
     char state[128];
     string id = next_task.task_id().substr(1);
-    sprintf(state,"%s/%s/%s",CGROUP_PATH,id,"freezer.state");
+    sprintf(state,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
+    cout<<state<<endl;
     write_to_cgroup_file(state, "THAWED");
+    cout<<"successfully thawed the first task"<<endl;
     if(!check_task_initialised())
     {
         pid_t pid = fork();
@@ -417,6 +443,9 @@ int task_timer_handler()
             exit(EXIT_FAILURE);
         } else if (pid == 0) {//child process
             prctl(PR_SET_PDEATHSIG,SIGKILL);
+            char tasks[128];
+            sprintf(tasks,"%s/%s/%s",CGROUP_PATH,id.c_str(),"tasks");
+            cout<<tasks<<endl;
             add_pid_to_cgroup(CGROUP_PATH"/1/tasks",getpid());
             const char* path = next_task.path().c_str();
             execl(path, path, NULL);
@@ -470,7 +499,7 @@ int handle_event()
         }else
         {
         //Third SITUATION: task switch check timer
-        
+        if(task_timer_handler(fd_temp)<0)return -1;
         }   
     }
     return 0;
@@ -511,9 +540,7 @@ int main()
         cout<<"ntp_timer failed"<<endl;
         return -1;
    }
-    printf("========================\n",
-        "==TCP&NTP CLIENT START==\n",
-        "========================\n");
+    printf("========================\n==TCP&NTP CLIENT START==\n========================\n");
 
     while (1)
     {
