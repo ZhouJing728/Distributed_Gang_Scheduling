@@ -334,9 +334,9 @@ int update_timer()
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
-
-    timer.it_value.tv_sec = diff_usec/1000000LL;
-    timer.it_value.tv_nsec = (diff_usec%1000000LL)*1000LL-10*1000000LL;
+    int64_t sum_ns=diff_usec*1000LL-10000000LL;
+    timer.it_value.tv_sec = sum_ns/1000000000LL;
+    timer.it_value.tv_nsec = sum_ns%1000000000LL;
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
 
