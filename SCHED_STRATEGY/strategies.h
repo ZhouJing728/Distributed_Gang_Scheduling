@@ -33,11 +33,15 @@ class Strategy{
 
     int hypperperiode_ms=0;
 
+    bool wait_for_processors = false;
+
     vector<vector<task>> ousterhaut_table;
 
     /* (five) seconds for each job(task at a local node) in turn*/
     vector<vector<task>> roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free);
 
     int get_hyperperiode_ms();
+
+    bool get_wait_for_processors();
 
 };

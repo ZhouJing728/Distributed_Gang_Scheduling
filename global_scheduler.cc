@@ -29,6 +29,9 @@ int timer_fd;
 int hyperperiode_ms;
 //true,when still has schedule to be send or job status changed
 bool need_schedule = false;
+//true, when new clients connect,
+//reset to false,when this changed has been seen by schedule stratrgy
+bool clinets_status_changed = false;
 
 struct itimerspec send_timer;
 
@@ -172,6 +175,9 @@ int handle_event()
         }else if(fd_temp==global_scheduler.server&&(global_scheduler.events[i].events&EPOLLIN))
         {
             if(global_scheduler.new_connection(i)<0)return -1;
+            clinets_status_changed =true;
+            //the connection of laucher doesn't matter,cause laucher comes before every schedule method.
+            //after schedule this flag will be reset. and this flag only make sense with still wait for processors flag.
                       
         }else
         {
@@ -323,7 +329,7 @@ int update_timer()
     given_time.tv_sec=next_Starttime.sec();
     given_time.tv_usec=next_Starttime.ms()*1000;
 
-    printf("NST time: %ld seconds and %ld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
+    printf("NST time: %ld seconds and %lld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
 
     long long diff_usec = time_diff_microseconds(current_time,given_time);
 
@@ -379,7 +385,6 @@ void initialise_nst()
 int update_nst()
 {
     //set 1ms for interval between two schedules,cause it could be a few time through code lines.
-    int interval_ms=1;
     hyperperiode_ms = mysched.get_hyperperiode_ms();
     //cout<<"in global_sched, hyperperiode_ms"<<hyperperiode_ms<<endl;
     //*******none schedule yet or has not been sent(no client)********//
@@ -389,14 +394,11 @@ int update_nst()
         //initialise_nst();
         cout<<"no need to update timer,interval stays 20s"<<endl;
     }else{//********has repeated schedule or new schedule********//
-        int64_t final_ms= next_Starttime.ms()+interval_ms+hyperperiode_ms;
-        if(final_ms>=1000)
-        {
-            next_Starttime.set_sec(next_Starttime.sec()+(final_ms/1000));
-            next_Starttime.set_ms(final_ms%1000);
-        }else{
-            next_Starttime.set_ms(final_ms);
-        }
+        int64_t final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
+
+        next_Starttime.set_sec(final_ms/1000LL);
+        next_Starttime.set_ms(final_ms%1000LL);
+
         if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
     }
     cout<<"nst has been updated"<<endl;
@@ -412,10 +414,25 @@ int timer_handler()
         cout<<"failed read from timer"<<endl;
         return -1;
     }
-
+    //NO NEW RECEIVED OR DELETED JOBS
     if(!need_schedule)
     {
-        printf("there is no new job received or finished \n");
+        //There are jobs in job list that wait for more clients 
+        //&& clients status changed
+        if(mysched.get_wait_for_processors()&&clinets_status_changed)
+        {
+            if(get_and_send_schedule()<0)
+            {
+                printf("failed to get and send schedules\n");
+                update_nst();
+                return -1;
+            }
+            printf("SUCCESSFULLY SEND SCHEDULE\n");
+        }else
+        {
+            printf("there is no new job received or finished \n");
+        }
+    //NEW JOB STATUS
     }else{
         printf("trying to get schedule using RR\n");
 
@@ -446,6 +463,8 @@ int get_and_send_schedule()
     }
     ousterhaut_table.clear();
     ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.left_free,global_scheduler.right_free);
+
+    clinets_status_changed = false;
 
     printf("successfully got schedule_Tasks(without start time)\n");
 
@@ -498,229 +517,3 @@ int get_and_send_schedule()
     return 0;
 
 }
-
-// int send_schedules_periodically()
-// {
-
-//     if(global_scheduler.right_child>0)
-//     {
-//         if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
-//         {
-//             printf("failed to send schedule to left child\n");
-//             return -1;
-//         }
-    
-//         if(write(global_scheduler.right_child,global_scheduler.send_buffer,1024)<0)
-//         {
-//             printf("failed to send schedule to right child\n");
-//             return -1;
-//         }
-//     }else if(global_scheduler.left_child>0)
-//     {
-//         if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
-//         {
-//             printf("failed to send schedule to left child\n");
-//             return -1;
-//         }
-//     }else
-//     {
-//         printf("there is no clients available now, will reschedule and retry in next round~\n");
-//         return 0;
-//     }
-
-//     return 0;
-// }
-
-
-/****************************************************/
-/******************from ntp server*******************/
-// void gettime64(uint32_t ts[])
-// {
-// 	struct timeval tv;
-// 	gettimeofday(&tv, NULL);
-
-// 	ts[0] = tv.tv_sec + UTC_NTP;
-// 	ts[1] = (4294*(tv.tv_usec)) + ((1981*(tv.tv_usec))>>11);
-// }
-
-
-// int die(const char *msg)
-// {
-// 	if (msg) {
-// 		fputs(msg, stderr);
-// 	}
-// 	exit(-1);
-// }
-
-
-// void log_request_arrive(uint32_t *ntp_time)
-// {
-// 	time_t t; 
-
-// 	if (ntp_time) {
-// 		t = *ntp_time - UTC_NTP;
-// 	} else {
-// 		t = time(NULL);
-// 	}
-// 	printf("A request comes at: %s", ctime(&t));
-// }
-
-
-// void log_ntp_event(const char *msg)
-// {
-// 	puts(msg);
-// }
-
-
-// int ntp_reply(
-// 	int socket_fd,
-// 	struct sockaddr *saddr_p,
-// 	socklen_t saddrlen,
-// 	unsigned char recv_buf[],
-// 	uint32_t recv_time[])
-// {
-// 	/* Assume that recv_time is in local endian ! */
-// 	unsigned char send_buf[48];
-// 	uint32_t *u32p;
-
-//  	/* do not use 0xC7 because the LI can be `unsynchronized` */
-// 	if ((recv_buf[0] & 0x07/*0xC7*/) != 0x3) {
-// 		/* LI VN Mode stimmt nicht */
-//         string s ="Invalid request: found error at the first byte";
-//         const char* cs= s.c_str();
-// 		log_ntp_event(cs);
-// 		return 1;
-// 	}
-
-// 	/* füllt LI VN Mode aus
-// 	   	LI   = 0
-// 		VN   = Version Nummer aus dem Client
-// 		Mode = 4
-// 	 */
-// 	send_buf[0] = (recv_buf[0] & 0x38) + 4;
-
-// 	/* Stratum = 1 (primary reference)
-// 	   Reference ID = 'LOCL"
-
-// 	       (falscher) Bezug auf der lokalen Uhr.
-// 	 */
-// 	/* Stratum */
-// 	send_buf[1] = 0x01;
-// 	/* Reference ID = "LOCL" */
-// 	*(uint32_t*)&send_buf[12] = htonl(0x4C4F434C);
-
-// 	/* Copy Poll */
-// 	send_buf[2] = recv_buf[2];
-
-// 	/* Precision in Microsecond ( from API gettimeofday() ) */
-// 	send_buf[3] = (signed char)(-6);  /* 2^(-6) sec */
-
-// 	/* danach sind alle Werte DWORD aligned  */
-// 	u32p = (uint32_t *)&send_buf[4];
-// 	/* zur Vereinfachung , Root Delay = 0, Root Dispersion = 0 */
-// 	*u32p++ = 0;
-// 	*u32p++ = 0;
-
-// 	/* Reference ID ist vorher eingetragen */
-// 	u32p++;
-
-// 	/* falscher Reference TimeStamp,
-// 	 * wird immer vor eine minute synchronisiert,
-// 	 * damit die Überprüfung in Client zu belügen */
-// 	gettime64(u32p);
-// 	*u32p = htonl(*u32p - 60);   /* -1 Min.*/
-// 	u32p++;
-// 	*u32p = htonl(*u32p);   /* -1 Min.*/
-// 	u32p++;
-
-// 	/* Originate Time = Transmit Time @ Client */
-// 	*u32p++ = *(uint32_t *)&recv_buf[40];
-// 	*u32p++ = *(uint32_t *)&recv_buf[44];
-
-// 	/* Receive Time @ Server */
-// 	*u32p++ = htonl(recv_time[0]);
-// 	*u32p++ = htonl(recv_time[1]);
-
-// 	/* zum Schluss: Transmit Time*/
-// 	gettime64(u32p);
-// 	*u32p = htonl(*u32p);   /* -1 Min.*/
-// 	u32p++;
-// 	*u32p = htonl(*u32p);   /* -1 Min.*/
-
-// 	if ( sendto( socket_fd,
-// 		     send_buf,
-// 		     sizeof(send_buf), 0,
-// 		     saddr_p, saddrlen)
-// 	     < 48) {
-// 		perror("sendto error");
-// 		return 1;
-// 	}
-
-// 	return 0;
-// }
-
-
-// void request_process_loop(int fd)
-// {
-// 	struct sockaddr src_addr;
-// 	socklen_t src_addrlen = sizeof(src_addr);
-// 	unsigned char buf[48];
-// 	uint32_t recv_time[2];
-// 	//pid_t pid;
-
-// 	//while (1) {
-// 		while (recvfrom(fd, buf,
-// 				48, 0,
-// 				&src_addr,
-// 				&src_addrlen)
-// 			< 48 );  /* invalid request */
-
-// 		gettime64(recv_time);
-// 		/* recv_time in local endian */
-// 		log_request_arrive(recv_time);
-
-// 		//pid = fork();
-// 		//if (pid == 0) {
-// 			/* Child */
-// 			ntp_reply(fd, &src_addr , src_addrlen, buf, recv_time);
-// 			//exit(0);
-// 		//} else if (pid == -1) {
-// 			//perror("fork() error");
-// 			//die(NULL);
-// 		//}
-// 		/* return to parent */
-// 	//}
-// }
-
-
-// int ntp_server(struct sockaddr_in bind_addr)
-// {
-// 	int s;
-// 	struct sockaddr_in sinaddr;
-
-// 	s = socket(AF_INET, SOCK_DGRAM, 0);
-// 	if (s == -1) {
-// 		perror("Can not create socket.");
-// 		die(NULL);
-// 	}
-
-// 	memset(&sinaddr, 0, sizeof(sinaddr));
-// 	sinaddr.sin_family = AF_INET;
-// 	sinaddr.sin_port = htons(123);
-// 	sinaddr.sin_addr.s_addr = bind_addr.sin_addr.s_addr;
-
-// 	if (0 != bind(s, (struct sockaddr *)&sinaddr, sizeof(sinaddr))) {
-// 		perror("Bind error");
-// 		die(NULL);
-// 	}
-//     string str = "\n========================================\n""= Server started, waiting for requests =\n""========================================\n";
-//     const char* cs = str.c_str();
-// 	// log_ntp_event(	"\n========================================\n"
-// 	// 		"= Server started, waiting for requests =\n"
-// 	// 		"========================================\n");
-//     log_ntp_event(cs);
-
-// 	return s;
-// 	//request_process_loop(s);
-// 	//close(s);
-// }

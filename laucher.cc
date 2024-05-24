@@ -58,10 +58,19 @@ int main()
 
 int job_initialise()
 {
-    Job_gang job1,job2;
-    int requested_processors1=1,requested_processors2=2;
-    int job_id1=2,job_id2=1;
-    string path1="../JOBS/Job1",path2="../JOBS/Job2";
+    Job_gang job0,job1,job2;
+    int requested_processors0=1,requested_processors1=1,requested_processors2=2;
+    int job_id0=0,job_id1=1,job_id2=2;
+    string path0="../JOBS/Job0",path1="../JOBS/Job1",path2="../JOBS/Job2";
+
+    job0.set_job_id(job_id0);
+    job0.set_job_path(path0);
+    job0.set_requested_processors(requested_processors0);
+    memset(laucher.send_buffer,'\0',1024);
+
+    job0.SerializePartialToArray(laucher.send_buffer,1024);
+
+    if(laucher.send_to_server(laucher.send_buffer)<0)return -1;
 
     job1.set_job_id(job_id1);
     job1.set_job_path(path1);

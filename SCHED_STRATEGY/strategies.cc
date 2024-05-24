@@ -6,7 +6,7 @@ Strategy strategy;
 vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free){
 
     ousterhaut_table.resize(2);//previous data will be reserved.
-
+    wait_for_processors = false;
     ousterhaut_table[0].clear();
     ousterhaut_table[1].clear();
     int queueSize = job_list.size();
@@ -38,7 +38,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
                     task.set_task_id("empty");
                     ousterhaut_table[1].push_back(task);
                 }
-            }else if((job.requested_processors()==2)||(left_free&&right_free))
+            }else if((job.requested_processors()==2)&&(left_free&&right_free))
             {
                 int job_id = job.job_id();
                 char left_buffer[128];
@@ -50,16 +50,21 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_fr
                 task.set_task_id(right_buffer);
                 ousterhaut_table[1].push_back(task);
                 
+            }else{
+                wait_for_processors =true;
             }
         }
     }
-    cout<<"in strategies.cc , hyperperiode_ms:"<<hypperperiode_ms<<endl;
     return ousterhaut_table;
 
 }
 
 int Strategy:: get_hyperperiode_ms()
 {
-    cout<<"in strategies.cc , hyperperiode_ms:"<<hypperperiode_ms<<endl;
     return hypperperiode_ms;
+}
+
+bool Strategy::get_wait_for_processors()
+{
+    return wait_for_processors;
 }

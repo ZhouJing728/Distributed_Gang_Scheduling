@@ -20,11 +20,15 @@ string server = "127.0.0.1";
 
 int ntp_timerfd;
 //events number from epoll_Wait()
+
+int task_timerfd;
 int read_number;
 //the position for next to be execute task in schedule
 int position;
 //size for current schedule tasks
 int size;
+//for interaive calculating start time of task
+struct timeval given_time;
 
 Client local_scheduler;
 //has been taken from the list, the currently executed scheduling
@@ -51,57 +55,6 @@ x_ccstring_t host = "127.0.0.1";
 x_int16_t port = 123;
 x_uint32_t xut_tmout = 3000;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// tcpcli_receive() receive schedules, 
-//* set the newschedule flag
-//* push the schedule into schedule_list
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// int tcpcli_receive()
-// {
-//     if(recv(local_scheduler.client,local_scheduler.receive_buffer,1024,0)<=0)
-//     {
-//         cout<<"failed to receive from server, connection closed"<<endl;
-//         return -1;
-//     }
-    
-//     new_schedule = true;
-
-//     schedule schedule_received;
-
-//     schedule_received.ParseFromArray(local_scheduler.receive_buffer,1024);
-
-//     schedule_new.push_back(schedule_received);
-
-//     return 0;
-    
-// }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//tcpcli() create a tcp socket and connect to server, it keeps receiving schedules and saving it.
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// void *tcpcli(void *arg){
-
-//     printf("====================\n",
-//             "==TCP CLIENT START==\n",
-//             "====================\n");
-
-//     if(local_scheduler.sock_create()<0)
-//     {
-//         cout<<"failed to create socket"<<endl;
-        
-//     }else if(local_scheduler.sock_connect(server,server_port)<0)
-//     {
-//         cout<<"failed to connect server"<<endl;
-        
-//     }else
-//     {
-//         while (1)
-//         {
-//             tcpcli_receive();
-//         }
-      
-//     }
-// }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //ntp_client_initialisation() initialise some parameter, config ntp server infomation
@@ -223,15 +176,20 @@ int ntp_timer_handler()
 //task_timer() create timerfd for every tasks in current schedule with their start time, 
 //and put them into epoll 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-int task_timer(itimerspec timer)
+int task_timer_initialise()
 {
-    int task_timerfd = timerfd_create(CLOCK_REALTIME,0);
+    task_timerfd = timerfd_create(CLOCK_REALTIME,0);
     if(task_timerfd<0)
     {
         printf("task_timer create failed!\n");
         return -1;
     }
-
+    struct itimerspec timer;
+    timer.it_interval.tv_nsec=0;
+    timer.it_interval.tv_sec=0;
+    timer.it_value.tv_nsec=0;
+    timer.it_value.tv_sec=0;
+    
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)
     {
         printf("task_timer settime failed!\n");
@@ -258,7 +216,7 @@ long long time_diff_microseconds(struct timeval start, struct timeval end) {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//organize_current_schedule() set the dispatching flag, reset the position from 0, create timer for task switch
+//organize_current_schedule() set the dispatching flag, reset the position from 0, set timer for first task start
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int organize_current_schedule()
 {
@@ -272,7 +230,7 @@ int organize_current_schedule()
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
 
-    struct timeval given_time;
+    //struct timeval given_time;
     //given_time.tv_sec = (schedule_current.start_time().hour()*60+schedule_current.start_time().min())*60+schedule_current.start_time().sec();
     //given_time.tv_usec = schedule_current.start_time().ms()*1000;
     given_time.tv_sec=schedule_current.start_time().sec();
@@ -290,39 +248,20 @@ int organize_current_schedule()
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
-    //timer interval = nst- (standard)server time= nst- (client time + deviation)
-    timer.it_value.tv_sec = diff_usec/1000000LL;
-    timer.it_value.tv_nsec = (-deviation_in_microsecond+(diff_usec%1000000LL))*1000LL;
+    //*****sum_ns = given server time - current server time*****************//
+    //************= given server time - (current client time + deviation)***// 
+    //************= diff_usec -deviation************************************//
+    int64_t sum_ns = diff_usec*1000LL-deviation_in_microsecond*1000LL;
+    timer.it_value.tv_sec = sum_ns/1000000000LL;
+    timer.it_value.tv_nsec = sum_ns%1000000000LL;
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
 
     printf("timer sec:%ld, nsec:%ld\n",timer.it_value.tv_sec,timer.it_value.tv_nsec);
 
-    if(task_timer(timer)<0)return -1;
+    if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
     cout<<"successful to set the first timer of a schedule"<<endl;
 
-    /**********from second task, the start time = last start time + last duration************/
-    for(int i =0;i<size;i++)
-    {
-        task task = schedule_current.tasks(i);
-        given_time.tv_sec=given_time.tv_sec+task.duration_ms()/1000;
-        given_time.tv_usec= given_time.tv_usec+(task.duration_ms()%1000)*1000;
-        diff_usec = time_diff_microseconds(current_time,given_time);
-        if(diff_usec<0)
-        {
-            cout<<"start time(not the first) is already passed!"<<endl;
-            return -1;
-        }
-
-        timer.it_value.tv_sec = diff_usec;
-        timer.it_value.tv_nsec = -deviation_in_microsecond*1000L;
-        timer.it_interval.tv_nsec = 0;
-        timer.it_interval.tv_sec =0;
-
-        if(task_timer(timer)<0)return -1;
-        cout<<"successful to set the timer"<<endl;
-
-    }
     return 0;
 }
 
@@ -375,19 +314,43 @@ bool check_task_initialised()
     return false;
 }
 
-int task_timer_handler(int fd)
+/**********from second task, the start time = last start time + last duration************/
+int timer_update(int position)
+{
+    struct timeval current_time;
+    gettimeofday(&current_time, NULL);
+    task task = schedule_current.tasks(position);
+    given_time.tv_sec=given_time.tv_sec+task.duration_ms()/1000;
+    given_time.tv_usec= given_time.tv_usec+(task.duration_ms()%1000)*1000;
+    long long diff_usec = time_diff_microseconds(current_time,given_time);
+    if(diff_usec<0)
+    {
+        cout<<"start time(not the first) is already passed!"<<endl;
+        return -1;
+    }
+    
+    struct itimerspec timer;
+    
+    int64_t sum_ns = diff_usec*1000LL-deviation_in_microsecond*1000LL;
+    timer.it_value.tv_sec = sum_ns/1000000000LL;
+    timer.it_value.tv_nsec = sum_ns%1000000000LL;
+    timer.it_interval.tv_nsec = 0;
+    timer.it_interval.tv_sec =0;
+
+    if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
+    cout<<"successful to set the timer"<<endl;
+    return 0;
+}
+
+int task_timer_handler()
 {
     uint64_t exp;
-    if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
+    if(read(task_timerfd,&exp,sizeof(uint64_t))<0)
     {
-        cout<<"failed read from timer"<<endl;
+        cout<<"failed read from task timer"<<endl;
         return -1;
     }
 
-    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_DEL,fd,nullptr)<0)
-    {
-        cout<<"failed to remove temp task timerfd from epoll"<<endl;
-    }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
     if(position>0){
         task last_task = schedule_current.tasks(position-1);
@@ -397,46 +360,30 @@ int task_timer_handler(int fd)
             string id = last_task.task_id().substr(1);
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
+            printf("frozen task in cgroup %s\n",id.c_str());
         }
     }
     /*********if next task is empty, skip the next step*******************/
     task next_task = schedule_current.tasks(position);
     if(next_task.task_id()=="empty")
     {
+        if(timer_update(position)<0)
+        {
+            cout<<"failed to update timer with task position:"<<position<<endl;
+            return -1;
+        }   
         position++;
         return 0;
     }
-    /*********current schedule finished********************/
-    if(position==schedule_current.tasks_size())
-    {
-        if(new_schedule)
-        {
-            new_schedule=false;
-            schedule_current.Clear();
-            schedule_current=schedule_new;
-            schedule_new.Clear();
-            if(organize_current_schedule()<0)return -1;
-            cout<<"successfully swtiched to new schedule!"<<endl;
-        }else{
-            struct timeval nnst;
-            gettimeofday(&nnst,NULL);
-            start_time nst;
-            nst.set_sec(nnst.tv_sec);
-            nst.set_ms(nnst.tv_usec/1000+1);
-            schedule_current.clear_start_time();
-            schedule_current.mutable_start_time()->CopyFrom(nst);
-            if(organize_current_schedule()<0)return -1;
-            cout<<"successfully swtiched to new schedule!"<<endl;
-        }
-        return 0;
-    }
+
     /*********thaw the next task********************/
     char state[128];
     string id = next_task.task_id().substr(1);
     sprintf(state,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
     cout<<state<<endl;
     write_to_cgroup_file(state, "THAWED");
-    cout<<"successfully thawed the first task"<<endl;
+    cout<<"successfully thawed the task in position"<<position<<endl;
+    //*****if not be executed before, it needs to get pid and store it ****//
     if(!check_task_initialised())
     {
         pid_t pid = fork();
@@ -448,13 +395,45 @@ int task_timer_handler(int fd)
             char tasks[128];
             sprintf(tasks,"%s/%s/%s",CGROUP_PATH,id.c_str(),"tasks");
             cout<<tasks<<endl;
-            add_pid_to_cgroup(CGROUP_PATH"/1/tasks",getpid());
+            add_pid_to_cgroup(tasks,getpid());
             const char* path = next_task.path().c_str();
             execl(path, path, NULL);
-            perror("Error executing program 1");
+            perror("Error executing program ");
             exit(EXIT_FAILURE);
         }//father process here continue
     }
+
+    /*********current schedule finished********************/
+    if(position==schedule_current.tasks_size()-1)
+    {
+        if(new_schedule)
+        {
+            new_schedule=false;
+            schedule_current.Clear();
+            schedule_current=schedule_new;
+            schedule_new.Clear();
+            if(organize_current_schedule()<0)return -1;
+            cout<<"successfully swtiched to new schedule!"<<endl;
+        }else{
+            start_time nst;
+            //start time for repeated schedule = last task'start time + last task's duration
+            int64_t given_time_us = given_time.tv_sec*1000000LL+given_time.tv_usec+schedule_current.tasks(position).duration_ms()*1000LL;
+            nst.set_sec(given_time_us/1000000LL);
+            nst.set_ms((given_time_us%1000000LL)/1000LL);
+            schedule_current.clear_start_time();
+            schedule_current.mutable_start_time()->CopyFrom(nst);
+            if(organize_current_schedule()<0)return -1;
+            cout<<"successfully swtiched to new schedule!"<<endl;
+        }
+        return 0;
+    }
+
+    if(timer_update(position)<0)
+    {
+        cout<<"failed to update timer with task position:"<<position<<endl;
+        return -1;
+    }
+
     position++;
     return 0;
 }
@@ -501,7 +480,7 @@ int handle_event()
         }else
         {
         //Third SITUATION: task switch check timer
-        if(task_timer_handler(fd_temp)<0)return -1;
+        if(task_timer_handler()<0)return -1;
         }   
     }
     return 0;
@@ -542,6 +521,13 @@ int main()
         cout<<"ntp_timer failed"<<endl;
         return -1;
    }
+
+   if(task_timer_initialise()<0)
+   {
+        cout<<"task_timer initialise failed"<<endl;
+        return -1;
+   }
+
     printf("========================\n==TCP&NTP CLIENT START==\n========================\n");
 
     while (1)

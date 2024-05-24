@@ -4,10 +4,9 @@ ntp.cc
 ntp1.cc
 .history/
 Ntp1
-cgroup/
 chain_job.h
 chain_task.h
 jobQueue*
 taskQueue*
 build/
-.vscode/
+.vscode
