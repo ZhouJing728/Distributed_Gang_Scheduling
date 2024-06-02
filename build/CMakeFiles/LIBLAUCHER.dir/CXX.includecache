@@ -6,30 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/root/DGS/MESSAGES/message.pb.cc
-message.pb.h
-/root/DGS/MESSAGES/message.pb.h
-algorithm
--
-google/protobuf/stubs/common.h
--
-google/protobuf/stubs/port.h
--
-google/protobuf/io/coded_stream.h
--
-google/protobuf/wire_format_lite_inl.h
--
-google/protobuf/descriptor.h
--
-google/protobuf/generated_message_reflection.h
--
-google/protobuf/reflection_ops.h
--
-google/protobuf/wire_format.h
--
-third_party/protobuf/version.h
-/root/DGS/MESSAGES/third_party/protobuf/version.h
-
 /root/DGS/MESSAGES/message.pb.h
 string
 -

@@ -25,8 +25,12 @@ class Server
     int opt = 1;
     int max_event = 128;
     int read_number = -1;
+    // maximun number of clients that allowed to connect the server.
+    int max_client;
     int left_child = -1;// always for the first came true client
     int right_child = -1;
+    //fd of connected clients, the sequece is first connect first in.
+    vector<int> clients;
     int laucher = -1;
     bool left_free=false;
     bool right_free=false;
@@ -37,9 +41,7 @@ class Server
     sockaddr_in client_addr;
     epoll_event ev;
     epoll_event events[128];
-    //Message_type server_to_client;
-    //Scheduling scheduling;
-    //Job_gang job_gang;
+
 
     typedef struct databuf
     {
@@ -47,22 +49,17 @@ class Server
         char buf[1024]; // used as receive buffer
     } databuf_t, *databuf_p;
 
-    int client_num=-1;//one for the laucher(also client), the number will be first checked after laucher is connected.
 
     int sock_create();
 
     int sock_bindAndListen(int port);
 
-    //int server_initialisation();
-
     int epoll_initialisation();
-
-    //void handle_event();
 
     int new_connection(int i);
 
     int readByevent(int i);
 
-    //int reply(int i);
+
 };
 

@@ -150,28 +150,27 @@ void request_process_loop(int fd)
 	uint32_t recv_time[2];
 	pid_t pid;
 
-	while (1) {
-		while (recvfrom(fd, buf,
-				48, 0,
-				&src_addr,
-				&src_addrlen)
-			< 48 );  /* invalid request */
+	while (recvfrom(fd, buf,
+			48, 0,
+			&src_addr,
+			&src_addrlen)
+		< 48 );  /* invalid request */
 
-		gettime64(recv_time);
-		/* recv_time in local endian */
-		log_request_arrive(recv_time);
+	gettime64(recv_time);
+	/* recv_time in local endian */
+	log_request_arrive(recv_time);
 
-		pid = fork();
-		if (pid == 0) {
-			/* Child */
-			ntp_reply(fd, &src_addr , src_addrlen, buf, recv_time);
-			exit(0);
-		} else if (pid == -1) {
-			perror("fork() error");
-			die(NULL);
-		}
-		/* return to parent */
+	pid = fork();
+	if (pid == 0) {
+		/* Child */
+		ntp_reply(fd, &src_addr , src_addrlen, buf, recv_time);
+		exit(0);
+	} else if (pid == -1) {
+		perror("fork() error");
+		die(NULL);
 	}
+	/*return to parent*/
+
 }
 
 

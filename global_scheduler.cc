@@ -42,6 +42,7 @@ vector<Job_gang> job_list;
 
 vector<vector<task>> ousterhaut_table;//MATRIX FOR SCHED FOR ALL PROCESSORS (assume we only have two local scheduler now
 
+map<int,int>taskid_finish;
 //Job_gang sched[4];//ARRAY FOR TRANSMIT TO SINGLE LOCAL(4 timeslice as a round)
 
 int global_scheduler_port = 1234;
@@ -70,7 +71,11 @@ extern "C"{
 
 int acceptNewJob(int fd);
 
-void finishJob(int fd);
+int finishJob(int fd);
+
+int get_rpn_by_id(int id);
+
+void remove_job_by_id(int id);
 
 int handle_event();
 
@@ -96,7 +101,21 @@ int update_nst();
 
 int main()
 {
-    
+    while(true)
+    {
+        cout<<"HOW MANY CLIENTS DO YOU NEED FOR THIS DGS :"<<endl;
+        cin>>global_scheduler.max_client;
+
+        if(cin.fail())
+        {
+            cin.clear();
+            std::cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout<<"invalid input. please enter an integer"<<endl;
+        }else{
+            break;
+        }
+    }
+
     if(global_scheduler.sock_create()<0)
     {
         cout<<"sock create failed"<<endl;
@@ -210,7 +229,7 @@ int readByevent(int i)
     
         }else{//*********JOB FINISH FROM LOCAL**************//
             
-            finishJob(fd);
+            if(finishJob(fd)<0)return -1;
             return 0;
         }
 
@@ -235,7 +254,7 @@ int acceptNewJob(int fd)
     Job_gang job_accept;
     job_accept.ParseFromArray(global_scheduler.read_buffer,1024);
 
-    if(job_accept.requested_processors()>2||(job_accept.requested_processors()==0))
+    if(job_accept.requested_processors()>global_scheduler.max_client||(job_accept.requested_processors()==0))
     {
         cout<<"received wrong job, discarded it~"<<endl;
         return -1;
@@ -250,17 +269,47 @@ int acceptNewJob(int fd)
 
 }
 
-void finishJob(int fd)
+int get_rpn_by_id(int id)
 {
-    Message_from_Local message;
-    message.ParseFromArray(global_scheduler.read_buffer,1024);
-    //if(save and get Status())  //return 1 when this job is finished at all locals
-    //{
-         //delete(job_id);
-         //SCHED();
-         //SEND();
-    //}
-   cout<<"job "<<message.task_id()<<" has finished  "<<endl;
+    for(auto it=job_list.begin();it!=job_list.end();it++)
+    {
+        if(it->job_id()==id)
+        return it->requested_processors();
+    }
+    return -1;
+}
+
+void remove_job_by_id(int id)
+{
+    for(auto it=job_list.begin();it!=job_list.end();it++)
+    {
+        if(it->job_id()==id)
+        job_list.erase(it);
+    }
+}
+
+int finishJob(int fd)
+{
+    int id=atoi(global_scheduler.read_buffer);
+    taskid_finish[id]++;
+    int num = get_rpn_by_id(id);
+    if(num<0)
+    {
+        printf("Don't find task with id %d in joblist!\n ",id);
+        return -1;
+    }
+
+    printf("Job with id %d has finished in %d processors\n",id,num);
+
+    if(taskid_finish[id]==num)
+    {
+        remove_job_by_id(id);
+        printf("Job with id %d has finished, and removed from joblist!\n",id);
+        need_schedule=true;
+    }
+    return 0;
+
+    
 }
 
 void ntpServer()
@@ -286,8 +335,8 @@ int epoll_timer()
     }
     //struct itimerspec send_timer;
     //---------------------------------------//
-    //triggered every 60s after first trigger
-    //(30s after the this program started)
+    //triggered every 20s after first trigger
+    //(10s after the this program started)
     send_timer.it_interval.tv_sec=20;
     send_timer.it_interval.tv_nsec=0;
     send_timer.it_value.tv_nsec=0;
@@ -340,9 +389,9 @@ int update_timer()
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
-    int64_t sum_ns=diff_usec*1000LL-10000000LL;
-    timer.it_value.tv_sec = sum_ns/1000000000LL;
-    timer.it_value.tv_nsec = sum_ns%1000000000LL;
+    int64_t sum_ns=diff_usec*1000LL-10*1000*1000*1000LL;
+    timer.it_value.tv_sec = sum_ns/(1000LL*1000LL*1000LL);
+    timer.it_value.tv_nsec = sum_ns%(1000LL*1000LL*1000LL);
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
 
@@ -384,7 +433,6 @@ void initialise_nst()
 
 int update_nst()
 {
-    //set 1ms for interval between two schedules,cause it could be a few time through code lines.
     hyperperiode_ms = mysched.get_hyperperiode_ms();
     //cout<<"in global_sched, hyperperiode_ms"<<hyperperiode_ms<<endl;
     //*******none schedule yet or has not been sent(no client)********//
@@ -402,7 +450,17 @@ int update_nst()
         if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
     }
     cout<<"nst has been updated"<<endl;
-    printf("NST : %ld seconds and %ld microseconds\n",next_Starttime.sec(),next_Starttime.ms());
+    struct tm *tm_info;
+    struct timeval tv;
+    char buffer[30];
+    char usec_buffer[21];
+    tv.tv_sec=next_Starttime.sec();
+    tv.tv_usec=next_Starttime.ms()*1000LL;
+    tm_info = localtime(&tv.tv_sec);
+    strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", tm_info);
+    snprintf(usec_buffer, 21, "%06ld", tv.tv_usec);
+    printf("NST TIME :%s.%s(us)\n", buffer, usec_buffer);
+    //printf("NST : %ld seconds and %ld microseconds\n",next_Starttime.sec(),next_Starttime.ms());
     return 0;
 }
 
@@ -455,16 +513,17 @@ int timer_handler()
 
 int get_and_send_schedule()
 {
-    if(!(global_scheduler.left_free||global_scheduler.right_free))
+    if(global_scheduler.clients.size()==0)
     {
         printf("there is no clients available now, will reschedule and retry in next round~\n");
         need_schedule=true;
         return 0;
     }
     ousterhaut_table.clear();
-    ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.left_free,global_scheduler.right_free);
+    ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.clients);
 
     clinets_status_changed = false;
+    need_schedule = false;
 
     printf("successfully got schedule_Tasks(without start time)\n");
 
@@ -473,46 +532,25 @@ int get_and_send_schedule()
     common_sched.mutable_start_time()->CopyFrom(next_Starttime);
     printf("successfully set nst\n");
 
-    vector<task>left = ousterhaut_table[0];
-
-    for(vector<task>::iterator it = left.begin();it!=left.end();it++)
+    for(int client = 0; client<(int)global_scheduler.clients.size();client++)
     {
-        task* common_task = common_sched.add_tasks();
-        *common_task = *it;
+        common_sched.clear_tasks();
+        vector<task> tasks = ousterhaut_table[client];
+        for(vector<task>::iterator it = tasks.begin();it!=tasks.end();it++)
+        {
+            task* common_task = common_sched.add_tasks();
+            *common_task = *it;
+        }
+        memset(global_scheduler.send_buffer,'\0',1024);
+        printf("reset send buffer\n");
+        common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
+        if(write(global_scheduler.clients[client],global_scheduler.send_buffer,1024)<0)
+        {
+            printf("failed to send schedule to client -%d-\n",client);
+            return -1;
+        }
+        printf("~~SCHEDULE TO CLIENT -%d- HAS SENT~~\n",client);
     }
-    memset(global_scheduler.send_buffer,'\0',1024);
-    printf("reset send buffer\n");
-    common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
-    printf("send buffer for left child is ready\n");
-    if(write(global_scheduler.left_child,global_scheduler.send_buffer,1024)<0)
-    {
-        printf("failed to send schedule to left child\n");
-        return -1;
-    }
-
-    if(global_scheduler.right_child<0)
-    {
-        need_schedule = false;
-        return 0;
-    }
-    common_sched.clear_tasks();
-    vector<task>right = ousterhaut_table[1];
-    for(vector<task>::iterator it = right.begin();it!=right.end();it++)
-    {
-        task* common_task = common_sched.add_tasks();
-        *common_task = *it;
-    }
-    memset(global_scheduler.send_buffer,'\0',1024);
-    printf("reset send buffer\n");
-    common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
-    printf("send buffer for right child is ready\n");
-    if(write(global_scheduler.right_child,global_scheduler.send_buffer,1024)<0)
-    {
-        printf("failed to send schedule to right child\n");
-        return -1;
-    }
-
-    need_schedule = false;
 
     return 0;
 

@@ -3,58 +3,60 @@ using namespace std;
 
 Strategy strategy;
 
-vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,bool left_free,bool right_free){
-
-    ousterhaut_table.resize(2);//previous data will be reserved.
-    wait_for_processors = false;
-    ousterhaut_table[0].clear();
-    ousterhaut_table[1].clear();
-    int queueSize = job_list.size();
-    cout<<"job list has size:"<<queueSize<<endl;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//**This scheduling method does not preserve previous scheduling. All jobs on all processors
+//  are rescheduled each round.
+//**Each task gets five seconds of run time for all clients. repeate for six times.
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,vector<int>clients){
     
-    for(int i =0; i<6;i++)
-    {
-   
+    hypperperiode_ms=0;
+
+    vector<vector<task>> ousterhaut_table;
+    int table_row = clients.size();
+    ousterhaut_table.resize(table_row);
+
+    task empty_task;
+    empty_task.set_duration_ms(5000);
+    empty_task.set_task_id("empty");
+
+    wait_for_processors = false;
+ 
+   for(int i =0;i<2;i++)
+   {
         for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
         {
             task task;
             task.set_duration_ms(5000);
-            hypperperiode_ms=hypperperiode_ms+5000;
+
             Job_gang job = *it;
             task.set_path(job.job_path());
-            if(job.requested_processors()==1)
+
+            if(job.requested_processors()>table_row)
             {
-                if(left_free)
-                {
-                    int job_id = job.job_id();
-                    char buffer[128];
-                    sprintf(buffer,"0%d",job_id);
-                    //printf("task id is %s ",buffer);
-                    task.set_task_id(buffer);
-                    ousterhaut_table[0].push_back(task);
-                }
-                if(right_free)//put a empty task,let right run nothing for the same time slice
-                {
-                    task.set_task_id("empty");
-                    ousterhaut_table[1].push_back(task);
-                }
-            }else if((job.requested_processors()==2)&&(left_free&&right_free))
+                printf("**There aren't enough processors for job with id %d now.** \n   ---> Wating for more free processors~\n",job.job_id());
+                wait_for_processors = true;
+                continue;
+            }
+            hypperperiode_ms=hypperperiode_ms+5000;
+            
+            int r;
+            for(r=0;r<job.requested_processors();r++)
             {
                 int job_id = job.job_id();
-                char left_buffer[128];
-                char right_buffer[128];
-                sprintf(left_buffer,"0%d",job_id);
-                sprintf(right_buffer,"1%d",job_id);
-                task.set_task_id(left_buffer);
-                ousterhaut_table[0].push_back(task);
-                task.set_task_id(right_buffer);
-                ousterhaut_table[1].push_back(task);
-                
-            }else{
-                wait_for_processors =true;
+                char buffer[128];
+                sprintf(buffer,"%d%d",r,job_id);
+                task.set_task_id(buffer);
+                ousterhaut_table[r].push_back(task);
             }
+            for(r=r;r<table_row;r++)
+            {
+                ousterhaut_table[r].push_back(empty_task);
+            }
+
         }
-    }
+   }
+    
     return ousterhaut_table;
 
 }

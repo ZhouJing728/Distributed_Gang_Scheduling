@@ -89,34 +89,14 @@ int Server::epoll_initialisation()
     return 0;
 }
 
-// void Server::handle_event()
-// {
-//     for(int i=0;i<read_number;i++)
-//     {
-//     //FIRST SITUATION: event of server->new connection
-//         if(events[i].data.fd==server&&(events[i].events&EPOLLIN))
-//         {
-//             if(new_connection(i)<0)continue;
-                      
-//         }else
-//         {
-//             //SECOND SITUATION: read from client
-//             if(events[i].events&EPOLLIN)
-//             {
-//                 if(readByevent(i)<0)continue;
-                
-//             //THIRD SITUATION : reply after read
-//             }else if(events[i].events&EPOLLOUT)
-//             {
-//                 if(reply(i)<0)cout<<"reply failed"<<endl;
-
-//             }
-//         }   
-//     }
-// }
-
 int Server::new_connection(int i)
 {
+    if((int)clients.size()>=max_client)
+    {
+        cout<<"|---Has reached the max num of clients. new connection is reject!---|";
+        return 0;
+    }
+
     int socklen=sizeof(struct sockaddr_in);
     server_accept=accept(events[i].data.fd,(struct sockaddr*)&client_addr,(socklen_t*)&socklen);
 
@@ -130,20 +110,9 @@ int Server::new_connection(int i)
     {
         laucher = server_accept;
         cout<<"laucher has been connected"<<endl;
-    }else if((left_child>0)&&(right_child>0))
-    {
-        cout<<"already two client has connected! new connection close...."<<endl;
-        close(server_accept);
-        return -1;
-    }else if(left_child>0)
-    {
-        right_child = server_accept;
-        right_free = true;
-        cout<<"new client comes as right child for this server"<<endl;
     }else{
-        left_child = server_accept;
-        left_free = true;
-        cout<<"new client comes as left child for this server"<<endl;
+        clients.push_back(server_accept);
+        cout<<inet_ntoa(client_addr.sin_addr)<<"has been connected as the"<<clients.size()<<" client"<<endl;
     }
 
     // add to list of epoll
@@ -155,10 +124,7 @@ int Server::new_connection(int i)
         cout<<"epoll add failed"<<endl;
         return -1;
     }
-
-    client_num++;
-
-    cout<<inet_ntoa(client_addr.sin_addr)<<"has been connected"<<endl;
+    
     return 0;
 }
 
@@ -212,46 +178,3 @@ int Server::readByevent(int i)
     }
 }
 
-// int Server::reply(int i)
-// {
-//     databuf_p mem = (databuf_p)events[i].data.ptr;
-//     int fd = mem->fd;
-//     memset(send_buffer,'\0',1024);
-
-//     //cout<<"please enter the reply:";
-//     //cin>>send_buffer;
-//     server_to_client.set_type(1);
-//     cout<<"please enter the scheduling order(7 number):"<<endl;
-//     int order[7];
-//     for(int i=0;i<7;i++)
-//     {
-//         cin>>order[i];
-//     }
-
-//     for(int i=0;i<7;i++)
-//     {
-//         scheduling.add_data(order[i]);
-//     }
-
-//     cout<<"the first number in order is:"<<order[0]<<endl;
-//     cout<<"you have inputed (first number for example):"<<scheduling.data(0)<<endl;
-
-//     scheduling.set_processor(fd);
-
-//     server_to_client.set_allocated_scheduling(&scheduling);
-
-//     server_to_client.SerializeToArray(send_buffer,1024);
-
-//     write(fd,send_buffer,1024);
-
-//     ev.events=EPOLLIN;    
-//     ev.data.fd=fd;
-
-//     if(epoll_ctl(epoll_fd,EPOLL_CTL_MOD,fd,&ev)<0)
-//     {
-//         cout<<"epoll modify by reply failed"<<endl;
-//         return -1;
-//     }
-
-//     return 0;
-// }

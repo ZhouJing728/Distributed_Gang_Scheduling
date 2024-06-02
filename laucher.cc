@@ -49,7 +49,22 @@ int main()
         return -1;
     }
 
+    Job_gang job3;
+    job3.set_job_id(3);
+    job3.set_job_path("../JOBS/Job3");
+    printf("+++++++++++++++++++++++++++++++++++++\n for test purpose(new job later || requested processor num),\n we have predifiend Job3..\n");
+    printf("please enter the processor number that you need\n");
+    int num;
+    cin>>num;
+    job3.set_requested_processors(num);
+    memset(laucher.send_buffer,'\0',1024);
+
+    job3.SerializePartialToArray(laucher.send_buffer,1024);
+
+    if(laucher.send_to_server(laucher.send_buffer)<0)return -1;
+
     while(1);
+    
     laucher.close_client();//unreachable unless errors happened
 
     return 0;
