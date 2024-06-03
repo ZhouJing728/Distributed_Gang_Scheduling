@@ -3,8 +3,8 @@
 using namespace std;
 using namespace Message::protobuf;
 
-#define laucher_port 1235
-#define server_port 1234
+// #define laucher_port 1235
+// #define server_port 1234
 
 Client laucher;
 string host = "127.0.0.1";
@@ -13,6 +13,12 @@ int job_initialise();
 
 int main()
 {
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini("../config.ini", pt);
+    
+    int server_port = pt.get<int>("port_globalscheduler.value");
+    int laucher_port = pt.get<int>("port_laucher.value");
+
     cout<<"welcome to laucher, please first connect to the Global Scheduler(Server)."<<endl;
 
     if(laucher.sock_create()<0)

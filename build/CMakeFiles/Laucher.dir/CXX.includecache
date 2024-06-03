@@ -57,6 +57,10 @@ string
 -
 iostream
 -
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/ini_parser.hpp
+-
 MESSAGES/message.pb.h
 /root/DGS/MESSAGES/message.pb.h
 

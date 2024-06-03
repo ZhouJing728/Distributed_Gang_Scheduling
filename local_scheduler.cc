@@ -22,13 +22,17 @@ WSAStartup(MAKEWORD(2, 0), &xwsa_data);
 using namespace std;
 
 
-#define server_port 1234
-#define CGROUP_PATH "../cgroup"
+int server_port;
 
-string server = "127.0.0.1";
+string CGROUP_PATH;
+
+string server;
+
+long int ntp_request_interval_sec;
+
+long int ntp_request_interval_nsec;
 
 int ntp_timerfd;
-//events number from epoll_Wait()
 
 int task_timerfd;
 
@@ -152,8 +156,8 @@ int ntp_timer()
     //(30s after the this program started)
     timer.it_interval.tv_sec=60;//this doesn't work
     timer.it_interval.tv_nsec=0;
-    timer.it_value.tv_nsec=0;
-    timer.it_value.tv_sec=30;//this works
+    timer.it_value.tv_nsec=ntp_request_interval_nsec;
+    timer.it_value.tv_sec=ntp_request_interval_sec;
 
     if(timerfd_settime(ntp_timerfd,0,&timer,NULL)<0)
     {
@@ -375,7 +379,7 @@ bool check_task_initialised(string id)
 bool check_file_empty(string id)
 {
     char buffer[128];
-    sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id.c_str(),"tasks");
+    sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
     FILE *file = fopen(buffer, "r");
     if (file == NULL) {
         printf("fopen failed");
@@ -443,7 +447,7 @@ int task_timer_handler()
         if(id_endTask_lastSched!="empty")
         {
             char buffer[128];
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id_endTask_lastSched.c_str(),"freezer.state");
+            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
             printf("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched.c_str());
         }else{
@@ -457,7 +461,7 @@ int task_timer_handler()
         {
             char buffer[128];
             string id = last_task.task_id().substr(1);
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
+            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
             printf("====================\nTask %s at position %d has been frozen\n",id.c_str(),position-1);
         }
@@ -480,7 +484,7 @@ int task_timer_handler()
     /*********thaw the next task********************/
     char state[128];
     string id = next_task.task_id().substr(1);
-    sprintf(state,"%s/%s/%s",CGROUP_PATH,id.c_str(),"freezer.state");
+    sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
     //cout<<state<<endl;
     write_to_cgroup_file(state, "THAWED");
     printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position);
@@ -496,7 +500,7 @@ int task_timer_handler()
         } else if (pid == 0) {//child process
             prctl(PR_SET_PDEATHSIG,SIGKILL);
             char tasks[128];
-            sprintf(tasks,"%s/%s/%s",CGROUP_PATH,id.c_str(),"tasks");
+            sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
             cout<<"task pid is"<<getpid()<<endl;
             add_pid_to_cgroup(tasks,getpid());
 
@@ -690,6 +694,15 @@ int set_shared_memory()
 
 int main()
 {
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini("../config.ini", pt);
+
+    server_port = pt.get<int>("port_globalscheduler.value");
+    CGROUP_PATH = pt.get<string>("path_cgroup.value");
+    server=pt.get<string>("ip_globalscheduler.value");
+    ntp_request_interval_nsec=pt.get<long int>("ntp_request_interval.nsec");
+    ntp_request_interval_sec=pt.get<long int>("ntp_request_interval.sec");
+
     
     if(local_scheduler.sock_create()<0)
     {

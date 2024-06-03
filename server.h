@@ -1,5 +1,7 @@
 #pragma once
 #include <stdio.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 #include <iostream>
 #include <cstring>
 #include <stdlib.h>

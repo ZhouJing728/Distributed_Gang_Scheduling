@@ -45,7 +45,7 @@ vector<vector<task>> ousterhaut_table;//MATRIX FOR SCHED FOR ALL PROCESSORS (ass
 map<int,int>taskid_finish;
 //Job_gang sched[4];//ARRAY FOR TRANSMIT TO SINGLE LOCAL(4 timeslice as a round)
 
-int global_scheduler_port = 1234;
+int global_scheduler_port;
 
 /********************************************/
 /*from ntp server*/
@@ -101,20 +101,24 @@ int update_nst();
 
 int main()
 {
-    while(true)
-    {
-        cout<<"HOW MANY CLIENTS DO YOU NEED FOR THIS DGS :"<<endl;
-        cin>>global_scheduler.max_client;
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini("../config.ini", pt);
+    global_scheduler_port= pt.get<int>("port_globalscheduler.value");
+    global_scheduler.max_client=pt.get<int>("max_local_num.value");
+    // while(true)
+    // {
+    //     cout<<"HOW MANY CLIENTS DO YOU NEED FOR THIS DGS :"<<endl;
+    //     cin>>global_scheduler.max_client;
 
-        if(cin.fail())
-        {
-            cin.clear();
-            std::cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            cout<<"invalid input. please enter an integer"<<endl;
-        }else{
-            break;
-        }
-    }
+    //     if(cin.fail())
+    //     {
+    //         cin.clear();
+    //         std::cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    //         cout<<"invalid input. please enter an integer"<<endl;
+    //     }else{
+    //         break;
+    //     }
+    // }
 
     if(global_scheduler.sock_create()<0)
     {

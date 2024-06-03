@@ -65,6 +65,10 @@ server.h
 /root/DGS/server.h
 stdio.h
 -
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/ini_parser.hpp
+-
 iostream
 -
 cstring
