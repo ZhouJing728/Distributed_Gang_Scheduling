@@ -22,6 +22,8 @@ Server global_scheduler;
 
 Strategy mysched;
 
+boost::property_tree::ptree pt;
+
 int ntp_fd;
 
 int timer_fd;
@@ -101,7 +103,6 @@ int update_nst();
 
 int main()
 {
-    boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     global_scheduler_port= pt.get<int>("port_globalscheduler.value");
     global_scheduler.max_client=pt.get<int>("max_local_num.value");
@@ -524,7 +525,9 @@ int get_and_send_schedule()
         return 0;
     }
     ousterhaut_table.clear();
-    ousterhaut_table = mysched.roundRobin(job_list,global_scheduler.clients);
+    int num_cpu_pro_local = pt.get<int>("num_cpus.value");
+    int sum_cpu =global_scheduler.clients.size()*num_cpu_pro_local;
+    ousterhaut_table = mysched.roundRobin(job_list,sum_cpu);
 
     clinets_status_changed = false;
     need_schedule = false;
@@ -538,13 +541,21 @@ int get_and_send_schedule()
 
     for(int client = 0; client<(int)global_scheduler.clients.size();client++)
     {
-        common_sched.clear_tasks();
-        vector<task> tasks = ousterhaut_table[client];
-        for(vector<task>::iterator it = tasks.begin();it!=tasks.end();it++)
+        common_sched.clear_tasksets();
+        vector<tasks_set_pro_cpu>tasksets;
+        for(int i=client*num_cpu_pro_local;i<(client+1)*num_cpu_pro_local;i++)
         {
-            task* common_task = common_sched.add_tasks();
-            *common_task = *it;
+            vector<task> tasks = ousterhaut_table[i];
+            tasks_set_pro_cpu taskset;
+            for(vector<task>::iterator it = tasks.begin();it!=tasks.end();it++)
+            {
+                task* common_task = taskset.add_tasks();
+                *common_task = *it;
+            }
+            tasksets.push_back(taskset);
         }
+        common_sched.mutable_tasksets()->CopyFrom({tasksets.begin(),tasksets.end()});
+
         memset(global_scheduler.send_buffer,'\0',1024);
         printf("reset send buffer\n");
         common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);

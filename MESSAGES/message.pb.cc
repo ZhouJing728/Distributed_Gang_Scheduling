@@ -22,6 +22,7 @@
 namespace protobuf_MESSAGES_2fmessage_2eproto {
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_MESSAGES_2fmessage_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_start_time;
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_MESSAGES_2fmessage_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_task;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_MESSAGES_2fmessage_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_tasks_set_pro_cpu;
 }  // namespace protobuf_MESSAGES_2fmessage_2eproto
 namespace Message {
 namespace protobuf {
@@ -30,6 +31,11 @@ class scheduleDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<schedule>
       _instance;
 } _schedule_default_instance_;
+class tasks_set_pro_cpuDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<tasks_set_pro_cpu>
+      _instance;
+} _tasks_set_pro_cpu_default_instance_;
 class taskDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<task>
@@ -45,11 +51,6 @@ class Job_gangDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<Job_gang>
       _instance;
 } _Job_gang_default_instance_;
-class Message_from_LocalDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Message_from_Local>
-      _instance;
-} _Message_from_Local_default_instance_;
 }  // namespace protobuf
 }  // namespace Message
 namespace protobuf_MESSAGES_2fmessage_2eproto {
@@ -66,8 +67,23 @@ static void InitDefaultsschedule() {
 
 ::google::protobuf::internal::SCCInfo<2> scc_info_schedule =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsschedule}, {
-      &protobuf_MESSAGES_2fmessage_2eproto::scc_info_task.base,
+      &protobuf_MESSAGES_2fmessage_2eproto::scc_info_tasks_set_pro_cpu.base,
       &protobuf_MESSAGES_2fmessage_2eproto::scc_info_start_time.base,}};
+
+static void InitDefaultstasks_set_pro_cpu() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::Message::protobuf::_tasks_set_pro_cpu_default_instance_;
+    new (ptr) ::Message::protobuf::tasks_set_pro_cpu();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::Message::protobuf::tasks_set_pro_cpu::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_tasks_set_pro_cpu =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultstasks_set_pro_cpu}, {
+      &protobuf_MESSAGES_2fmessage_2eproto::scc_info_task.base,}};
 
 static void InitDefaultstask() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -111,26 +127,12 @@ static void InitDefaultsJob_gang() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_Job_gang =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsJob_gang}, {}};
 
-static void InitDefaultsMessage_from_Local() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::Message::protobuf::_Message_from_Local_default_instance_;
-    new (ptr) ::Message::protobuf::Message_from_Local();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::Message::protobuf::Message_from_Local::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_Message_from_Local =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsMessage_from_Local}, {}};
-
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_schedule.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_tasks_set_pro_cpu.base);
   ::google::protobuf::internal::InitSCC(&scc_info_task.base);
   ::google::protobuf::internal::InitSCC(&scc_info_start_time.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Job_gang.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_Message_from_Local.base);
 }
 
 ::google::protobuf::Metadata file_level_metadata[5];
@@ -141,8 +143,14 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::schedule, tasks_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::schedule, tasksets_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::schedule, start_time_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::tasks_set_pro_cpu, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::tasks_set_pro_cpu, tasks_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::task, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -166,28 +174,21 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Job_gang, job_id_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Job_gang, requested_processors_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Job_gang, job_path_),
-  ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Message_from_Local, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Message_from_Local, task_id_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::Message_from_Local, status_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Message::protobuf::schedule)},
-  { 7, -1, sizeof(::Message::protobuf::task)},
-  { 15, -1, sizeof(::Message::protobuf::start_time)},
-  { 22, -1, sizeof(::Message::protobuf::Job_gang)},
-  { 30, -1, sizeof(::Message::protobuf::Message_from_Local)},
+  { 7, -1, sizeof(::Message::protobuf::tasks_set_pro_cpu)},
+  { 13, -1, sizeof(::Message::protobuf::task)},
+  { 21, -1, sizeof(::Message::protobuf::start_time)},
+  { 28, -1, sizeof(::Message::protobuf::Job_gang)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_schedule_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_tasks_set_pro_cpu_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_task_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_start_time_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_Job_gang_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::Message::protobuf::_Message_from_Local_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -212,18 +213,19 @@ void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
       "\n\026MESSAGES/message.proto\022\020Message.protob"
-      "uf\"c\n\010schedule\022%\n\005tasks\030\010 \003(\0132\026.Message."
-      "protobuf.task\0220\n\nstart_time\030\t \001(\0132\034.Mess"
-      "age.protobuf.start_time\":\n\004task\022\017\n\007task_"
-      "id\030\002 \001(\t\022\023\n\013duration_ms\030\003 \001(\005\022\014\n\004path\030\026 "
-      "\001(\t\"%\n\nstart_time\022\013\n\003sec\030\006 \001(\003\022\n\n\002ms\030\007 \001"
-      "(\003\"J\n\010Job_gang\022\016\n\006job_id\030\n \001(\005\022\034\n\024reques"
-      "ted_processors\030\013 \001(\005\022\020\n\010job_path\030\014 \001(\t\"5"
-      "\n\022Message_from_Local\022\017\n\007task_id\030\r \001(\005\022\016\n"
-      "\006status\030\016 \001(\tb\006proto3"
+      "uf\"s\n\010schedule\0225\n\010tasksets\030\001 \003(\0132#.Messa"
+      "ge.protobuf.tasks_set_pro_cpu\0220\n\nstart_t"
+      "ime\030\002 \001(\0132\034.Message.protobuf.start_time\""
+      ":\n\021tasks_set_pro_cpu\022%\n\005tasks\030\003 \003(\0132\026.Me"
+      "ssage.protobuf.task\":\n\004task\022\017\n\007task_id\030\004"
+      " \001(\t\022\023\n\013duration_ms\030\005 \001(\005\022\014\n\004path\030\006 \001(\t\""
+      "%\n\nstart_time\022\013\n\003sec\030\007 \001(\003\022\n\n\002ms\030\010 \001(\003\"J"
+      "\n\010Job_gang\022\016\n\006job_id\030\t \001(\005\022\034\n\024requested_"
+      "processors\030\n \001(\005\022\020\n\010job_path\030\013 \001(\tb\006prot"
+      "o3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 381);
+      descriptor, 402);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "MESSAGES/message.proto", &protobuf_RegisterTypes);
 }
@@ -249,7 +251,7 @@ void schedule::InitAsDefaultInstance() {
       ::Message::protobuf::start_time::internal_default_instance());
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int schedule::kTasksFieldNumber;
+const int schedule::kTasksetsFieldNumber;
 const int schedule::kStartTimeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -263,7 +265,7 @@ schedule::schedule()
 schedule::schedule(const schedule& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(NULL),
-      tasks_(from.tasks_) {
+      tasksets_(from.tasksets_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_start_time()) {
     start_time_ = new ::Message::protobuf::start_time(*from.start_time_);
@@ -306,7 +308,7 @@ void schedule::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  tasks_.Clear();
+  tasksets_.Clear();
   if (GetArenaNoVirtual() == NULL && start_time_ != NULL) {
     delete start_time_;
   }
@@ -324,22 +326,22 @@ bool schedule::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .Message.protobuf.task tasks = 8;
-      case 8: {
+      // repeated .Message.protobuf.tasks_set_pro_cpu tasksets = 1;
+      case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(66u /* 66 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_tasks()));
+                input, add_tasksets()));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // .Message.protobuf.start_time start_time = 9;
-      case 9: {
+      // .Message.protobuf.start_time start_time = 2;
+      case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(74u /* 74 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_start_time()));
         } else {
@@ -374,19 +376,19 @@ void schedule::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .Message.protobuf.task tasks = 8;
+  // repeated .Message.protobuf.tasks_set_pro_cpu tasksets = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->tasks_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->tasksets_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      8,
-      this->tasks(static_cast<int>(i)),
+      1,
+      this->tasksets(static_cast<int>(i)),
       output);
   }
 
-  // .Message.protobuf.start_time start_time = 9;
+  // .Message.protobuf.start_time start_time = 2;
   if (this->has_start_time()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      9, this->_internal_start_time(), output);
+      2, this->_internal_start_time(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -403,19 +405,19 @@ void schedule::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .Message.protobuf.task tasks = 8;
+  // repeated .Message.protobuf.tasks_set_pro_cpu tasksets = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->tasks_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->tasksets_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        8, this->tasks(static_cast<int>(i)), deterministic, target);
+        1, this->tasksets(static_cast<int>(i)), deterministic, target);
   }
 
-  // .Message.protobuf.start_time start_time = 9;
+  // .Message.protobuf.start_time start_time = 2;
   if (this->has_start_time()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        9, this->_internal_start_time(), deterministic, target);
+        2, this->_internal_start_time(), deterministic, target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -435,18 +437,18 @@ size_t schedule::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // repeated .Message.protobuf.task tasks = 8;
+  // repeated .Message.protobuf.tasks_set_pro_cpu tasksets = 1;
   {
-    unsigned int count = static_cast<unsigned int>(this->tasks_size());
+    unsigned int count = static_cast<unsigned int>(this->tasksets_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->tasks(static_cast<int>(i)));
+          this->tasksets(static_cast<int>(i)));
     }
   }
 
-  // .Message.protobuf.start_time start_time = 9;
+  // .Message.protobuf.start_time start_time = 2;
   if (this->has_start_time()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -480,7 +482,7 @@ void schedule::MergeFrom(const schedule& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  tasks_.MergeFrom(from.tasks_);
+  tasksets_.MergeFrom(from.tasksets_);
   if (from.has_start_time()) {
     mutable_start_time()->::Message::protobuf::start_time::MergeFrom(from.start_time());
   }
@@ -510,12 +512,241 @@ void schedule::Swap(schedule* other) {
 }
 void schedule::InternalSwap(schedule* other) {
   using std::swap;
-  CastToBase(&tasks_)->InternalSwap(CastToBase(&other->tasks_));
+  CastToBase(&tasksets_)->InternalSwap(CastToBase(&other->tasksets_));
   swap(start_time_, other->start_time_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
 ::google::protobuf::Metadata schedule::GetMetadata() const {
+  protobuf_MESSAGES_2fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_MESSAGES_2fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void tasks_set_pro_cpu::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int tasks_set_pro_cpu::kTasksFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+tasks_set_pro_cpu::tasks_set_pro_cpu()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  ::google::protobuf::internal::InitSCC(
+      &protobuf_MESSAGES_2fmessage_2eproto::scc_info_tasks_set_pro_cpu.base);
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Message.protobuf.tasks_set_pro_cpu)
+}
+tasks_set_pro_cpu::tasks_set_pro_cpu(const tasks_set_pro_cpu& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      tasks_(from.tasks_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Message.protobuf.tasks_set_pro_cpu)
+}
+
+void tasks_set_pro_cpu::SharedCtor() {
+}
+
+tasks_set_pro_cpu::~tasks_set_pro_cpu() {
+  // @@protoc_insertion_point(destructor:Message.protobuf.tasks_set_pro_cpu)
+  SharedDtor();
+}
+
+void tasks_set_pro_cpu::SharedDtor() {
+}
+
+void tasks_set_pro_cpu::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ::google::protobuf::Descriptor* tasks_set_pro_cpu::descriptor() {
+  ::protobuf_MESSAGES_2fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_MESSAGES_2fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const tasks_set_pro_cpu& tasks_set_pro_cpu::default_instance() {
+  ::google::protobuf::internal::InitSCC(&protobuf_MESSAGES_2fmessage_2eproto::scc_info_tasks_set_pro_cpu.base);
+  return *internal_default_instance();
+}
+
+
+void tasks_set_pro_cpu::Clear() {
+// @@protoc_insertion_point(message_clear_start:Message.protobuf.tasks_set_pro_cpu)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  tasks_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool tasks_set_pro_cpu::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Message.protobuf.tasks_set_pro_cpu)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .Message.protobuf.task tasks = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_tasks()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Message.protobuf.tasks_set_pro_cpu)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Message.protobuf.tasks_set_pro_cpu)
+  return false;
+#undef DO_
+}
+
+void tasks_set_pro_cpu::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Message.protobuf.tasks_set_pro_cpu)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .Message.protobuf.task tasks = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->tasks_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3,
+      this->tasks(static_cast<int>(i)),
+      output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Message.protobuf.tasks_set_pro_cpu)
+}
+
+::google::protobuf::uint8* tasks_set_pro_cpu::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:Message.protobuf.tasks_set_pro_cpu)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .Message.protobuf.task tasks = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->tasks_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        3, this->tasks(static_cast<int>(i)), deterministic, target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Message.protobuf.tasks_set_pro_cpu)
+  return target;
+}
+
+size_t tasks_set_pro_cpu::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Message.protobuf.tasks_set_pro_cpu)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // repeated .Message.protobuf.task tasks = 3;
+  {
+    unsigned int count = static_cast<unsigned int>(this->tasks_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          this->tasks(static_cast<int>(i)));
+    }
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void tasks_set_pro_cpu::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:Message.protobuf.tasks_set_pro_cpu)
+  GOOGLE_DCHECK_NE(&from, this);
+  const tasks_set_pro_cpu* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const tasks_set_pro_cpu>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Message.protobuf.tasks_set_pro_cpu)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:Message.protobuf.tasks_set_pro_cpu)
+    MergeFrom(*source);
+  }
+}
+
+void tasks_set_pro_cpu::MergeFrom(const tasks_set_pro_cpu& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Message.protobuf.tasks_set_pro_cpu)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  tasks_.MergeFrom(from.tasks_);
+}
+
+void tasks_set_pro_cpu::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:Message.protobuf.tasks_set_pro_cpu)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void tasks_set_pro_cpu::CopyFrom(const tasks_set_pro_cpu& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Message.protobuf.tasks_set_pro_cpu)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool tasks_set_pro_cpu::IsInitialized() const {
+  return true;
+}
+
+void tasks_set_pro_cpu::Swap(tasks_set_pro_cpu* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void tasks_set_pro_cpu::InternalSwap(tasks_set_pro_cpu* other) {
+  using std::swap;
+  CastToBase(&tasks_)->InternalSwap(CastToBase(&other->tasks_));
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata tasks_set_pro_cpu::GetMetadata() const {
   protobuf_MESSAGES_2fmessage_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_MESSAGES_2fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -602,14 +833,14 @@ bool task::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:Message.protobuf.task)
   for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(16383u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string task_id = 2;
-      case 2: {
+      // string task_id = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_task_id()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -622,10 +853,10 @@ bool task::MergePartialFromCodedStream(
         break;
       }
 
-      // int32 duration_ms = 3;
-      case 3: {
+      // int32 duration_ms = 5;
+      case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -636,10 +867,10 @@ bool task::MergePartialFromCodedStream(
         break;
       }
 
-      // string path = 22;
-      case 22: {
+      // string path = 6;
+      case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(178u /* 178 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_path()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -678,29 +909,29 @@ void task::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string task_id = 2;
+  // string task_id = 4;
   if (this->task_id().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->task_id().data(), static_cast<int>(this->task_id().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "Message.protobuf.task.task_id");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->task_id(), output);
+      4, this->task_id(), output);
   }
 
-  // int32 duration_ms = 3;
+  // int32 duration_ms = 5;
   if (this->duration_ms() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->duration_ms(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->duration_ms(), output);
   }
 
-  // string path = 22;
+  // string path = 6;
   if (this->path().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->path().data(), static_cast<int>(this->path().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "Message.protobuf.task.path");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      22, this->path(), output);
+      6, this->path(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -717,7 +948,7 @@ void task::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string task_id = 2;
+  // string task_id = 4;
   if (this->task_id().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->task_id().data(), static_cast<int>(this->task_id().length()),
@@ -725,15 +956,15 @@ void task::SerializeWithCachedSizes(
       "Message.protobuf.task.task_id");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->task_id(), target);
+        4, this->task_id(), target);
   }
 
-  // int32 duration_ms = 3;
+  // int32 duration_ms = 5;
   if (this->duration_ms() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->duration_ms(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->duration_ms(), target);
   }
 
-  // string path = 22;
+  // string path = 6;
   if (this->path().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->path().data(), static_cast<int>(this->path().length()),
@@ -741,7 +972,7 @@ void task::SerializeWithCachedSizes(
       "Message.protobuf.task.path");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        22, this->path(), target);
+        6, this->path(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -761,21 +992,21 @@ size_t task::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string task_id = 2;
+  // string task_id = 4;
   if (this->task_id().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->task_id());
   }
 
-  // string path = 22;
+  // string path = 6;
   if (this->path().size() > 0) {
-    total_size += 2 +
+    total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->path());
   }
 
-  // int32 duration_ms = 3;
+  // int32 duration_ms = 5;
   if (this->duration_ms() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -936,10 +1167,10 @@ bool start_time::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int64 sec = 6;
-      case 6: {
+      // int64 sec = 7;
+      case 7: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -950,10 +1181,10 @@ bool start_time::MergePartialFromCodedStream(
         break;
       }
 
-      // int64 ms = 7;
-      case 7: {
+      // int64 ms = 8;
+      case 8: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -990,14 +1221,14 @@ void start_time::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 sec = 6;
+  // int64 sec = 7;
   if (this->sec() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(6, this->sec(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(7, this->sec(), output);
   }
 
-  // int64 ms = 7;
+  // int64 ms = 8;
   if (this->ms() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(7, this->ms(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(8, this->ms(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1014,14 +1245,14 @@ void start_time::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 sec = 6;
+  // int64 sec = 7;
   if (this->sec() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(6, this->sec(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(7, this->sec(), target);
   }
 
-  // int64 ms = 7;
+  // int64 ms = 8;
   if (this->ms() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(7, this->ms(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(8, this->ms(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1041,14 +1272,14 @@ size_t start_time::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // int64 sec = 6;
+  // int64 sec = 7;
   if (this->sec() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
         this->sec());
   }
 
-  // int64 ms = 7;
+  // int64 ms = 8;
   if (this->ms() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
@@ -1209,10 +1440,10 @@ bool Job_gang::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 job_id = 10;
-      case 10: {
+      // int32 job_id = 9;
+      case 9: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(80u /* 80 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(72u /* 72 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -1223,10 +1454,10 @@ bool Job_gang::MergePartialFromCodedStream(
         break;
       }
 
-      // int32 requested_processors = 11;
-      case 11: {
+      // int32 requested_processors = 10;
+      case 10: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(88u /* 88 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(80u /* 80 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -1237,10 +1468,10 @@ bool Job_gang::MergePartialFromCodedStream(
         break;
       }
 
-      // string job_path = 12;
-      case 12: {
+      // string job_path = 11;
+      case 11: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(98u /* 98 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(90u /* 90 & 0xFF */)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_job_path()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -1279,24 +1510,24 @@ void Job_gang::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 job_id = 10;
+  // int32 job_id = 9;
   if (this->job_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(10, this->job_id(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(9, this->job_id(), output);
   }
 
-  // int32 requested_processors = 11;
+  // int32 requested_processors = 10;
   if (this->requested_processors() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(11, this->requested_processors(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(10, this->requested_processors(), output);
   }
 
-  // string job_path = 12;
+  // string job_path = 11;
   if (this->job_path().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->job_path().data(), static_cast<int>(this->job_path().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "Message.protobuf.Job_gang.job_path");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      12, this->job_path(), output);
+      11, this->job_path(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1313,17 +1544,17 @@ void Job_gang::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 job_id = 10;
+  // int32 job_id = 9;
   if (this->job_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(10, this->job_id(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(9, this->job_id(), target);
   }
 
-  // int32 requested_processors = 11;
+  // int32 requested_processors = 10;
   if (this->requested_processors() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(11, this->requested_processors(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(10, this->requested_processors(), target);
   }
 
-  // string job_path = 12;
+  // string job_path = 11;
   if (this->job_path().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->job_path().data(), static_cast<int>(this->job_path().length()),
@@ -1331,7 +1562,7 @@ void Job_gang::SerializeWithCachedSizes(
       "Message.protobuf.Job_gang.job_path");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        12, this->job_path(), target);
+        11, this->job_path(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1351,21 +1582,21 @@ size_t Job_gang::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
-  // string job_path = 12;
+  // string job_path = 11;
   if (this->job_path().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->job_path());
   }
 
-  // int32 job_id = 10;
+  // int32 job_id = 9;
   if (this->job_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->job_id());
   }
 
-  // int32 requested_processors = 11;
+  // int32 requested_processors = 10;
   if (this->requested_processors() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -1448,287 +1679,6 @@ void Job_gang::InternalSwap(Job_gang* other) {
 }
 
 
-// ===================================================================
-
-void Message_from_Local::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int Message_from_Local::kTaskIdFieldNumber;
-const int Message_from_Local::kStatusFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-Message_from_Local::Message_from_Local()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  ::google::protobuf::internal::InitSCC(
-      &protobuf_MESSAGES_2fmessage_2eproto::scc_info_Message_from_Local.base);
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:Message.protobuf.Message_from_Local)
-}
-Message_from_Local::Message_from_Local(const Message_from_Local& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  status_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.status().size() > 0) {
-    status_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.status_);
-  }
-  task_id_ = from.task_id_;
-  // @@protoc_insertion_point(copy_constructor:Message.protobuf.Message_from_Local)
-}
-
-void Message_from_Local::SharedCtor() {
-  status_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  task_id_ = 0;
-}
-
-Message_from_Local::~Message_from_Local() {
-  // @@protoc_insertion_point(destructor:Message.protobuf.Message_from_Local)
-  SharedDtor();
-}
-
-void Message_from_Local::SharedDtor() {
-  status_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void Message_from_Local::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const ::google::protobuf::Descriptor* Message_from_Local::descriptor() {
-  ::protobuf_MESSAGES_2fmessage_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_MESSAGES_2fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const Message_from_Local& Message_from_Local::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_MESSAGES_2fmessage_2eproto::scc_info_Message_from_Local.base);
-  return *internal_default_instance();
-}
-
-
-void Message_from_Local::Clear() {
-// @@protoc_insertion_point(message_clear_start:Message.protobuf.Message_from_Local)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  status_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  task_id_ = 0;
-  _internal_metadata_.Clear();
-}
-
-bool Message_from_Local::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:Message.protobuf.Message_from_Local)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int32 task_id = 13;
-      case 13: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(104u /* 104 & 0xFF */)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &task_id_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string status = 14;
-      case 14: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(114u /* 114 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_status()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->status().data(), static_cast<int>(this->status().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "Message.protobuf.Message_from_Local.status"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:Message.protobuf.Message_from_Local)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:Message.protobuf.Message_from_Local)
-  return false;
-#undef DO_
-}
-
-void Message_from_Local::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:Message.protobuf.Message_from_Local)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 task_id = 13;
-  if (this->task_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(13, this->task_id(), output);
-  }
-
-  // string status = 14;
-  if (this->status().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->status().data(), static_cast<int>(this->status().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "Message.protobuf.Message_from_Local.status");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      14, this->status(), output);
-  }
-
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
-  }
-  // @@protoc_insertion_point(serialize_end:Message.protobuf.Message_from_Local)
-}
-
-::google::protobuf::uint8* Message_from_Local::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:Message.protobuf.Message_from_Local)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int32 task_id = 13;
-  if (this->task_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(13, this->task_id(), target);
-  }
-
-  // string status = 14;
-  if (this->status().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->status().data(), static_cast<int>(this->status().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "Message.protobuf.Message_from_Local.status");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        14, this->status(), target);
-  }
-
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:Message.protobuf.Message_from_Local)
-  return target;
-}
-
-size_t Message_from_Local::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Message.protobuf.Message_from_Local)
-  size_t total_size = 0;
-
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
-  }
-  // string status = 14;
-  if (this->status().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->status());
-  }
-
-  // int32 task_id = 13;
-  if (this->task_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->task_id());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void Message_from_Local::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:Message.protobuf.Message_from_Local)
-  GOOGLE_DCHECK_NE(&from, this);
-  const Message_from_Local* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Message_from_Local>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Message.protobuf.Message_from_Local)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:Message.protobuf.Message_from_Local)
-    MergeFrom(*source);
-  }
-}
-
-void Message_from_Local::MergeFrom(const Message_from_Local& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:Message.protobuf.Message_from_Local)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.status().size() > 0) {
-
-    status_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.status_);
-  }
-  if (from.task_id() != 0) {
-    set_task_id(from.task_id());
-  }
-}
-
-void Message_from_Local::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:Message.protobuf.Message_from_Local)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void Message_from_Local::CopyFrom(const Message_from_Local& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Message.protobuf.Message_from_Local)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool Message_from_Local::IsInitialized() const {
-  return true;
-}
-
-void Message_from_Local::Swap(Message_from_Local* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void Message_from_Local::InternalSwap(Message_from_Local* other) {
-  using std::swap;
-  status_.Swap(&other->status_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(task_id_, other->task_id_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata Message_from_Local::GetMetadata() const {
-  protobuf_MESSAGES_2fmessage_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_MESSAGES_2fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
-
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace protobuf
 }  // namespace Message
@@ -1736,6 +1686,9 @@ namespace google {
 namespace protobuf {
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::schedule* Arena::CreateMaybeMessage< ::Message::protobuf::schedule >(Arena* arena) {
   return Arena::CreateInternal< ::Message::protobuf::schedule >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::tasks_set_pro_cpu* Arena::CreateMaybeMessage< ::Message::protobuf::tasks_set_pro_cpu >(Arena* arena) {
+  return Arena::CreateInternal< ::Message::protobuf::tasks_set_pro_cpu >(arena);
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::task* Arena::CreateMaybeMessage< ::Message::protobuf::task >(Arena* arena) {
   return Arena::CreateInternal< ::Message::protobuf::task >(arena);
@@ -1745,9 +1698,6 @@ template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::start_time* A
 }
 template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::Job_gang* Arena::CreateMaybeMessage< ::Message::protobuf::Job_gang >(Arena* arena) {
   return Arena::CreateInternal< ::Message::protobuf::Job_gang >(arena);
-}
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::Message::protobuf::Message_from_Local* Arena::CreateMaybeMessage< ::Message::protobuf::Message_from_Local >(Arena* arena) {
-  return Arena::CreateInternal< ::Message::protobuf::Message_from_Local >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

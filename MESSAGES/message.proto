@@ -4,33 +4,33 @@ package Message.protobuf;
 
 message schedule
 {
-    repeated task tasks = 8;
-    start_time start_time = 9;
+    repeated tasks_set_pro_cpu tasksets = 1;
+    start_time start_time = 2;
     
+}
+
+message tasks_set_pro_cpu
+{
+    repeated task tasks = 3;
 }
 
 message task
 {
-    string task_id=2;
-    int32 duration_ms = 3;
-    string path = 22;
+    string task_id=4;
+    int32 duration_ms = 5;
+    string path = 6;
 }
 
 message start_time
 {
-    int64 sec = 6;
-    int64 ms = 7;
+    int64 sec = 7;
+    int64 ms = 8;
 }
 
 message Job_gang
 {
-    int32 job_id =10;
-    int32 requested_processors = 11;
-    string job_path = 12;
+    int32 job_id =9;
+    int32 requested_processors = 10;
+    string job_path = 11;
 }
 
-message Message_from_Local
-{
-    int32 task_id = 13;
-    string status = 14;
-}

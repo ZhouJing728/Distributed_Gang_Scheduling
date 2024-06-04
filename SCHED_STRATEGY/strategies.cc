@@ -8,12 +8,12 @@ Strategy strategy;
 //  are rescheduled each round.
 //**Each task gets five seconds of run time for all clients. repeate for six times.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,vector<int>clients){
+vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu){
     
     hypperperiode_ms=0;
 
     vector<vector<task>> ousterhaut_table;
-    int table_row = clients.size();
+    int table_row = sum_cpu;
     ousterhaut_table.resize(table_row);
 
     task empty_task;

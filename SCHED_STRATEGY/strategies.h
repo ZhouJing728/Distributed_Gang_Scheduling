@@ -38,7 +38,7 @@ class Strategy{
     //vector<vector<task>> ousterhaut_table;
 
     /* (five) seconds for each job(task at a local node) in turn*/
-    vector<vector<task>> roundRobin(vector<Job_gang> job_list,vector<int>clients);
+    vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu);
 
     int get_hyperperiode_ms();
 
