@@ -1,8 +1,12 @@
-#include "server.h"
+#include "../include/server.h"
 #include<vector>
 #include <sys/timerfd.h>
-#include "SCHED_STRATEGY/strategies.h"
+#include "../include/strategies.h"
 #include "MESSAGES/message.pb.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <errno.h>
 /*******************************************/
 /* from ntp server*************************/
 #include <sys/time.h> /* gettimeofday() */
@@ -265,6 +269,16 @@ int acceptNewJob(int fd)
         return -1;
     }
     job_list.push_back(job_accept);
+
+    char path[128];
+    sprintf(path,"../cgroup/%d",job_accept.job_id());
+
+    struct stat st;
+    if((stat(path,&st)<0)&&mkdir(path,0755)<0)
+    {
+        perror("mkdir");
+        return -1;
+    }
 
     need_schedule = true;
 

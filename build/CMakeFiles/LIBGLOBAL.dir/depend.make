@@ -4,11 +4,12 @@
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.cc
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.h
 
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o: ../MESSAGES/message.pb.h
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o: ../SCHED_STRATEGY/strategies.cc
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o: ../SCHED_STRATEGY/strategies.h
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../include/server.h
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../src/server.cc
 
-CMakeFiles/LIBGLOBAL.dir/server.cc.o: ../MESSAGES/message.pb.h
-CMakeFiles/LIBGLOBAL.dir/server.cc.o: ../server.cc
-CMakeFiles/LIBGLOBAL.dir/server.cc.o: ../server.h
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o: ../include/strategies.h
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o: ../src/strategies.cc
 

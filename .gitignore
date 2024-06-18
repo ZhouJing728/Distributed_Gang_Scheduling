@@ -1,12 +1,8 @@
 *.[oa]
 NTP/
 ntp.cc
-ntp1.cc
 .history/
-Ntp1
-chain_job.h
-chain_task.h
-jobQueue*
-taskQueue*
 build/
 .vscode
+Freezernew
+freezer.cc

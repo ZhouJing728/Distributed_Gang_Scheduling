@@ -57,18 +57,18 @@ include CMakeFiles/LIBGLOBAL.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/LIBGLOBAL.dir/flags.make
 
-CMakeFiles/LIBGLOBAL.dir/server.cc.o: CMakeFiles/LIBGLOBAL.dir/flags.make
-CMakeFiles/LIBGLOBAL.dir/server.cc.o: ../server.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/LIBGLOBAL.dir/server.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LIBGLOBAL.dir/server.cc.o -c /root/DGS/server.cc
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: CMakeFiles/LIBGLOBAL.dir/flags.make
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../src/server.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/LIBGLOBAL.dir/src/server.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LIBGLOBAL.dir/src/server.cc.o -c /root/DGS/src/server.cc
 
-CMakeFiles/LIBGLOBAL.dir/server.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LIBGLOBAL.dir/server.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/server.cc > CMakeFiles/LIBGLOBAL.dir/server.cc.i
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LIBGLOBAL.dir/src/server.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/src/server.cc > CMakeFiles/LIBGLOBAL.dir/src/server.cc.i
 
-CMakeFiles/LIBGLOBAL.dir/server.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/server.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/server.cc -o CMakeFiles/LIBGLOBAL.dir/server.cc.s
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/src/server.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/server.cc -o CMakeFiles/LIBGLOBAL.dir/src/server.cc.s
 
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: CMakeFiles/LIBGLOBAL.dir/flags.make
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.cc
@@ -83,33 +83,33 @@ CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/MESSAGES/message.pb.cc -o CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.s
 
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o: CMakeFiles/LIBGLOBAL.dir/flags.make
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o: ../SCHED_STRATEGY/strategies.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o -c /root/DGS/SCHED_STRATEGY/strategies.cc
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o: CMakeFiles/LIBGLOBAL.dir/flags.make
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o: ../src/strategies.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o -c /root/DGS/src/strategies.cc
 
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/SCHED_STRATEGY/strategies.cc > CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.i
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/src/strategies.cc > CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.i
 
-CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/SCHED_STRATEGY/strategies.cc -o CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s
+CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/strategies.cc -o CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.s
 
 # Object files for target LIBGLOBAL
 LIBGLOBAL_OBJECTS = \
-"CMakeFiles/LIBGLOBAL.dir/server.cc.o" \
+"CMakeFiles/LIBGLOBAL.dir/src/server.cc.o" \
 "CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o" \
-"CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o"
+"CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o"
 
 # External object files for target LIBGLOBAL
 LIBGLOBAL_EXTERNAL_OBJECTS = \
-"/root/DGS/ntp-master/ntp-master/server.o"
+"/root/DGS/lib/ntp-master/server.o"
 
-libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/server.cc.o
+libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/src/server.cc.o
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o
-libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o
-libLIBGLOBAL.a: ../ntp-master/ntp-master/server.o
+libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o
+libLIBGLOBAL.a: ../lib/ntp-master/server.o
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/build.make
 libLIBGLOBAL.a: CMakeFiles/LIBGLOBAL.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libLIBGLOBAL.a"

@@ -6,14 +6,15 @@
 #include<sys/wait.h>
 #include<map>
 #include<sstream>
+#include<deque>
 #include<string>
 #include<iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <fcntl.h>
 #include <sys/prctl.h>
-#include "client.h"
-#include "ntp_client-Gaa/src/ntp_client.h"
+#include "../include/client.h"
+#include "../lib/ntp_client-Gaa/src/ntp_client.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 WSADATA xwsa_data;
@@ -21,6 +22,20 @@ WSAStartup(MAKEWORD(2, 0), &xwsa_data);
 #endif // defined(_WIN32) || defined(_WIN64)
 using namespace std;
 
+struct timeinterval{
+    vector<int> cpus;//it could be multiple cpus switch task at same time
+                    //at least the first tasks
+    long int timeinterval_ms;
+};
+
+struct task_local{
+    string task_id;
+    string path;
+};
+
+vector<vector<task_local>> tasksets_local;
+
+vector<timeinterval> timeinervals;
 
 int server_port;
 
@@ -47,10 +62,10 @@ char* shmaddr;
 int read_number;
 //the position for next to be execute task in schedule
 vector<int> position;
-//size for current schedule tasks
-int size;
+
+int index_timeInterval;
 //for interaive calculating start time of task
-struct timeval given_time;
+struct timeval ST;
 
 map<int,string>pid_to_taskid;
 
@@ -82,30 +97,6 @@ xtime_descr_t xtm_local = { 0 };
 x_ccstring_t host = "127.0.0.1";
 x_int16_t port = 123;
 x_uint32_t xut_tmout = 3000;
-
-
-string serializeMap(const std::map<int, std::string>& myMap) {
-    ostringstream oss;
-    for (const auto& pair : myMap) {
-        oss<< pair.first << ":" << pair.second << ";";
-    }
-    return oss.str();
-}
-
-map<int,string> deserializeMap(const std::string& str) {
-    std::map<int, std::string> myMap;
-    std::istringstream iss(str);
-    std::string item;
-    while (std::getline(iss, item, ';')) {
-        if (!item.empty()) {
-            size_t pos = item.find(':');
-            int key = std::stoi(item.substr(0, pos));
-            std::string value = item.substr(pos + 1);
-            myMap[key] = value;
-        }
-    }
-    return myMap;
-}
 
 
 void print_current_time() {
@@ -282,13 +273,52 @@ long long time_diff_microseconds(struct timeval start, struct timeval end) {
     return end_usec - start_usec;
 }
 
+bool compareTimeInterval(const timeinterval&a,const timeinterval &b) {
+    return a.timeinterval_ms< b.timeinterval_ms;
+}
+
+void insert_timeIntervals(task task,int cpu)
+{
+    // cout<<"in insert"<<endl;
+    // auto it=timeinervals.begin();
+    // while(it!=timeinervals.end()&&it->timeinterval_ms<task.relevant_swtichtime_ms())
+    // {
+    //     it++;
+    // }
+    // timeinterval tinterval=*it;
+    // if(tinterval.timeinterval_ms==task.relevant_swtichtime_ms())
+    // {
+    //     it->cpus.push_back(cpu);
+    // }else{
+    //     timeinterval ti;
+    //     ti.cpus.push_back(cpu);
+    //     ti.timeinterval_ms=task.relevant_swtichtime_ms();
+    //     timeinervals.insert(it,ti);
+    // }
+    for (auto &interval : timeinervals) {
+        if (interval.timeinterval_ms == task.relevant_swtichtime_ms()) {
+            // 如果时间长度相同，合并CPU组
+            interval.cpus.insert(interval.cpus.end(), cpu);
+            return;
+        }
+    }
+    // 如果没有相同时间长度的时间间隔，插入新的时间间隔
+    timeinterval ti;
+    ti.cpus.push_back(cpu);
+    ti.timeinterval_ms=task.relevant_swtichtime_ms();
+    timeinervals.push_back(ti);
+    // 按时间长度排序
+    std::sort(timeinervals.begin(), timeinervals.end(), compareTimeInterval);
+
+}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //organize_current_schedule() set the dispatching flag, reset the position from 0, set timer for first task start
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int organize_current_schedule()
 {
-    size = schedule_current.tasksets(0).tasks_size();
+    //size = schedule_current.tasksets(0).tasks_size();
     dispatching = true;
+    index_timeInterval = 0;
     for(int i=0;i<num_cpu;i++)position[i] = 0;
 
     /***********the start time of first task is the start time of schedule********************/
@@ -297,10 +327,10 @@ int organize_current_schedule()
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
 
-    given_time.tv_sec=schedule_current.start_time().sec();
-    given_time.tv_usec=schedule_current.start_time().ms()*1000;
+    ST.tv_sec=schedule_current.start_time().sec();
+    ST.tv_usec=schedule_current.start_time().ms()*1000;
 
-    long long diff_usec = time_diff_microseconds(current_time,given_time);
+    long long diff_usec = time_diff_microseconds(current_time,ST);
 
     if(diff_usec<0)
     {
@@ -320,7 +350,24 @@ int organize_current_schedule()
 
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
     cout<<"successful to set the first timer of a schedule"<<endl;
+    if(new_schedule){
+        for(int i=0;i<num_cpu;i++)tasksets_local[i].clear();
+        timeinervals.clear();
+        for(int i=0;i<schedule_current.tasksets_size();i++)
+        {
+            for(int j=0;j<schedule_current.tasksets(i).tasks_size();j++)
+            {
+                task task=schedule_current.tasksets(i).tasks(j);
+                task_local tl;
+                tl.path=task.path();
+                tl.task_id=task.task_id();
+                tasksets_local[i].push_back(tl);
 
+                insert_timeIntervals(task,i);
+            }
+        }
+    }
+    new_schedule=false;
     return 0;
 }
 
@@ -402,14 +449,13 @@ bool check_file_empty(string id)
 }
 
 /**********from second task, the start time = last start time + last duration************/
-int timer_update(int position)
+int timer_update()
 {
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
-    tasks_set_pro_cpu taskset0=schedule_current.tasksets(0);
-    task task = taskset0.tasks(position);
-    given_time.tv_sec=given_time.tv_sec+task.duration_ms()/1000;
-    given_time.tv_usec= given_time.tv_usec+(task.duration_ms()%1000)*1000;
+    struct timeval given_time;
+    given_time.tv_sec=ST.tv_sec+timeinervals[index_timeInterval].timeinterval_ms/1000;
+    given_time.tv_usec= ST.tv_usec+(timeinervals[index_timeInterval].timeinterval_ms%1000)*1000;
     long long diff_usec = time_diff_microseconds(current_time,given_time);
     if(diff_usec<0)
     {
@@ -426,11 +472,12 @@ int timer_update(int position)
     timer.it_interval.tv_sec =0;
 
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
+    index_timeInterval++;
     cout<<"successful to set the timer"<<endl;
     return 0;
 }
 
-int task_timer_handler_pro_cpu(int cpu)
+int task_switch(int cpu)
 {
     if(position[cpu]==0)
     {
@@ -445,79 +492,77 @@ int task_timer_handler_pro_cpu(int cpu)
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
+    //vector<task_local>::iterator it = tasksets_local[cpu].begin();
     if(position[cpu]>0){
-        task last_task = schedule_current.tasksets(cpu).tasks(position[cpu]-1);
-        if(last_task.task_id()!="empty")
+        //vector<task_local>::iterator it = tasksets_local[cpu].begin();
+        //for(int i=0;i<position[cpu]-1;i++)it++;
+        vector<task_local>taskset =tasksets_local[cpu];        
+        task_local last_task = taskset[position[cpu]-1];
+        if(last_task.task_id!="empty")
         {
             char buffer[128];
-            string id = last_task.task_id().substr(1);
+            string id = last_task.task_id.substr(1);
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
             printf("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
-    /*********if next task is empty, skip the next step*******************/
-    task next_task = schedule_current.tasksets(cpu).tasks(position[cpu]);
-    if(next_task.task_id()=="empty")
+    /*********thaw the next task********************/
+    //it++;
+    task_local next_task = tasksets_local[cpu][position[cpu]];
+    if(next_task.task_id!="empty")
+    {
+        char state[128];
+        string id = next_task.task_id.substr(1);
+        sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+        //cout<<state<<endl;
+        write_to_cgroup_file(state, "THAWED");
+        printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
+        print_current_time();
+        //*****if not be executed before, it needs to get pid and store it ****//
+        if(!check_task_initialised(cpu,id))
+        {
+            taskids_exist_local[cpu].push_back(id);
+            pid_t pid = fork();
+            if (pid == -1) {
+                perror("Error forking process");
+                exit(EXIT_FAILURE);
+            } else if (pid == 0) {//child process
+                prctl(PR_SET_PDEATHSIG,SIGKILL);
+
+                cpu_set_t set;
+                CPU_ZERO(&set);
+                CPU_SET(cpu,&set);
+
+                if (sched_setaffinity(0, sizeof(set), &set) == -1) {
+                    perror("sched_setaffinity");
+                    exit(EXIT_FAILURE);
+                }
+
+                const char* path = next_task.path.c_str();
+                execl(path, path, NULL);
+                perror("Error executing program ");
+                exit(EXIT_FAILURE);
+            }else//father process here continue
+            {
+                char tasks[128];
+                sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
+                cout<<"task pid is"<<getpid()<<endl;
+                add_pid_to_cgroup(tasks,pid);
+                pid_to_taskid.insert(pair<int,string>(pid,id));
+            }
+        }
+    }else/*********if next task is empty, skip the next step*******************/
     {
         printf("Next task time slice is empty!\n====================\n");
-        // if(timer_update(position[cpu])<0)
-        // {
-        //     cout<<"failed to update timer with task position:"<<position[cpu]<<endl;
-        //     return -1;
-        // }   
-        // print_current_time();
-        // position[cpu]++;
+    }
+
+    if((schedule_current.tasksets(cpu).tasks(position[cpu]).task_id()!="empty")&&(position[cpu]==schedule_current.tasksets(cpu).tasks_size()-1))
+    {
+        id_endTask_lastSched[cpu]=next_task.task_id.substr(1);
         return 0;
     }
-
-    /*********thaw the next task********************/
-    char state[128];
-    string id = next_task.task_id().substr(1);
-    sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-    //cout<<state<<endl;
-    write_to_cgroup_file(state, "THAWED");
-    printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
-    print_current_time();
-    //*****if not be executed before, it needs to get pid and store it ****//
-    if(!check_task_initialised(cpu,id))
-    {
-        taskids_exist_local[cpu].push_back(id);
-        pid_t pid = fork();
-        if (pid == -1) {
-            perror("Error forking process");
-            exit(EXIT_FAILURE);
-        } else if (pid == 0) {//child process
-            prctl(PR_SET_PDEATHSIG,SIGKILL);
-            char tasks[128];
-            sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
-            cout<<"task pid is"<<getpid()<<endl;
-            add_pid_to_cgroup(tasks,getpid());
-
-            string serializedMap(shmaddr);
-            map<int, string> receivedMap = deserializeMap(serializedMap);
-
-            receivedMap.insert(pair<int,string>(getpid(),id));
-            serializedMap = serializeMap(receivedMap);
-            copy(serializedMap.begin(), serializedMap.end(), shmaddr);
-            shmaddr[serializedMap.size()] = '\0';
-            shmdt(shmaddr);
-
-            cpu_set_t set;
-            CPU_ZERO(&set);
-            CPU_SET(cpu,&set);
-
-            if (sched_setaffinity(0, sizeof(set), &set) == -1) {
-                perror("sched_setaffinity");
-                exit(EXIT_FAILURE);
-            }
-
-            const char* path = next_task.path().c_str();
-            execl(path, path, NULL);
-            perror("Error executing program ");
-            exit(EXIT_FAILURE);
-        }//father process here continue
-    }
+    position[cpu]++;
     return 0;
 }
 
@@ -530,51 +575,49 @@ int task_timer_handler()
         return -1;
     }
 
-    for(int i=0;i<num_cpu;i++)
+    for(long unsigned int i=0;i<timeinervals[0].cpus.size();i++)
     {
-        if(task_timer_handler_pro_cpu(i)<0)
+        if(task_switch(timeinervals[0].cpus[i])<0)
         cout<<"failed to handle task timer for cpu"<<i<<endl;
     }
+    //timeinervals.pop_front();
+    
     /*********current schedule finished********************/
-    if(position[0]==schedule_current.tasksets(0).tasks_size()-1)
+    /*must be the last task of all tasksets cause the current shceduler will be cleaned*/
+    /*the last task still in list,because we need its switch time to update timer */
+    if(index_timeInterval==(int)timeinervals.size()-1)
     {
-        for(int i=0;i<schedule_current.tasksets_size();i++)
-        {
-            if(schedule_current.tasksets(i).tasks(position[i]).task_id()!="empty")
-            id_endTask_lastSched[i]=schedule_current.tasksets(i).tasks(position[i]).task_id().substr(1);
-        }
- 
         if(new_schedule)
         {
             printf("THERE IS NEW SCHEDULE DETECTED!\n");
-            new_schedule=false;
+            //new_schedule=false;
             schedule_current.Clear();
             //schedule_current.CopyFrom(schedule_new);
             schedule_current.mutable_start_time()->CopyFrom(schedule_new.start_time());
             schedule_current.mutable_tasksets()->CopyFrom(schedule_new.tasksets());
             schedule_new.Clear();
             if(organize_current_schedule()<0)return -1;
-            cout<<"successfully swtiched to new schedule!"<<endl;
+            cout<<"successfully organized the new schedule!"<<endl;
         }else{
             start_time nst;
-            //start time for repeated schedule = last task'start time + last task's duration
-            int64_t given_time_us = given_time.tv_sec*1000000LL+given_time.tv_usec+schedule_current.tasksets(0).tasks(position[0]).duration_ms()*1000LL;
+            //start time for repeated schedule = last schedule'start time + last task's deadline
+            int i = timeinervals.size();
+            int64_t given_time_us = ST.tv_sec*1000000LL+ST.tv_usec+timeinervals[i-1].timeinterval_ms*1000LL;
             nst.set_sec(given_time_us/1000000LL);
             nst.set_ms((given_time_us%1000000LL)/1000LL);
             schedule_current.clear_start_time();
             schedule_current.mutable_start_time()->CopyFrom(nst);
             if(organize_current_schedule()<0)return -1;
-            cout<<"successfully swtiched to new schedule!"<<endl;
+            cout<<"successfully organized the repeated schedule!"<<endl;
         }
-        return 0;
+        return 0;//now need to update timer,cause current schedule'last deadline will be updated as new schedule's first start
     }
 
-    if(timer_update(position[0])<0)
+    if(timer_update()<0)
     {
-        cout<<"failed to update timer with task position:"<<position[0]<<endl;
+        cout<<"failed to update timer with task position:"<<index_timeInterval<<endl;
         return -1;
     }
-    for(int i =0;i<num_cpu;i++)position[i]++;
     return 0;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -604,9 +647,9 @@ int handle_event()
                 cout<<"failed to receive from server, connection closed"<<endl;
                 return -1;
             }
-            if(dispatching)
+            new_schedule = true;
+            if(dispatching)//或者这里的代码是一样的，在organize那里判断schedule_Cuurent是不是空
             {
-                new_schedule = true;
                 schedule_new.Clear();
                 schedule_new.ParseFromArray(local_scheduler.receive_buffer,1024);
                 cout<<"*******a new schedule is stored in schedule_new********<----"<<endl;
@@ -637,14 +680,14 @@ int handle_event()
             
                 memset(local_scheduler.send_buffer,'\0',1024);
 
-                string serializedMap(shmaddr);
-                map<int, string> receivedMap = deserializeMap(serializedMap);
-                for (std::map<int, string>::iterator it = receivedMap.begin(); it != receivedMap.end(); ++it) 
+                // string serializedMap(shmaddr);
+                // map<int, string> receivedMap = deserializeMap(serializedMap);
+                for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
                 {
                     cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
                 }
-                map<int,string>::iterator iter = receivedMap.find(pid);
-                if(iter!= receivedMap.end())
+                map<int,string>::iterator iter = pid_to_taskid.find(pid);
+                if(iter!= pid_to_taskid.end())
                 {
                     strcpy(local_scheduler.send_buffer,iter->second.c_str());
                     local_scheduler.send_to_server(local_scheduler.send_buffer);
@@ -689,23 +732,6 @@ int epoll_sigchild()
     return 0;
 }
 
-int set_shared_memory()
-{
-    key_t key = 1234;
-    shmid = shmget(key, 1024, 0666 | IPC_CREAT);
-    if (shmid < 0) {
-        cout << "shmget failed" <<endl;
-        return -1;
-    }
-
-    shmaddr = (char*)shmat(shmid, nullptr, 0);
-    if (shmaddr == (char*)-1) {
-        cout<< "shmat failed" <<endl;
-        return -1;
-    }
-    return 0;
-}
-
 int main()
 {
     boost::property_tree::ptree pt;
@@ -723,6 +749,8 @@ int main()
         position.push_back(0);
     }
 
+    tasksets_local.resize(num_cpu);
+    
     taskids_exist_local.resize(num_cpu);
     
     if(local_scheduler.sock_create()<0)
@@ -769,8 +797,6 @@ int main()
         cout<<"failed to create sigchild fd and add it in epoll"<<endl;
         return -1;
    }
-
-   if(set_shared_memory()<0)return-1;
 
     printf("========================\n==TCP&NTP CLIENT START==\n========================\n");
 

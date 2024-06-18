@@ -9,8 +9,8 @@
 #include<sys/types.h>
 #include <arpa/inet.h>
 #include<sys/epoll.h>
-#include"MESSAGES/message.pb.h"
-#include"server.h"
+#include"../MESSAGES/message.pb.h"
+#include"../include/server.h"
 using namespace std;//cause <iostream> 
 using namespace Message::protobuf;
 //MESSAGE_TYPE 0 FOR JOB_GANG, 1 FOR SCHEDULING

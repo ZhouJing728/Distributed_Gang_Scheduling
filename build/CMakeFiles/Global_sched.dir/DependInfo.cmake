@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/root/DGS/global_scheduler.cc" "/root/DGS/build/CMakeFiles/Global_sched.dir/global_scheduler.cc.o"
+  "/root/DGS/src/global_scheduler.cc" "/root/DGS/build/CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -12,10 +12,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../"
   "../MESSAGES"
-  "../JOBS"
-  "../SCHED_STRATEGY"
-  "../ntp-master/ntp-master"
-  "../ntp_client-Gaa"
+  "../src"
+  "../lib"
   )
 
 # Targets to which this target links.

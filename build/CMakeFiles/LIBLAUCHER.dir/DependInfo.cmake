@@ -5,7 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/root/DGS/MESSAGES/message.pb.cc" "/root/DGS/build/CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o"
-  "/root/DGS/client.cc" "/root/DGS/build/CMakeFiles/LIBLAUCHER.dir/client.cc.o"
+  "/root/DGS/src/client.cc" "/root/DGS/build/CMakeFiles/LIBLAUCHER.dir/src/client.cc.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -13,10 +13,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../"
   "../MESSAGES"
-  "../JOBS"
-  "../SCHED_STRATEGY"
-  "../ntp-master/ntp-master"
-  "../ntp_client-Gaa"
+  "../src"
+  "../lib"
   )
 
 # Targets to which this target links.

@@ -1,4 +1,4 @@
-#include "strategies.h"
+#include "../include/strategies.h"
 using namespace std;
 
 Strategy strategy;
@@ -16,9 +16,9 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
     int table_row = sum_cpu;
     ousterhaut_table.resize(table_row);
 
-    task empty_task;
-    empty_task.set_duration_ms(5000);
-    empty_task.set_task_id("empty");
+    task task;
+    task.set_relevant_swtichtime_ms(5000);
+    //task.set_task_id("empty");
 
     wait_for_processors = false;
  
@@ -26,8 +26,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
    {
         for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
         {
-            task task;
-            task.set_duration_ms(5000);
+            //task.set_duration_ms(5000);
 
             Job_gang job = *it;
             task.set_path(job.job_path());
@@ -38,7 +37,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
                 wait_for_processors = true;
                 continue;
             }
-            hypperperiode_ms=hypperperiode_ms+5000;
+            //hypperperiode_ms=hypperperiode_ms+5000;
             
             int r;
             for(r=0;r<job.requested_processors();r++)
@@ -51,8 +50,11 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
             }
             for(r=r;r<table_row;r++)
             {
-                ousterhaut_table[r].push_back(empty_task);
+                task.set_task_id("empty");
+                ousterhaut_table[r].push_back(task);
             }
+            hypperperiode_ms=hypperperiode_ms+5000;
+            task.set_relevant_swtichtime_ms(task.relevant_swtichtime_ms()+5000);
 
         }
    }

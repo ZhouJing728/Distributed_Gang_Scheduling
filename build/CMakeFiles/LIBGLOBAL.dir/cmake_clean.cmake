@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o"
-  "CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o"
-  "CMakeFiles/LIBGLOBAL.dir/server.cc.o"
+  "CMakeFiles/LIBGLOBAL.dir/src/server.cc.o"
+  "CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o"
   "libLIBGLOBAL.a"
   "libLIBGLOBAL.pdb"
 )

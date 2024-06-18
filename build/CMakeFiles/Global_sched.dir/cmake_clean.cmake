@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Global_sched.dir/global_scheduler.cc.o"
+  "CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o"
   "Global_sched"
   "Global_sched.pdb"
 )

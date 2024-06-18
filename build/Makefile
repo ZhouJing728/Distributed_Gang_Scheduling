@@ -221,170 +221,170 @@ MESSAGES/message.pb.cc.s:
 	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.s
 .PHONY : MESSAGES/message.pb.cc.s
 
-SCHED_STRATEGY/strategies.o: SCHED_STRATEGY/strategies.cc.o
+src/client.o: src/client.cc.o
 
-.PHONY : SCHED_STRATEGY/strategies.o
-
-# target to build an object file
-SCHED_STRATEGY/strategies.cc.o:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.o
-.PHONY : SCHED_STRATEGY/strategies.cc.o
-
-SCHED_STRATEGY/strategies.i: SCHED_STRATEGY/strategies.cc.i
-
-.PHONY : SCHED_STRATEGY/strategies.i
-
-# target to preprocess a source file
-SCHED_STRATEGY/strategies.cc.i:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.i
-.PHONY : SCHED_STRATEGY/strategies.cc.i
-
-SCHED_STRATEGY/strategies.s: SCHED_STRATEGY/strategies.cc.s
-
-.PHONY : SCHED_STRATEGY/strategies.s
-
-# target to generate assembly for a file
-SCHED_STRATEGY/strategies.cc.s:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/SCHED_STRATEGY/strategies.cc.s
-.PHONY : SCHED_STRATEGY/strategies.cc.s
-
-client.o: client.cc.o
-
-.PHONY : client.o
+.PHONY : src/client.o
 
 # target to build an object file
-client.cc.o:
-	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.o
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.o
-.PHONY : client.cc.o
+src/client.cc.o:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.o
+	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.o
+.PHONY : src/client.cc.o
 
-client.i: client.cc.i
+src/client.i: src/client.cc.i
 
-.PHONY : client.i
+.PHONY : src/client.i
 
 # target to preprocess a source file
-client.cc.i:
-	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.i
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.i
-.PHONY : client.cc.i
+src/client.cc.i:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.i
+	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.i
+.PHONY : src/client.cc.i
 
-client.s: client.cc.s
+src/client.s: src/client.cc.s
 
-.PHONY : client.s
+.PHONY : src/client.s
 
 # target to generate assembly for a file
-client.cc.s:
-	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/client.cc.s
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/client.cc.s
-.PHONY : client.cc.s
+src/client.cc.s:
+	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.s
+	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.s
+.PHONY : src/client.cc.s
 
-global_scheduler.o: global_scheduler.cc.o
+src/global_scheduler.o: src/global_scheduler.cc.o
 
-.PHONY : global_scheduler.o
+.PHONY : src/global_scheduler.o
 
 # target to build an object file
-global_scheduler.cc.o:
-	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/global_scheduler.cc.o
-.PHONY : global_scheduler.cc.o
+src/global_scheduler.cc.o:
+	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o
+.PHONY : src/global_scheduler.cc.o
 
-global_scheduler.i: global_scheduler.cc.i
+src/global_scheduler.i: src/global_scheduler.cc.i
 
-.PHONY : global_scheduler.i
+.PHONY : src/global_scheduler.i
 
 # target to preprocess a source file
-global_scheduler.cc.i:
-	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/global_scheduler.cc.i
-.PHONY : global_scheduler.cc.i
+src/global_scheduler.cc.i:
+	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/src/global_scheduler.cc.i
+.PHONY : src/global_scheduler.cc.i
 
-global_scheduler.s: global_scheduler.cc.s
+src/global_scheduler.s: src/global_scheduler.cc.s
 
-.PHONY : global_scheduler.s
+.PHONY : src/global_scheduler.s
 
 # target to generate assembly for a file
-global_scheduler.cc.s:
-	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/global_scheduler.cc.s
-.PHONY : global_scheduler.cc.s
+src/global_scheduler.cc.s:
+	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/src/global_scheduler.cc.s
+.PHONY : src/global_scheduler.cc.s
 
-laucher.o: laucher.cc.o
+src/laucher.o: src/laucher.cc.o
 
-.PHONY : laucher.o
+.PHONY : src/laucher.o
 
 # target to build an object file
-laucher.cc.o:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/laucher.cc.o
-.PHONY : laucher.cc.o
+src/laucher.cc.o:
+	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.o
+.PHONY : src/laucher.cc.o
 
-laucher.i: laucher.cc.i
+src/laucher.i: src/laucher.cc.i
 
-.PHONY : laucher.i
+.PHONY : src/laucher.i
 
 # target to preprocess a source file
-laucher.cc.i:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/laucher.cc.i
-.PHONY : laucher.cc.i
+src/laucher.cc.i:
+	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.i
+.PHONY : src/laucher.cc.i
 
-laucher.s: laucher.cc.s
+src/laucher.s: src/laucher.cc.s
 
-.PHONY : laucher.s
+.PHONY : src/laucher.s
 
 # target to generate assembly for a file
-laucher.cc.s:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/laucher.cc.s
-.PHONY : laucher.cc.s
+src/laucher.cc.s:
+	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.s
+.PHONY : src/laucher.cc.s
 
-local_scheduler.o: local_scheduler.cc.o
+src/local_scheduler.o: src/local_scheduler.cc.o
 
-.PHONY : local_scheduler.o
+.PHONY : src/local_scheduler.o
 
 # target to build an object file
-local_scheduler.cc.o:
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.o
-.PHONY : local_scheduler.cc.o
+src/local_scheduler.cc.o:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/src/local_scheduler.cc.o
+.PHONY : src/local_scheduler.cc.o
 
-local_scheduler.i: local_scheduler.cc.i
+src/local_scheduler.i: src/local_scheduler.cc.i
 
-.PHONY : local_scheduler.i
+.PHONY : src/local_scheduler.i
 
 # target to preprocess a source file
-local_scheduler.cc.i:
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.i
-.PHONY : local_scheduler.cc.i
+src/local_scheduler.cc.i:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/src/local_scheduler.cc.i
+.PHONY : src/local_scheduler.cc.i
 
-local_scheduler.s: local_scheduler.cc.s
+src/local_scheduler.s: src/local_scheduler.cc.s
 
-.PHONY : local_scheduler.s
+.PHONY : src/local_scheduler.s
 
 # target to generate assembly for a file
-local_scheduler.cc.s:
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/local_scheduler.cc.s
-.PHONY : local_scheduler.cc.s
+src/local_scheduler.cc.s:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/src/local_scheduler.cc.s
+.PHONY : src/local_scheduler.cc.s
 
-server.o: server.cc.o
+src/server.o: src/server.cc.o
 
-.PHONY : server.o
+.PHONY : src/server.o
 
 # target to build an object file
-server.cc.o:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/server.cc.o
-.PHONY : server.cc.o
+src/server.cc.o:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/server.cc.o
+.PHONY : src/server.cc.o
 
-server.i: server.cc.i
+src/server.i: src/server.cc.i
 
-.PHONY : server.i
+.PHONY : src/server.i
 
 # target to preprocess a source file
-server.cc.i:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/server.cc.i
-.PHONY : server.cc.i
+src/server.cc.i:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/server.cc.i
+.PHONY : src/server.cc.i
 
-server.s: server.cc.s
+src/server.s: src/server.cc.s
 
-.PHONY : server.s
+.PHONY : src/server.s
 
 # target to generate assembly for a file
-server.cc.s:
-	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/server.cc.s
-.PHONY : server.cc.s
+src/server.cc.s:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/server.cc.s
+.PHONY : src/server.cc.s
+
+src/strategies.o: src/strategies.cc.o
+
+.PHONY : src/strategies.o
+
+# target to build an object file
+src/strategies.cc.o:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.o
+.PHONY : src/strategies.cc.o
+
+src/strategies.i: src/strategies.cc.i
+
+.PHONY : src/strategies.i
+
+# target to preprocess a source file
+src/strategies.cc.i:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.i
+.PHONY : src/strategies.cc.i
+
+src/strategies.s: src/strategies.cc.s
+
+.PHONY : src/strategies.s
+
+# target to generate assembly for a file
+src/strategies.cc.s:
+	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/strategies.cc.s
+.PHONY : src/strategies.cc.s
 
 # Help Target
 help:
@@ -403,24 +403,24 @@ help:
 	@echo "... MESSAGES/message.pb.o"
 	@echo "... MESSAGES/message.pb.i"
 	@echo "... MESSAGES/message.pb.s"
-	@echo "... SCHED_STRATEGY/strategies.o"
-	@echo "... SCHED_STRATEGY/strategies.i"
-	@echo "... SCHED_STRATEGY/strategies.s"
-	@echo "... client.o"
-	@echo "... client.i"
-	@echo "... client.s"
-	@echo "... global_scheduler.o"
-	@echo "... global_scheduler.i"
-	@echo "... global_scheduler.s"
-	@echo "... laucher.o"
-	@echo "... laucher.i"
-	@echo "... laucher.s"
-	@echo "... local_scheduler.o"
-	@echo "... local_scheduler.i"
-	@echo "... local_scheduler.s"
-	@echo "... server.o"
-	@echo "... server.i"
-	@echo "... server.s"
+	@echo "... src/client.o"
+	@echo "... src/client.i"
+	@echo "... src/client.s"
+	@echo "... src/global_scheduler.o"
+	@echo "... src/global_scheduler.i"
+	@echo "... src/global_scheduler.s"
+	@echo "... src/laucher.o"
+	@echo "... src/laucher.i"
+	@echo "... src/laucher.s"
+	@echo "... src/local_scheduler.o"
+	@echo "... src/local_scheduler.i"
+	@echo "... src/local_scheduler.s"
+	@echo "... src/server.o"
+	@echo "... src/server.i"
+	@echo "... src/server.s"
+	@echo "... src/strategies.o"
+	@echo "... src/strategies.i"
+	@echo "... src/strategies.s"
 .PHONY : help
 
 

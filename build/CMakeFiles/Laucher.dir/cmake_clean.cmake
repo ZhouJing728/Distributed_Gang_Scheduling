@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Laucher.dir/laucher.cc.o"
+  "CMakeFiles/Laucher.dir/src/laucher.cc.o"
   "Laucher"
   "Laucher.pdb"
 )

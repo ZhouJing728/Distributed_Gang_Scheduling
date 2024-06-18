@@ -6,6 +6,34 @@
 
 #IncludeRegexTransform: 
 
+../MESSAGES/message.pb.h
+string
+-
+google/protobuf/stubs/common.h
+-
+google/protobuf/io/coded_stream.h
+-
+google/protobuf/arena.h
+-
+google/protobuf/arenastring.h
+-
+google/protobuf/generated_message_table_driven.h
+-
+google/protobuf/generated_message_util.h
+-
+google/protobuf/inlined_string_field.h
+-
+google/protobuf/metadata.h
+-
+google/protobuf/message.h
+-
+google/protobuf/repeated_field.h
+-
+google/protobuf/extension_set.h
+-
+google/protobuf/unknown_field_set.h
+-
+
 /root/DGS/MESSAGES/message.pb.h
 string
 -
@@ -34,7 +62,7 @@ google/protobuf/extension_set.h
 google/protobuf/unknown_field_set.h
 -
 
-/root/DGS/client.h
+/root/DGS/include/client.h
 stdio.h
 -
 string.h
@@ -62,11 +90,11 @@ boost/property_tree/ptree.hpp
 boost/property_tree/ini_parser.hpp
 -
 MESSAGES/message.pb.h
-/root/DGS/MESSAGES/message.pb.h
+/root/DGS/include/MESSAGES/message.pb.h
 
-/root/DGS/laucher.cc
-client.h
-/root/DGS/client.h
-MESSAGES/message.pb.h
+/root/DGS/src/laucher.cc
+../include/client.h
+/root/DGS/include/client.h
+../MESSAGES/message.pb.h
 /root/DGS/MESSAGES/message.pb.h
 

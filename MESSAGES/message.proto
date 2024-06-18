@@ -17,7 +17,7 @@ message tasks_set_pro_cpu
 message task
 {
     string task_id=4;
-    int32 duration_ms = 5;
+    int32 relevant_swtichTime_ms = 5;
     string path = 6;
 }
 

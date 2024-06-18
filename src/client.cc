@@ -8,8 +8,8 @@
 #include <arpa/inet.h>
 #include<string>
 #include<iostream>
-#include"MESSAGES/message.pb.h"
-#include"client.h"
+#include"../MESSAGES/message.pb.h"
+#include"../include/client.h"
 using namespace std;
 using namespace Message::protobuf;
 //MESSAGE_TYPE 0 FOR JOB_GANG, 1 FOR SCHEDULING

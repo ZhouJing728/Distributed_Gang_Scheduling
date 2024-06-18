@@ -4,7 +4,8 @@
 CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.cc
 CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.h
 
-CMakeFiles/LIBLAUCHER.dir/client.cc.o: ../MESSAGES/message.pb.h
-CMakeFiles/LIBLAUCHER.dir/client.cc.o: ../client.cc
-CMakeFiles/LIBLAUCHER.dir/client.cc.o: ../client.h
+CMakeFiles/LIBLAUCHER.dir/src/client.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBLAUCHER.dir/src/client.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBLAUCHER.dir/src/client.cc.o: ../include/client.h
+CMakeFiles/LIBLAUCHER.dir/src/client.cc.o: ../src/client.cc
 

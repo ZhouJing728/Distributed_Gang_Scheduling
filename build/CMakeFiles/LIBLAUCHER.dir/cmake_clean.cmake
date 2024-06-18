@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o"
-  "CMakeFiles/LIBLAUCHER.dir/client.cc.o"
+  "CMakeFiles/LIBLAUCHER.dir/src/client.cc.o"
   "libLIBLAUCHER.a"
   "libLIBLAUCHER.pdb"
 )

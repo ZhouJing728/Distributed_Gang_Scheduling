@@ -157,7 +157,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::task, task_id_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::task, duration_ms_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::task, relevant_swtichtime_ms_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::task, path_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Message::protobuf::start_time, _internal_metadata_),
@@ -217,15 +217,15 @@ void AddDescriptorsImpl() {
       "ge.protobuf.tasks_set_pro_cpu\0220\n\nstart_t"
       "ime\030\002 \001(\0132\034.Message.protobuf.start_time\""
       ":\n\021tasks_set_pro_cpu\022%\n\005tasks\030\003 \003(\0132\026.Me"
-      "ssage.protobuf.task\":\n\004task\022\017\n\007task_id\030\004"
-      " \001(\t\022\023\n\013duration_ms\030\005 \001(\005\022\014\n\004path\030\006 \001(\t\""
-      "%\n\nstart_time\022\013\n\003sec\030\007 \001(\003\022\n\n\002ms\030\010 \001(\003\"J"
-      "\n\010Job_gang\022\016\n\006job_id\030\t \001(\005\022\034\n\024requested_"
-      "processors\030\n \001(\005\022\020\n\010job_path\030\013 \001(\tb\006prot"
-      "o3"
+      "ssage.protobuf.task\"E\n\004task\022\017\n\007task_id\030\004"
+      " \001(\t\022\036\n\026relevant_swtichTime_ms\030\005 \001(\005\022\014\n\004"
+      "path\030\006 \001(\t\"%\n\nstart_time\022\013\n\003sec\030\007 \001(\003\022\n\n"
+      "\002ms\030\010 \001(\003\"J\n\010Job_gang\022\016\n\006job_id\030\t \001(\005\022\034\n"
+      "\024requested_processors\030\n \001(\005\022\020\n\010job_path\030"
+      "\013 \001(\tb\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 402);
+      descriptor, 413);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "MESSAGES/message.proto", &protobuf_RegisterTypes);
 }
@@ -758,7 +758,7 @@ void task::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int task::kTaskIdFieldNumber;
-const int task::kDurationMsFieldNumber;
+const int task::kRelevantSwtichTimeMsFieldNumber;
 const int task::kPathFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -781,14 +781,14 @@ task::task(const task& from)
   if (from.path().size() > 0) {
     path_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.path_);
   }
-  duration_ms_ = from.duration_ms_;
+  relevant_swtichtime_ms_ = from.relevant_swtichtime_ms_;
   // @@protoc_insertion_point(copy_constructor:Message.protobuf.task)
 }
 
 void task::SharedCtor() {
   task_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   path_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  duration_ms_ = 0;
+  relevant_swtichtime_ms_ = 0;
 }
 
 task::~task() {
@@ -823,7 +823,7 @@ void task::Clear() {
 
   task_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  duration_ms_ = 0;
+  relevant_swtichtime_ms_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -853,14 +853,14 @@ bool task::MergePartialFromCodedStream(
         break;
       }
 
-      // int32 duration_ms = 5;
+      // int32 relevant_swtichTime_ms = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &duration_ms_)));
+                 input, &relevant_swtichtime_ms_)));
         } else {
           goto handle_unusual;
         }
@@ -919,9 +919,9 @@ void task::SerializeWithCachedSizes(
       4, this->task_id(), output);
   }
 
-  // int32 duration_ms = 5;
-  if (this->duration_ms() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->duration_ms(), output);
+  // int32 relevant_swtichTime_ms = 5;
+  if (this->relevant_swtichtime_ms() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->relevant_swtichtime_ms(), output);
   }
 
   // string path = 6;
@@ -959,9 +959,9 @@ void task::SerializeWithCachedSizes(
         4, this->task_id(), target);
   }
 
-  // int32 duration_ms = 5;
-  if (this->duration_ms() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->duration_ms(), target);
+  // int32 relevant_swtichTime_ms = 5;
+  if (this->relevant_swtichtime_ms() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->relevant_swtichtime_ms(), target);
   }
 
   // string path = 6;
@@ -1006,11 +1006,11 @@ size_t task::ByteSizeLong() const {
         this->path());
   }
 
-  // int32 duration_ms = 5;
-  if (this->duration_ms() != 0) {
+  // int32 relevant_swtichTime_ms = 5;
+  if (this->relevant_swtichtime_ms() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->duration_ms());
+        this->relevant_swtichtime_ms());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1048,8 +1048,8 @@ void task::MergeFrom(const task& from) {
 
     path_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.path_);
   }
-  if (from.duration_ms() != 0) {
-    set_duration_ms(from.duration_ms());
+  if (from.relevant_swtichtime_ms() != 0) {
+    set_relevant_swtichtime_ms(from.relevant_swtichtime_ms());
   }
 }
 
@@ -1081,7 +1081,7 @@ void task::InternalSwap(task* other) {
     GetArenaNoVirtual());
   path_.Swap(&other->path_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(duration_ms_, other->duration_ms_);
+  swap(relevant_swtichtime_ms_, other->relevant_swtichtime_ms_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 

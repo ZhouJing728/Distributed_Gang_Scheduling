@@ -424,11 +424,11 @@ class task : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
   ::std::string* release_path();
   void set_allocated_path(::std::string* path);
 
-  // int32 duration_ms = 5;
-  void clear_duration_ms();
-  static const int kDurationMsFieldNumber = 5;
-  ::google::protobuf::int32 duration_ms() const;
-  void set_duration_ms(::google::protobuf::int32 value);
+  // int32 relevant_swtichTime_ms = 5;
+  void clear_relevant_swtichtime_ms();
+  static const int kRelevantSwtichTimeMsFieldNumber = 5;
+  ::google::protobuf::int32 relevant_swtichtime_ms() const;
+  void set_relevant_swtichtime_ms(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:Message.protobuf.task)
  private:
@@ -436,7 +436,7 @@ class task : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr task_id_;
   ::google::protobuf::internal::ArenaStringPtr path_;
-  ::google::protobuf::int32 duration_ms_;
+  ::google::protobuf::int32 relevant_swtichtime_ms_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_MESSAGES_2fmessage_2eproto::TableStruct;
 };
@@ -861,18 +861,18 @@ inline void task::set_allocated_task_id(::std::string* task_id) {
   // @@protoc_insertion_point(field_set_allocated:Message.protobuf.task.task_id)
 }
 
-// int32 duration_ms = 5;
-inline void task::clear_duration_ms() {
-  duration_ms_ = 0;
+// int32 relevant_swtichTime_ms = 5;
+inline void task::clear_relevant_swtichtime_ms() {
+  relevant_swtichtime_ms_ = 0;
 }
-inline ::google::protobuf::int32 task::duration_ms() const {
-  // @@protoc_insertion_point(field_get:Message.protobuf.task.duration_ms)
-  return duration_ms_;
+inline ::google::protobuf::int32 task::relevant_swtichtime_ms() const {
+  // @@protoc_insertion_point(field_get:Message.protobuf.task.relevant_swtichTime_ms)
+  return relevant_swtichtime_ms_;
 }
-inline void task::set_duration_ms(::google::protobuf::int32 value) {
+inline void task::set_relevant_swtichtime_ms(::google::protobuf::int32 value) {
   
-  duration_ms_ = value;
-  // @@protoc_insertion_point(field_set:Message.protobuf.task.duration_ms)
+  relevant_swtichtime_ms_ = value;
+  // @@protoc_insertion_point(field_set:Message.protobuf.task.relevant_swtichTime_ms)
 }
 
 // string path = 6;

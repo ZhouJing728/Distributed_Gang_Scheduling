@@ -57,27 +57,27 @@ include CMakeFiles/Laucher.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Laucher.dir/flags.make
 
-CMakeFiles/Laucher.dir/laucher.cc.o: CMakeFiles/Laucher.dir/flags.make
-CMakeFiles/Laucher.dir/laucher.cc.o: ../laucher.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Laucher.dir/laucher.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Laucher.dir/laucher.cc.o -c /root/DGS/laucher.cc
+CMakeFiles/Laucher.dir/src/laucher.cc.o: CMakeFiles/Laucher.dir/flags.make
+CMakeFiles/Laucher.dir/src/laucher.cc.o: ../src/laucher.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Laucher.dir/src/laucher.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Laucher.dir/src/laucher.cc.o -c /root/DGS/src/laucher.cc
 
-CMakeFiles/Laucher.dir/laucher.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Laucher.dir/laucher.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/laucher.cc > CMakeFiles/Laucher.dir/laucher.cc.i
+CMakeFiles/Laucher.dir/src/laucher.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Laucher.dir/src/laucher.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/src/laucher.cc > CMakeFiles/Laucher.dir/src/laucher.cc.i
 
-CMakeFiles/Laucher.dir/laucher.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Laucher.dir/laucher.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/laucher.cc -o CMakeFiles/Laucher.dir/laucher.cc.s
+CMakeFiles/Laucher.dir/src/laucher.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Laucher.dir/src/laucher.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/laucher.cc -o CMakeFiles/Laucher.dir/src/laucher.cc.s
 
 # Object files for target Laucher
 Laucher_OBJECTS = \
-"CMakeFiles/Laucher.dir/laucher.cc.o"
+"CMakeFiles/Laucher.dir/src/laucher.cc.o"
 
 # External object files for target Laucher
 Laucher_EXTERNAL_OBJECTS =
 
-Laucher: CMakeFiles/Laucher.dir/laucher.cc.o
+Laucher: CMakeFiles/Laucher.dir/src/laucher.cc.o
 Laucher: CMakeFiles/Laucher.dir/build.make
 Laucher: libLIBLAUCHER.a
 Laucher: /usr/lib/x86_64-linux-gnu/libprotobuf.so

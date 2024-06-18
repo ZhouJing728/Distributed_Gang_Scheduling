@@ -57,27 +57,27 @@ include CMakeFiles/Global_sched.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Global_sched.dir/flags.make
 
-CMakeFiles/Global_sched.dir/global_scheduler.cc.o: CMakeFiles/Global_sched.dir/flags.make
-CMakeFiles/Global_sched.dir/global_scheduler.cc.o: ../global_scheduler.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Global_sched.dir/global_scheduler.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Global_sched.dir/global_scheduler.cc.o -c /root/DGS/global_scheduler.cc
+CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o: CMakeFiles/Global_sched.dir/flags.make
+CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o: ../src/global_scheduler.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o -c /root/DGS/src/global_scheduler.cc
 
-CMakeFiles/Global_sched.dir/global_scheduler.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Global_sched.dir/global_scheduler.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/global_scheduler.cc > CMakeFiles/Global_sched.dir/global_scheduler.cc.i
+CMakeFiles/Global_sched.dir/src/global_scheduler.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Global_sched.dir/src/global_scheduler.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/src/global_scheduler.cc > CMakeFiles/Global_sched.dir/src/global_scheduler.cc.i
 
-CMakeFiles/Global_sched.dir/global_scheduler.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Global_sched.dir/global_scheduler.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/global_scheduler.cc -o CMakeFiles/Global_sched.dir/global_scheduler.cc.s
+CMakeFiles/Global_sched.dir/src/global_scheduler.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Global_sched.dir/src/global_scheduler.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/global_scheduler.cc -o CMakeFiles/Global_sched.dir/src/global_scheduler.cc.s
 
 # Object files for target Global_sched
 Global_sched_OBJECTS = \
-"CMakeFiles/Global_sched.dir/global_scheduler.cc.o"
+"CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o"
 
 # External object files for target Global_sched
 Global_sched_EXTERNAL_OBJECTS =
 
-Global_sched: CMakeFiles/Global_sched.dir/global_scheduler.cc.o
+Global_sched: CMakeFiles/Global_sched.dir/src/global_scheduler.cc.o
 Global_sched: CMakeFiles/Global_sched.dir/build.make
 Global_sched: libLIBGLOBAL.a
 Global_sched: /usr/lib/x86_64-linux-gnu/libprotobuf.so

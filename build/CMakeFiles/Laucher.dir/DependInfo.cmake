@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/root/DGS/laucher.cc" "/root/DGS/build/CMakeFiles/Laucher.dir/laucher.cc.o"
+  "/root/DGS/src/laucher.cc" "/root/DGS/build/CMakeFiles/Laucher.dir/src/laucher.cc.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -12,10 +12,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../"
   "../MESSAGES"
-  "../JOBS"
-  "../SCHED_STRATEGY"
-  "../ntp-master/ntp-master"
-  "../ntp_client-Gaa"
+  "../src"
+  "../lib"
   )
 
 # Targets to which this target links.
