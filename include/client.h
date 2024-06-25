@@ -13,6 +13,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include"MESSAGES/message.pb.h"
+#include"print_level.h"
 using namespace std;
 using namespace Message::protobuf;
 
@@ -29,6 +30,7 @@ class Client
     char receive_buffer[1024];
     epoll_event ev;
     epoll_event events[128];
+    PrintL pLevel;
 
     schedule scheduling;
 

@@ -18,15 +18,15 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
 
     task task;
     task.set_relevant_swtichtime_ms(5000);
-    //task.set_task_id("empty");
 
     wait_for_processors = false;
+
+    max_last_task_duration_ms=5000;
  
    for(int i =0;i<2;i++)
    {
         for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
         {
-            //task.set_duration_ms(5000);
 
             Job_gang job = *it;
             task.set_path(job.job_path());
@@ -37,8 +37,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
                 wait_for_processors = true;
                 continue;
             }
-            //hypperperiode_ms=hypperperiode_ms+5000;
-            
+
             int r;
             for(r=0;r<job.requested_processors();r++)
             {
@@ -66,6 +65,11 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
 int Strategy:: get_hyperperiode_ms()
 {
     return hypperperiode_ms;
+}
+
+int Strategy::get_max_ltd_ms()
+{
+    return max_last_task_duration_ms;
 }
 
 bool Strategy::get_wait_for_processors()

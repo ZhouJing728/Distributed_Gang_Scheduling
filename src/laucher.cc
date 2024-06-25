@@ -57,7 +57,7 @@ int main()
 
     Job_gang job3;
     job3.set_job_id(3);
-    job3.set_job_path("../src/JOBS/Job3");
+    job3.set_job_path("./Job3");
     printf("+++++++++++++++++++++++++++++++++++++\n for test purpose(new job later || requested processor num),\n we have predifiend Job3..\n");
     printf("please enter the processor number that you need\n");
     int num;
@@ -82,7 +82,7 @@ int job_initialise()
     Job_gang job0,job1,job2;
     int requested_processors0=1,requested_processors1=1,requested_processors2=2;
     int job_id0=0,job_id1=1,job_id2=2;
-    string path0="../src/JOBS/Job0",path1="../src/JOBS/Job1",path2="../src/JOBS/Job2";
+    string path0="./Job0",path1="./Job1",path2="./Job2";
 
     job0.set_job_id(job_id0);
     job0.set_job_path(path0);

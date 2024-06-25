@@ -21,10 +21,10 @@ int Client::sock_create()
     
     if ( (client = socket(AF_INET,SOCK_STREAM,0))==-1) 
     { 
-        cout<<"fail to create socket"<<endl;
+        pLevel.P_ERR("fail to create socket");
         return -1; 
     }else{
-        cout<<"succeed to create socket"<<endl;
+        pLevel.P_NODE("succeed to create socket");
     }
     return 0;
 }

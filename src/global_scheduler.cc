@@ -110,20 +110,6 @@ int main()
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     global_scheduler_port= pt.get<int>("port_globalscheduler.value");
     global_scheduler.max_client=pt.get<int>("max_local_num.value");
-    // while(true)
-    // {
-    //     cout<<"HOW MANY CLIENTS DO YOU NEED FOR THIS DGS :"<<endl;
-    //     cin>>global_scheduler.max_client;
-
-    //     if(cin.fail())
-    //     {
-    //         cin.clear();
-    //         std::cin.ignore(numeric_limits<streamsize>::max(),'\n');
-    //         cout<<"invalid input. please enter an integer"<<endl;
-    //     }else{
-    //         break;
-    //     }
-    // }
 
     if(global_scheduler.sock_create()<0)
     {
@@ -397,7 +383,7 @@ int update_timer()
     given_time.tv_sec=next_Starttime.sec();
     given_time.tv_usec=next_Starttime.ms()*1000;
 
-    printf("NST time: %ld seconds and %lld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
+    printf("NST time: %ld seconds and %lld milliseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
 
     long long diff_usec = time_diff_microseconds(current_time,given_time);
 
@@ -408,7 +394,8 @@ int update_timer()
         cout<<"start time is already passed!"<<endl;
         return -1;
     }
-    int64_t sum_ns=diff_usec*1000LL-10*1000*1000*1000LL;
+    int max_lastTask_duration_ms = mysched.get_max_ltd_ms();
+    int64_t sum_ns=diff_usec*1000LL-max_lastTask_duration_ms*1000*1000LL;
     timer.it_value.tv_sec = sum_ns/(1000LL*1000LL*1000LL);
     timer.it_value.tv_nsec = sum_ns%(1000LL*1000LL*1000LL);
     timer.it_interval.tv_nsec = 0;

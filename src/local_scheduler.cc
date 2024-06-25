@@ -33,6 +33,11 @@ struct task_local{
     string path;
 };
 
+struct pid_tid{
+    int pid;
+    string tid;
+};
+
 vector<vector<task_local>> tasksets_local;
 
 vector<timeinterval> timeinervals;
@@ -67,7 +72,9 @@ int index_timeInterval;
 //for interaive calculating start time of task
 struct timeval ST;
 
-map<int,string>pid_to_taskid;
+vector<vector<pid_tid>>pid_tid_list;
+
+//map<int,string>pid_to_taskid;
 
 vector<string> id_endTask_lastSched;
 //ids of tasks that has run on this local. these task don't need to execute again and get a new pid
@@ -477,18 +484,51 @@ int timer_update()
     return 0;
 }
 
+int find_pid_by_tid(int cpu,string tid)
+{
+    for(vector<pid_tid>::iterator it=pid_tid_list[cpu].begin();it!=pid_tid_list[cpu].end();it++)
+    {
+        pid_tid pt=*it;
+        if(pt.tid==tid)return pt.pid;
+    }
+    return -1;
+}
+
+string find_tid_by_pid(int pid)
+{
+    for(int i=0;i<num_cpu;i++)
+    {
+        for(vector<pid_tid>::iterator it=pid_tid_list[i].begin();it!=pid_tid_list[i].end();it++)
+        {
+            pid_tid pt=*it;
+            if(pt.pid==pid)return pt.tid;
+        }
+    }
+    string s="not found";
+    return s;
+}
+
 int task_switch(int cpu)
 {
     if(position[cpu]==0)
     {
         if(id_endTask_lastSched[cpu]!="empty")
         {
-            char buffer[128];
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
-            write_to_cgroup_file(buffer, "FROZEN");
-            printf("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched[cpu].c_str());
+        //     char buffer[128];
+        //     sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
+        //     write_to_cgroup_file(buffer, "FROZEN");
+        //     printf("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched[cpu].c_str());
+        // }else{
+        //     printf("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
+            int pid = find_pid_by_tid(cpu,id_endTask_lastSched[cpu]);
+            if(kill(pid,SIGSTOP)==-1)
+            {
+                local_scheduler.pLevel.P_ERR("kill(SIGSTOP)\n");
+                return -1;
+            }
+            local_scheduler.pLevel.P_NODE("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN STOPPED\n====================\n",id_endTask_lastSched[cpu].c_str());
         }else{
-            printf("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
+            local_scheduler.pLevel.P_NODE("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
@@ -500,11 +540,18 @@ int task_switch(int cpu)
         task_local last_task = taskset[position[cpu]-1];
         if(last_task.task_id!="empty")
         {
-            char buffer[128];
-            string id = last_task.task_id.substr(1);
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-            write_to_cgroup_file(buffer, "FROZEN");
-            printf("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
+            // char buffer[128];
+            // string id = last_task.task_id.substr(1);
+            // sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+            // write_to_cgroup_file(buffer, "FROZEN");
+            // printf("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
+            int pid = find_pid_by_tid(cpu,last_task.task_id);
+            if(kill(pid,SIGSTOP)==-1)
+            {
+                local_scheduler.pLevel.P_ERR("kill(SIGSTOP)\n");
+                return -1;
+            }
+            local_scheduler.pLevel.P_NODE("====================\nLAST TASK WITH ID %s OF CURRENT SCHEDULE HAS BEEN STOPPED\n====================\n",last_task.task_id.c_str());
         }
     }
     /*********thaw the next task********************/
@@ -512,22 +559,22 @@ int task_switch(int cpu)
     task_local next_task = tasksets_local[cpu][position[cpu]];
     if(next_task.task_id!="empty")
     {
-        char state[128];
-        string id = next_task.task_id.substr(1);
-        sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-        //cout<<state<<endl;
-        write_to_cgroup_file(state, "THAWED");
-        printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
-        print_current_time();
-        //*****if not be executed before, it needs to get pid and store it ****//
-        if(!check_task_initialised(cpu,id))
+        string tid = next_task.task_id.substr(1);
+        int pid = find_pid_by_tid(cpu,tid);
+        if(pid>0)
         {
-            taskids_exist_local[cpu].push_back(id);
-            pid_t pid = fork();
-            if (pid == -1) {
-                perror("Error forking process");
+            if(kill(pid,SIGCONT)==0)
+            {
+                local_scheduler.pLevel.P_ERR("kill(SIGCONT)\n");
+                return -1;
+            }
+        }else{
+            pid_t pid =fork();
+            if(pid ==-1)
+            {
+                local_scheduler.pLevel.P_ERR("FORK\n");
                 exit(EXIT_FAILURE);
-            } else if (pid == 0) {//child process
+            }else if(pid==0){
                 prctl(PR_SET_PDEATHSIG,SIGKILL);
 
                 cpu_set_t set;
@@ -535,26 +582,64 @@ int task_switch(int cpu)
                 CPU_SET(cpu,&set);
 
                 if (sched_setaffinity(0, sizeof(set), &set) == -1) {
-                    perror("sched_setaffinity");
+                    local_scheduler.pLevel.P_ERR("sched_setaffinity\n");
                     exit(EXIT_FAILURE);
                 }
 
                 const char* path = next_task.path.c_str();
                 execl(path, path, NULL);
-                perror("Error executing program ");
+                local_scheduler.pLevel.P_ERR("Error executing program \n");
                 exit(EXIT_FAILURE);
-            }else//father process here continue
-            {
-                char tasks[128];
-                sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
-                cout<<"task pid is"<<getpid()<<endl;
-                add_pid_to_cgroup(tasks,pid);
-                pid_to_taskid.insert(pair<int,string>(pid,id));
+            }else{
+                pid_tid pt;
+                pt.pid=pid;
+                pt.tid=tid;
+                pid_tid_list[cpu].push_back(pt);
             }
         }
+
+        // char state[128];
+        // string id = next_task.task_id.substr(1);
+        // sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+        // write_to_cgroup_file(state, "THAWED");
+        // printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
+        // print_current_time();
+        // //*****if not be executed before, it needs to get pid and store it ****//
+        // if(!check_task_initialised(cpu,id))
+        // {
+        //     taskids_exist_local[cpu].push_back(id);
+        //     pid_t pid = fork();
+        //     if (pid == -1) {
+        //         perror("Error forking process");
+        //         exit(EXIT_FAILURE);
+        //     } else if (pid == 0) {//child process
+        //         prctl(PR_SET_PDEATHSIG,SIGKILL);
+
+        //         cpu_set_t set;
+        //         CPU_ZERO(&set);
+        //         CPU_SET(cpu,&set);
+
+        //         if (sched_setaffinity(0, sizeof(set), &set) == -1) {
+        //             perror("sched_setaffinity");
+        //             exit(EXIT_FAILURE);
+        //         }
+
+        //         const char* path = next_task.path.c_str();
+        //         execl(path, path, NULL);
+        //         perror("Error executing program ");
+        //         exit(EXIT_FAILURE);
+        //     }else//father process here continue
+        //     {
+        //         char tasks[128];
+        //         sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
+        //         cout<<"task pid is"<<getpid()<<endl;
+        //         add_pid_to_cgroup(tasks,pid);
+        //         pid_to_taskid.insert(pair<int,string>(pid,id));
+        //     }
+        // }
     }else/*********if next task is empty, skip the next step*******************/
     {
-        printf("Next task time slice is empty!\n====================\n");
+        local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n====================\n");
     }
 
     if((schedule_current.tasksets(cpu).tasks(position[cpu]).task_id()!="empty")&&(position[cpu]==schedule_current.tasksets(cpu).tasks_size()-1))
@@ -680,20 +765,27 @@ int handle_event()
             
                 memset(local_scheduler.send_buffer,'\0',1024);
 
-                // string serializedMap(shmaddr);
-                // map<int, string> receivedMap = deserializeMap(serializedMap);
-                for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
+                string tid=find_tid_by_pid(pid);
+                if(tid!="not found")
                 {
-                    cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-                }
-                map<int,string>::iterator iter = pid_to_taskid.find(pid);
-                if(iter!= pid_to_taskid.end())
-                {
-                    strcpy(local_scheduler.send_buffer,iter->second.c_str());
+                    strcpy(local_scheduler.send_buffer,tid.c_str());
                     local_scheduler.send_to_server(local_scheduler.send_buffer);
                 }else{
-                    cout<<"Don't find the correct pid"<<endl;
+                    local_scheduler.pLevel.P_ERR("Don't found the terminated PID\n");
                 }
+               
+                // for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
+                // {
+                //     cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
+                // }
+                // map<int,string>::iterator iter = pid_to_taskid.find(pid);
+                // if(iter!= pid_to_taskid.end())
+                // {
+                //     strcpy(local_scheduler.send_buffer,iter->second.c_str());
+                //     local_scheduler.send_to_server(local_scheduler.send_buffer);
+                // }else{
+                //     cout<<"Don't find the correct pid"<<endl;
+                // }
            }
         }else
         {
@@ -752,6 +844,8 @@ int main()
     tasksets_local.resize(num_cpu);
     
     taskids_exist_local.resize(num_cpu);
+
+    pid_tid_list.resize(num_cpu);
     
     if(local_scheduler.sock_create()<0)
     {

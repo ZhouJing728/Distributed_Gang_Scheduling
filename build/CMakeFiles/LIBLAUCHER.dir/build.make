@@ -83,19 +83,34 @@ CMakeFiles/LIBLAUCHER.dir/src/client.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBLAUCHER.dir/src/client.cc.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/client.cc -o CMakeFiles/LIBLAUCHER.dir/src/client.cc.s
 
+CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o: CMakeFiles/LIBLAUCHER.dir/flags.make
+CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o: ../src/print_level.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o -c /root/DGS/src/print_level.cc
+
+CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /root/DGS/src/print_level.cc > CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.i
+
+CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /root/DGS/src/print_level.cc -o CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.s
+
 # Object files for target LIBLAUCHER
 LIBLAUCHER_OBJECTS = \
 "CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o" \
-"CMakeFiles/LIBLAUCHER.dir/src/client.cc.o"
+"CMakeFiles/LIBLAUCHER.dir/src/client.cc.o" \
+"CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o"
 
 # External object files for target LIBLAUCHER
 LIBLAUCHER_EXTERNAL_OBJECTS =
 
 libLIBLAUCHER.a: CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o
 libLIBLAUCHER.a: CMakeFiles/LIBLAUCHER.dir/src/client.cc.o
+libLIBLAUCHER.a: CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o
 libLIBLAUCHER.a: CMakeFiles/LIBLAUCHER.dir/build.make
 libLIBLAUCHER.a: CMakeFiles/LIBLAUCHER.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libLIBLAUCHER.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/root/DGS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libLIBLAUCHER.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/LIBLAUCHER.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/LIBLAUCHER.dir/link.txt --verbose=$(VERBOSE)
 

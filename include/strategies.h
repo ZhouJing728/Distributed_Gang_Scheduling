@@ -33,6 +33,8 @@ class Strategy{
 
     int hypperperiode_ms=0;
 
+    int max_last_task_duration_ms=0;
+
     bool wait_for_processors = false;
 
     //vector<vector<task>> ousterhaut_table;
@@ -41,6 +43,8 @@ class Strategy{
     vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu);
 
     int get_hyperperiode_ms();
+
+    int get_max_ltd_ms();
 
     bool get_wait_for_processors();
 
