@@ -4,8 +4,11 @@
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.cc
 CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o: ../MESSAGES/message.pb.h
 
+CMakeFiles/LIBGLOBAL.dir/src/print_level.cc.o: ../include/print_level.h
+CMakeFiles/LIBGLOBAL.dir/src/print_level.cc.o: ../src/print_level.cc
+
 CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../MESSAGES/message.pb.h
-CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../MESSAGES/message.pb.h
+CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../include/print_level.h
 CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../include/server.h
 CMakeFiles/LIBGLOBAL.dir/src/server.cc.o: ../src/server.cc
 

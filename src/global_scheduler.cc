@@ -1,12 +1,12 @@
-#include "../include/server.h"
 #include<vector>
 #include <sys/timerfd.h>
-#include "../include/strategies.h"
-#include "MESSAGES/message.pb.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <errno.h>
+#include "../include/server.h"
+#include "../include/strategies.h"
+#include "MESSAGES/message.pb.h"
 /*******************************************/
 /* from ntp server*************************/
 #include <sys/time.h> /* gettimeofday() */
@@ -110,69 +110,56 @@ int main()
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     global_scheduler_port= pt.get<int>("port_globalscheduler.value");
     global_scheduler.max_client=pt.get<int>("max_local_num.value");
-    // while(true)
-    // {
-    //     cout<<"HOW MANY CLIENTS DO YOU NEED FOR THIS DGS :"<<endl;
-    //     cin>>global_scheduler.max_client;
 
-    //     if(cin.fail())
-    //     {
-    //         cin.clear();
-    //         std::cin.ignore(numeric_limits<streamsize>::max(),'\n');
-    //         cout<<"invalid input. please enter an integer"<<endl;
-    //     }else{
-    //         break;
-    //     }
-    // }
 
     if(global_scheduler.sock_create()<0)
     {
-        cout<<"sock create failed"<<endl;
+        global_scheduler.pLevel.P_ERR("sock create failed\n");
         return -1;
     }
     if(global_scheduler.sock_bindAndListen(global_scheduler_port)<0)
     {
-        cout<<"sock bind and listen failed"<<endl;
+        global_scheduler.pLevel.P_ERR("sock bind and listen failed\n");
         return -1;
     }
 
     if(global_scheduler.epoll_initialisation()<0)
     {
-        cout<<"epoll initialisation failed"<<endl;
+        global_scheduler.pLevel.P_ERR("epoll initialisation failed\n");
         return -1;
     }
    if(epoll_ntpServer()<0)
    {
-        cout<<"epoll_ntpServer failed"<<endl;
+        global_scheduler.pLevel.P_ERR("epoll_ntpServer failed\n");
         return -1;
    }
 
    if(epoll_timer()<0)
    {
-        cout<<"epoll_timer failed"<<endl;
+        global_scheduler.pLevel.P_ERR("epoll_timer failed\n");
         return -1;
    }
 
    initialise_nst();
-   printf("SUCCESSFULLY INITIALISED NST\n");
+   global_scheduler.pLevel.P_NODE("SUCCESSFULLY INITIALISED NST\n");
 
     while (1)
     {
-        switch (global_scheduler.read_number=epoll_wait(global_scheduler.epoll_fd,global_scheduler.events,global_scheduler.max_event,-1))//time out -1 for infinite waiting
+        switch (global_scheduler.read_number=epoll_wait(global_scheduler.epoll_fd,global_scheduler.events,128,-1))//time out -1 for infinite waiting
         {
             case 0:
-                cout<<"time out"<<endl;
+                global_scheduler.pLevel.P_NODE("time out\n");
                 break;//go out of this switch but still in while loop..
 
             case -1:
-                cout<<"epoll_Wait error"<<endl;
+                global_scheduler.pLevel.P_ERR("epoll_Wait error\n");
                 close(global_scheduler.server);
                 return -1;
         
             default:
                 if(handle_event()<0)
                 {
-                    cout<<"failed to handle event"<<endl;
+                    global_scheduler.pLevel.P_ERR("failed to handle event\n");
                     close(global_scheduler.server);
                     return -1;
                 }
@@ -189,10 +176,10 @@ int handle_event()
         //Fist situation: send_timer is triggered
         if(fd_temp == timer_fd&&(global_scheduler.events[i].events&EPOLLIN))
         {
-            printf("\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n");
+            global_scheduler.pLevel.P_NODE("\n==============================\n""TIMER TRIGGERED,BEGIN SCHEDULE\n""==============================\n\n");
             if(timer_handler()<0)
             {
-                printf("-----Schedule Generate and send process failed------\n");
+                global_scheduler.pLevel.P_ERR("-----Schedule Generate and send process failed------\n");
                 return -1;
             }
         //Second situation: ntp client requests for time
@@ -223,7 +210,7 @@ int readByevent(int i)
     if(fd<0)
     {
         cout<<i<<endl;
-        cout<<"illegal fd triggered Epollin!"<<endl;
+        global_scheduler.pLevel.P_ERR("illegal fd triggered Epollin!\n");
         return -1;
     }
     
@@ -244,14 +231,13 @@ int readByevent(int i)
 
     }else if(size==0)//end of file
     {
-        cout<<"client close.."<<endl;
+        global_scheduler.pLevel.P_NODE("client close..\n");
         epoll_ctl(global_scheduler.epoll_fd,EPOLL_CTL_DEL,fd,NULL);
         close(fd);
-        //free(mem);
         return -1;
     }else//error
     {
-        cout<<"read failed"<<endl;
+        global_scheduler.pLevel.P_ERR("read failed\n");
         return -1;
     }
     
@@ -265,7 +251,7 @@ int acceptNewJob(int fd)
 
     if(job_accept.requested_processors()>global_scheduler.max_client||(job_accept.requested_processors()==0))
     {
-        cout<<"received wrong job, discarded it~"<<endl;
+        global_scheduler.pLevel.P_WRN("received wrong job, discarded it~\n");
         return -1;
     }
     job_list.push_back(job_accept);
@@ -282,7 +268,7 @@ int acceptNewJob(int fd)
 
     need_schedule = true;
 
-    cout<<"received a new job, added to job list"<<endl;
+    global_scheduler.pLevel.P_NODE("received a new job, added to job list\n");
 
     return 0;
 
@@ -314,16 +300,15 @@ int finishJob(int fd)
     int num = get_rpn_by_id(id);
     if(num<0)
     {
-        printf("Don't find task with id %d in joblist!\n ",id);
+        global_scheduler.pLevel.P_ERR("Don't find task with id %d in joblist!\n",id);
         return -1;
     }
-
-    printf("Job with id %d has finished in %d processors\n",id,num);
+    global_scheduler.pLevel.P_NODE("Job with id %d has finished in %d processors\n",id,num);
 
     if(taskid_finish[id]==num)
     {
         remove_job_by_id(id);
-        printf("Job with id %d has finished, and removed from joblist!\n",id);
+        global_scheduler.pLevel.P_NODE("Job with id %d has finished, and removed from joblist!\n",id);
         need_schedule=true;
     }
     return 0;
@@ -338,10 +323,8 @@ void ntpServer()
 
     bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   
-    //signal(SIGCHLD,wait_wrapper);
 	ntp_fd=ntp_server(bind_addr);
-    //request_process_loop(ntp_fd)
-	/* nicht erreichbar: */
+
 }
 
 int epoll_timer()
@@ -349,7 +332,7 @@ int epoll_timer()
     timer_fd = timerfd_create(CLOCK_REALTIME,0);
     if(timer_fd<0)
     {
-        printf("epoll_timer create failed!\n");
+        global_scheduler.pLevel.P_ERR("epoll_timer create failed!\n");
         return -1;
     }
     //struct itimerspec send_timer;
@@ -363,17 +346,18 @@ int epoll_timer()
 
     if(timerfd_settime(timer_fd,0,&send_timer,NULL)<0)
     {
-        printf("send_timer settime failed!\n");
+        global_scheduler.pLevel.P_ERR("send_timer settime failed!\n");
         return -1;
     }
-    global_scheduler.ev.events= EPOLLIN;
-    global_scheduler.ev.data.fd = timer_fd;
-    if(epoll_ctl(global_scheduler.epoll_fd,EPOLL_CTL_ADD,timer_fd,&global_scheduler.ev)<0)
+    epoll_event ev;
+    ev.events= EPOLLIN;
+    ev.data.fd = timer_fd;
+    if(epoll_ctl(global_scheduler.epoll_fd,EPOLL_CTL_ADD,timer_fd,&ev)<0)
     {
-        printf("epoll_ctl_Add timer failed!\n");
+        global_scheduler.pLevel.P_ERR("epoll_ctl_Add timer failed!\n");
         return -1;
     }
-    printf("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
+    global_scheduler.pLevel.P_NODE("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
     return 0;
 }
 
@@ -397,15 +381,15 @@ int update_timer()
     given_time.tv_sec=next_Starttime.sec();
     given_time.tv_usec=next_Starttime.ms()*1000;
 
-    printf("NST time: %ld seconds and %lld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
+    global_scheduler.pLevel.P_NODE("NST time: %ld seconds and %lld microseconds\n", given_time.tv_sec, given_time.tv_usec/1000LL);
 
     long long diff_usec = time_diff_microseconds(current_time,given_time);
 
-    printf("Time difference: %lld milliseconds\n", diff_usec/1000LL);
+    global_scheduler.pLevel.P_NODE("Time difference: %lld milliseconds\n", diff_usec/1000LL);
 
     if(diff_usec<0)
     {
-        cout<<"start time is already passed!"<<endl;
+        global_scheduler.pLevel.P_ERR("start time is already passed!\n");
         return -1;
     }
     int64_t sum_ns=diff_usec*1000LL-10*1000*1000*1000LL;
@@ -416,26 +400,26 @@ int update_timer()
 
     if(timerfd_settime(timer_fd,0,&timer,NULL)<0)
     {
-        printf("send_timer settime failed!\n");
+        global_scheduler.pLevel.P_ERR("send_timer settime failed!\n");
         return -1;
     }
-    cout<<"timer has been updated!"<<endl;
+    global_scheduler.pLevel.P_NODE("timer has been updated!\n");
     return 0;
 }
 
 int epoll_ntpServer()
 {
-     ntpServer();
+    ntpServer();
+    epoll_event ev;
+    ev.events=EPOLLIN;
+    ev.data.fd=ntp_fd;
 
-    global_scheduler.ev.events=EPOLLIN;
-    global_scheduler.ev.data.fd=ntp_fd;
-
-    if(epoll_ctl(global_scheduler.epoll_fd,EPOLL_CTL_ADD,ntp_fd,&global_scheduler.ev)<0)
+    if(epoll_ctl(global_scheduler.epoll_fd,EPOLL_CTL_ADD,ntp_fd,&ev)<0)
     {
-        cout<<"epoll_ctl_add ntp_Fd failed"<<endl;
+        global_scheduler.pLevel.P_ERR("epoll_ctl_add ntp_Fd failed\n");
         return -1;
     }
-    printf("SUCCESSFULLY TO ADD NTP SERVER TO EPOLL\n");
+    global_scheduler.pLevel.P_NODE("SUCCESSFULLY TO ADD NTP SERVER TO EPOLL\n");
     return 0;
 }
 
@@ -444,22 +428,17 @@ void initialise_nst()
 {
     struct timeval tv;
     gettimeofday(&tv,NULL);
-    printf("got current time in us\n");
     next_Starttime.set_sec(tv.tv_sec+20);
     next_Starttime.set_ms(tv.tv_usec/1000);
-    printf("finished with nst\n");
 }
 
 int update_nst()
 {
     hyperperiode_ms = mysched.get_hyperperiode_ms();
-    //cout<<"in global_sched, hyperperiode_ms"<<hyperperiode_ms<<endl;
     //*******none schedule yet or has not been sent(no client)********//
     if(!hyperperiode_ms)
     {
         next_Starttime.set_sec(next_Starttime.sec()+20);//to be more determinted
-        //initialise_nst();
-        cout<<"no need to update timer,interval stays 20s"<<endl;
     }else{//********has repeated schedule or new schedule********//
         int64_t final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
 
@@ -468,7 +447,7 @@ int update_nst()
 
         if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
     }
-    cout<<"nst has been updated"<<endl;
+    global_scheduler.pLevel.P_NODE("nst has been updated\n");
     struct tm *tm_info;
     struct timeval tv;
     char buffer[30];
@@ -478,8 +457,7 @@ int update_nst()
     tm_info = localtime(&tv.tv_sec);
     strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", tm_info);
     snprintf(usec_buffer, 21, "%06ld", tv.tv_usec);
-    printf("NST TIME :%s.%s(us)\n", buffer, usec_buffer);
-    //printf("NST : %ld seconds and %ld microseconds\n",next_Starttime.sec(),next_Starttime.ms());
+    global_scheduler.pLevel.P_NODE("NST TIME :%s.%s(us)\n", buffer, usec_buffer);
     return 0;
 }
 
@@ -488,7 +466,7 @@ int timer_handler()
     uint64_t exp;
     if(read(timer_fd,&exp,sizeof(uint64_t))<0)
     {
-        cout<<"failed read from timer"<<endl;
+        global_scheduler.pLevel.P_ERR("failed read from timer\n");
         return -1;
     }
     //NO NEW RECEIVED OR DELETED JOBS
@@ -500,31 +478,30 @@ int timer_handler()
         {
             if(get_and_send_schedule()<0)
             {
-                printf("failed to get and send schedules\n");
+                global_scheduler.pLevel.P_ERR("failed to get and send schedules\n");
                 update_nst();
                 return -1;
             }
-            printf("SUCCESSFULLY SEND SCHEDULE\n");
+            global_scheduler.pLevel.P_NODE("SUCCESSFULLY SEND SCHEDULE\n");
         }else
         {
-            printf("there is no new job received or finished \n");
+            global_scheduler.pLevel.P_NODE("there is no new job received or finished \n");
         }
     //NEW JOB STATUS
     }else{
-        printf("trying to get schedule using RR\n");
+        global_scheduler.pLevel.P_NODE("trying to get schedule using RR\n");
 
         if(get_and_send_schedule()<0)
         {
-            printf("failed to get and send schedules\n");
+            global_scheduler.pLevel.P_ERR("failed to get and send schedules\n");
             update_nst();
             return -1;
         }
-
-        printf("SUCCESSFULLY SEND SCHEDULE OR NO CLIENTS YET\n");
+        global_scheduler.pLevel.P_NODE("SUCCESSFULLY SEND SCHEDULE OR NO CLIENTS YET\n");
     }
 
     if(update_nst()<0)return -1;
-    printf("SUCCESSFULLY UPDATED NST\n");
+    global_scheduler.pLevel.P_NODE("SUCCESSFULLY UPDATED NST\n");
     
     return 0;
     
@@ -534,24 +511,25 @@ int get_and_send_schedule()
 {
     if(global_scheduler.clients.size()==0)
     {
-        printf("there is no clients available now, will reschedule and retry in next round~\n");
+        global_scheduler.pLevel.P_NODE("there is no clients available now, will reschedule and retry in next round~\n");
         need_schedule=true;
         return 0;
     }
     ousterhaut_table.clear();
     int num_cpu_pro_local = pt.get<int>("num_cpus.value");
     int sum_cpu =global_scheduler.clients.size()*num_cpu_pro_local;
-    ousterhaut_table = mysched.roundRobin(job_list,sum_cpu);
+    ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu);
 
     clinets_status_changed = false;
     need_schedule = false;
 
-    printf("successfully got schedule_Tasks(without start time)\n");
+    global_scheduler.pLevel.P_NODE("successfully got schedule_Tasks(without start time)\n");
 
     schedule common_sched;
-    //schedule_temp schedule_Temp;
+
     common_sched.mutable_start_time()->CopyFrom(next_Starttime);
-    printf("successfully set nst\n");
+
+    global_scheduler.pLevel.P_NODE("successfully set nst\n");
 
     for(int client = 0; client<(int)global_scheduler.clients.size();client++)
     {
@@ -571,14 +549,15 @@ int get_and_send_schedule()
         common_sched.mutable_tasksets()->CopyFrom({tasksets.begin(),tasksets.end()});
 
         memset(global_scheduler.send_buffer,'\0',1024);
-        printf("reset send buffer\n");
+
+        global_scheduler.pLevel.P_NODE("reset send buffer\n");
         common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
         if(write(global_scheduler.clients[client],global_scheduler.send_buffer,1024)<0)
         {
-            printf("failed to send schedule to client -%d-\n",client);
+            global_scheduler.pLevel.P_ERR("failed to send schedule to client -%d-\n",client);
             return -1;
         }
-        printf("~~SCHEDULE TO CLIENT -%d- HAS SENT~~\n",client);
+        global_scheduler.pLevel.P_NODE("~~SCHEDULE TO CLIENT -%d- HAS SENT~~\n",client);
     }
 
     return 0;

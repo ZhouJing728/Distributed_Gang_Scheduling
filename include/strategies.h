@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include<vector>
 #include "../MESSAGES/message.pb.h"
@@ -5,9 +6,11 @@ using namespace std;
 using namespace Message::protobuf;
 
 /*****************************************************************
- * For now, the strategy can only generate one schedule for all
- * local_nodes. it doesn't consider cpu number or resuse of a free
- * cpu.
+ * For now, we have only ROUND ROBIN strategy, which can only (re)
+ * generate one schedule for all local_nodes. it doesn't consider 
+ * resuse of a free cpu slice after some jobs finished(we could always
+ * store that info in Global_scheduler, and some future strategies 
+ * could use that info).
  * 
  * for now task id = job id. but in the furture it should be distinct
  * in different machines.
@@ -20,7 +23,6 @@ class Strategy{
     enum strategies {
         Roundrobin,
         Other
-
     };
 
     // Strategy()
@@ -36,12 +38,14 @@ class Strategy{
     bool wait_for_processors = false;
 
     //vector<vector<task>> ousterhaut_table;
-
-    /* (five) seconds for each job(task at a local node) in turn*/
-    vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu);
+    vector<vector<task>> get_scheduleTable(strategies strategy,vector<Job_gang> job_list,int sum_cpu);
 
     int get_hyperperiode_ms();
 
     bool get_wait_for_processors();
+
+    private:
+    /* (five) seconds for each job(task at a local node) in turn*/
+    vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu);
 
 };

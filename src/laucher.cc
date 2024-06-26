@@ -3,11 +3,7 @@
 using namespace std;
 using namespace Message::protobuf;
 
-// #define laucher_port 1235
-// #define server_port 1234
-
 Client laucher;
-string host = "127.0.0.1";
 int job_createAndsend();
 int job_initialise();
 
@@ -18,6 +14,7 @@ int main()
     
     int server_port = pt.get<int>("port_globalscheduler.value");
     int laucher_port = pt.get<int>("port_laucher.value");
+    string server_ip =pt.get<string>("ip_globalscheduler.value");
 
     cout<<"welcome to laucher, please first connect to the Global Scheduler(Server)."<<endl;
 
@@ -33,22 +30,12 @@ int main()
         return -1;
     }
 
-    if(laucher.sock_connect(host,server_port)<0)
+    if(laucher.sock_connect(server_ip,server_port)<0)
     {
         cout<<"failed to connect server"<<endl;
         return -1;
     }
 
-    // while(1)
-    // {
-    //     cout<<"you can create a new gang now."<<endl;
-
-    //     if(job_createAndsend()<0)
-    //     {
-    //         cout<<"failed to create and send a job_gang message"<<endl;
-    //         break;
-    //     }
-    // }
     if(job_initialise()<0)
     {
         cout<<"failed to initialise and send job message"<<endl;
@@ -57,7 +44,7 @@ int main()
 
     Job_gang job3;
     job3.set_job_id(3);
-    job3.set_job_path("../src/JOBS/Job3");
+    job3.set_job_path("./Job3");
     printf("+++++++++++++++++++++++++++++++++++++\n for test purpose(new job later || requested processor num),\n we have predifiend Job3..\n");
     printf("please enter the processor number that you need\n");
     int num;
@@ -82,7 +69,7 @@ int job_initialise()
     Job_gang job0,job1,job2;
     int requested_processors0=1,requested_processors1=1,requested_processors2=2;
     int job_id0=0,job_id1=1,job_id2=2;
-    string path0="../src/JOBS/Job0",path1="../src/JOBS/Job1",path2="../src/JOBS/Job2";
+    string path0="./Job0",path1="./Job1",path2="./Job2";
 
     job0.set_job_id(job_id0);
     job0.set_job_path(path0);

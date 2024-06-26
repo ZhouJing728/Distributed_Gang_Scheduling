@@ -15,12 +15,15 @@
 #include <sys/prctl.h>
 #include "../include/client.h"
 #include "../lib/ntp_client-Gaa/src/ntp_client.h"
+#include "../MESSAGES/message.pb.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 WSADATA xwsa_data;
 WSAStartup(MAKEWORD(2, 0), &xwsa_data);
 #endif // defined(_WIN32) || defined(_WIN64)
 using namespace std;
+using namespace Message::protobuf;
+
 
 struct timeinterval{
     vector<int> cpus;//it could be multiple cpus switch task at same time
@@ -37,11 +40,7 @@ vector<vector<task_local>> tasksets_local;
 
 vector<timeinterval> timeinervals;
 
-int server_port;
-
 string CGROUP_PATH;
-
-string server;
 
 long int ntp_request_interval_sec;
 
@@ -54,10 +53,6 @@ int task_timerfd;
 int sigchildfd;
 
 int num_cpu;
-
-int shmid;
-
-char* shmaddr;
 
 int read_number;
 //the position for next to be execute task in schedule
@@ -95,7 +90,7 @@ xtime_vnsec_t xtm_ltime = XTIME_INVALID_VNSEC;
 xtime_descr_t xtm_descr = { 0 };
 xtime_descr_t xtm_local = { 0 };
 x_ccstring_t host = "127.0.0.1";
-x_int16_t port = 123;
+x_int16_t port=123;
 x_uint32_t xut_tmout = 3000;
 
 
@@ -124,7 +119,7 @@ int ntp_client_initialisation()
 
     if (X_NULL == xntp_this)
     {
-        printf("ntpcli_open() return X_NULL, errno : %d\n", errno);
+        local_scheduler.pLevel.P_ERR("ntpcli_open() return X_NULL, errno : %d\n", errno);
         return -1;
     }
 
@@ -140,7 +135,7 @@ int ntp_timer()
     ntp_timerfd = timerfd_create(CLOCK_REALTIME,0);
     if(ntp_timerfd<0)
     {
-        printf("ntp_timer create failed!\n");
+        local_scheduler.pLevel.P_ERR("ntp_timer create failed!\n");
         return -1;
     }
     struct itimerspec timer;
@@ -154,17 +149,18 @@ int ntp_timer()
 
     if(timerfd_settime(ntp_timerfd,0,&timer,NULL)<0)
     {
-        printf("ntp_timer settime failed!\n");
+        local_scheduler.pLevel.P_ERR("ntp_timer settime failed!\n");
         return -1;
     }
-    local_scheduler.ev.events= EPOLLIN;
-    local_scheduler.ev.data.fd = ntp_timerfd;
-    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_ADD,ntp_timerfd,&local_scheduler.ev)<0)
+    epoll_event ev;
+    ev.events= EPOLLIN;
+    ev.data.fd = ntp_timerfd;
+    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_ADD,ntp_timerfd,&ev)<0)
     {
-        printf("epoll_ctl_Add timer failed!\n");
+        local_scheduler.pLevel.P_ERR("epoll_ctl_Add timer failed!\n");
         return -1;
     }
-    printf("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
+    local_scheduler.pLevel.P_NODE("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
     return 0;
 }
 
@@ -175,7 +171,7 @@ int ntp_timer_handler()
     uint64_t exp;
     if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
     {
-        cout<<"failed read from timer"<<endl;
+        local_scheduler.pLevel.P_ERR("failed read from timer\n");
         return -1;
     }
 
@@ -220,7 +216,7 @@ int ntp_timer_handler()
     }
     else
     {
-        printf("\n[%d] %s:%d : errno = %d\n",
+        local_scheduler.pLevel.P_ERR("\n[%d] %s:%d : errno = %d\n",
                 xit_iter + 1,
                 host,
                 port,
@@ -239,7 +235,7 @@ int task_timer_initialise()
     task_timerfd = timerfd_create(CLOCK_REALTIME,0);
     if(task_timerfd<0)
     {
-        printf("task_timer create failed!\n");
+        local_scheduler.pLevel.P_ERR("task_timer create failed!\n");
         return -1;
     }
     struct itimerspec timer;
@@ -250,17 +246,18 @@ int task_timer_initialise()
     
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)
     {
-        printf("task_timer settime failed!\n");
+        local_scheduler.pLevel.P_ERR("task_timer settime failed!\n");
         return -1;
     }
-    local_scheduler.ev.events= EPOLLIN;
-    local_scheduler.ev.data.fd = task_timerfd;
-    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_ADD,task_timerfd,&local_scheduler.ev)<0)
+    epoll_event ev;
+    ev.events= EPOLLIN;
+    ev.data.fd = task_timerfd;
+    if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_ADD,task_timerfd,&ev)<0)
     {
-        printf("epoll_ctl_Add task timer failed!\n");
+        local_scheduler.pLevel.P_ERR("epoll_ctl_Add task timer failed!\n");
         return -1;
     }
-    printf("SUCCESSFULLY CREATE AND ADD task TIMER TO EPOLL\n");
+    local_scheduler.pLevel.P_NODE("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
     return 0;
 }
 
@@ -279,35 +276,17 @@ bool compareTimeInterval(const timeinterval&a,const timeinterval &b) {
 
 void insert_timeIntervals(task task,int cpu)
 {
-    // cout<<"in insert"<<endl;
-    // auto it=timeinervals.begin();
-    // while(it!=timeinervals.end()&&it->timeinterval_ms<task.relevant_swtichtime_ms())
-    // {
-    //     it++;
-    // }
-    // timeinterval tinterval=*it;
-    // if(tinterval.timeinterval_ms==task.relevant_swtichtime_ms())
-    // {
-    //     it->cpus.push_back(cpu);
-    // }else{
-    //     timeinterval ti;
-    //     ti.cpus.push_back(cpu);
-    //     ti.timeinterval_ms=task.relevant_swtichtime_ms();
-    //     timeinervals.insert(it,ti);
-    // }
+
     for (auto &interval : timeinervals) {
         if (interval.timeinterval_ms == task.relevant_swtichtime_ms()) {
-            // 如果时间长度相同，合并CPU组
             interval.cpus.insert(interval.cpus.end(), cpu);
             return;
         }
     }
-    // 如果没有相同时间长度的时间间隔，插入新的时间间隔
     timeinterval ti;
     ti.cpus.push_back(cpu);
     ti.timeinterval_ms=task.relevant_swtichtime_ms();
     timeinervals.push_back(ti);
-    // 按时间长度排序
     std::sort(timeinervals.begin(), timeinervals.end(), compareTimeInterval);
 
 }
@@ -334,7 +313,7 @@ int organize_current_schedule()
 
     if(diff_usec<0)
     {
-        cout<<"start time is already passed!"<<endl;
+        local_scheduler.pLevel.P_ERR("start time is already passed!\n");
         return -1;
     }
     //*****sum_ns = given server time - current server time*****************//
@@ -349,7 +328,7 @@ int organize_current_schedule()
     //printf("timer sec:%ld, nsec:%ld\n",timer.it_value.tv_sec,timer.it_value.tv_nsec);
 
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
-    cout<<"successful to set the first timer of a schedule"<<endl;
+    local_scheduler.pLevel.P_NODE("successful to set the first timer of a schedule\n");
     if(new_schedule){
         for(int i=0;i<num_cpu;i++)tasksets_local[i].clear();
         timeinervals.clear();
@@ -374,12 +353,12 @@ int organize_current_schedule()
 void write_to_cgroup_file(const char *file_path, const char *value) {
     int fd = open(file_path, O_WRONLY);
     if (fd == -1) {
-        perror("Error opening file");
+        local_scheduler.pLevel.P_ERR("Error opening file\n");
         exit(EXIT_FAILURE);
     }
 
     if (write(fd, value, strlen(value)) == -1) {
-        perror("Error writing to file");
+        local_scheduler.pLevel.P_ERR("Error writing to file\n");
         close(fd);
         exit(EXIT_FAILURE);
     }
@@ -393,12 +372,12 @@ void add_pid_to_cgroup(const char *tasks_file_path, pid_t pid) {
 
     fd = open(tasks_file_path, O_WRONLY);
     if (fd == -1) {
-        perror("Error opening tasks file");
+        local_scheduler.pLevel.P_ERR("Error opening tasks file\n");
         exit(EXIT_FAILURE);
     }
     //write pid to task file 
     if (dprintf(fd, "%d", pid) == -1) {
-        perror("Error writing to tasks file");
+        local_scheduler.pLevel.P_ERR("Error writing to tasks file\n");
         close(fd);
         exit(EXIT_FAILURE);
     }
@@ -425,19 +404,19 @@ bool check_file_empty(string id)
     sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
     FILE *file = fopen(buffer, "r");
     if (file == NULL) {
-        printf("fopen failed");
+        local_scheduler.pLevel.P_ERR("fopen failed\n");
         return -1; 
     }
 
     if (fseek(file, 0, SEEK_END) != 0) {
-        printf("fseek failed");
+        local_scheduler.pLevel.P_ERR("fseek failed!\n");
         fclose(file);
         return -1; 
     }
 
     long file_size = ftell(file);
     if (file_size == -1) {
-        printf("ftell failed");
+        local_scheduler.pLevel.P_ERR("ftell failed!\n");
         fclose(file);
         return -1; 
     }
@@ -459,7 +438,7 @@ int timer_update()
     long long diff_usec = time_diff_microseconds(current_time,given_time);
     if(diff_usec<0)
     {
-        cout<<"start time(not the first) is already passed!"<<endl;
+        local_scheduler.pLevel.P_ERR("start time(not the first) is already passed!\n");
         return -1;
     }
     
@@ -473,7 +452,7 @@ int timer_update()
 
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
     index_timeInterval++;
-    cout<<"successful to set the timer"<<endl;
+    local_scheduler.pLevel.P_NODE("succeed to update the timer\n");
     return 0;
 }
 
@@ -486,9 +465,9 @@ int task_switch(int cpu)
             char buffer[128];
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
-            printf("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched[cpu].c_str());
+            local_scheduler.pLevel.P_NODE("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched[cpu].c_str());
         }else{
-            printf("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
+            local_scheduler.pLevel.P_NODE("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
@@ -504,7 +483,7 @@ int task_switch(int cpu)
             string id = last_task.task_id.substr(1);
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
-            printf("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
+            local_scheduler.pLevel.P_NODE("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
     /*********thaw the next task********************/
@@ -517,7 +496,7 @@ int task_switch(int cpu)
         sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
         //cout<<state<<endl;
         write_to_cgroup_file(state, "THAWED");
-        printf("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
+        local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
         print_current_time();
         //*****if not be executed before, it needs to get pid and store it ****//
         if(!check_task_initialised(cpu,id))
@@ -525,7 +504,7 @@ int task_switch(int cpu)
             taskids_exist_local[cpu].push_back(id);
             pid_t pid = fork();
             if (pid == -1) {
-                perror("Error forking process");
+                local_scheduler.pLevel.P_ERR("Error forking process\n");
                 exit(EXIT_FAILURE);
             } else if (pid == 0) {//child process
                 prctl(PR_SET_PDEATHSIG,SIGKILL);
@@ -535,26 +514,25 @@ int task_switch(int cpu)
                 CPU_SET(cpu,&set);
 
                 if (sched_setaffinity(0, sizeof(set), &set) == -1) {
-                    perror("sched_setaffinity");
+                    local_scheduler.pLevel.P_ERR("sched_setaffinity!\n");
                     exit(EXIT_FAILURE);
                 }
 
                 const char* path = next_task.path.c_str();
                 execl(path, path, NULL);
-                perror("Error executing program ");
+                local_scheduler.pLevel.P_ERR("Error executing program!\n");
                 exit(EXIT_FAILURE);
             }else//father process here continue
             {
                 char tasks[128];
                 sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
-                cout<<"task pid is"<<getpid()<<endl;
                 add_pid_to_cgroup(tasks,pid);
                 pid_to_taskid.insert(pair<int,string>(pid,id));
             }
         }
     }else/*********if next task is empty, skip the next step*******************/
     {
-        printf("Next task time slice is empty!\n====================\n");
+        local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n====================\n");
     }
 
     if((schedule_current.tasksets(cpu).tasks(position[cpu]).task_id()!="empty")&&(position[cpu]==schedule_current.tasksets(cpu).tasks_size()-1))
@@ -571,16 +549,15 @@ int task_timer_handler()
     uint64_t exp;
     if(read(task_timerfd,&exp,sizeof(uint64_t))<0)
     {
-        cout<<"failed read from task timer"<<endl;
+        local_scheduler.pLevel.P_ERR("failed read from task timer\n");
         return -1;
     }
 
     for(long unsigned int i=0;i<timeinervals[0].cpus.size();i++)
     {
         if(task_switch(timeinervals[0].cpus[i])<0)
-        cout<<"failed to handle task timer for cpu"<<i<<endl;
+        local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
     }
-    //timeinervals.pop_front();
     
     /*********current schedule finished********************/
     /*must be the last task of all tasksets cause the current shceduler will be cleaned*/
@@ -589,15 +566,13 @@ int task_timer_handler()
     {
         if(new_schedule)
         {
-            printf("THERE IS NEW SCHEDULE DETECTED!\n");
-            //new_schedule=false;
+            local_scheduler.pLevel.P_NODE("THERE IS NEW SCHEDULE DETECTED!\n");
             schedule_current.Clear();
-            //schedule_current.CopyFrom(schedule_new);
             schedule_current.mutable_start_time()->CopyFrom(schedule_new.start_time());
             schedule_current.mutable_tasksets()->CopyFrom(schedule_new.tasksets());
             schedule_new.Clear();
             if(organize_current_schedule()<0)return -1;
-            cout<<"successfully organized the new schedule!"<<endl;
+            local_scheduler.pLevel.P_NODE("successfully organized the new schedule\n");
         }else{
             start_time nst;
             //start time for repeated schedule = last schedule'start time + last task's deadline
@@ -608,13 +583,14 @@ int task_timer_handler()
             schedule_current.clear_start_time();
             schedule_current.mutable_start_time()->CopyFrom(nst);
             if(organize_current_schedule()<0)return -1;
-            cout<<"successfully organized the repeated schedule!"<<endl;
+            local_scheduler.pLevel.P_NODE("successfully organized the repeated schedule!\n");
         }
         return 0;//now need to update timer,cause current schedule'last deadline will be updated as new schedule's first start
     }
 
     if(timer_update()<0)
     {
+        local_scheduler.pLevel.P_ERR("ntp_timer settime failed!\n");
         cout<<"failed to update timer with task position:"<<index_timeInterval<<endl;
         return -1;
     }
@@ -631,10 +607,10 @@ int handle_event()
         //Fist situation: ntp_timer is triggered,it is time to request a deviation!
         if(fd_temp == ntp_timerfd)
         {
-            printf("\n==============================\n""REQUSTING TIME DEVIATION\n""==============================\n");
+            local_scheduler.pLevel.P_NODE("\n==============================\n""REQUSTING TIME DEVIATION\n""==============================\n");
             if(ntp_timer_handler()<0)
             {
-                printf("-----request time deviation failed------\n");
+                local_scheduler.pLevel.P_ERR("-----request time deviation failed------\n");
                 return -1;
             }
         
@@ -644,23 +620,23 @@ int handle_event()
             memset(local_scheduler.receive_buffer,'\0',sizeof(local_scheduler.receive_buffer));
             if(recv(local_scheduler.client,local_scheduler.receive_buffer,1024,0)<=0)
             {
-                cout<<"failed to receive from server, connection closed"<<endl;
+                local_scheduler.pLevel.P_ERR("failed to receive from server, connection closed!\n");
                 return -1;
             }
             new_schedule = true;
-            if(dispatching)//或者这里的代码是一样的，在organize那里判断schedule_Cuurent是不是空
+            if(dispatching)
             {
                 schedule_new.Clear();
                 schedule_new.ParseFromArray(local_scheduler.receive_buffer,1024);
-                cout<<"*******a new schedule is stored in schedule_new********<----"<<endl;
+                local_scheduler.pLevel.P_NODE("*******a new schedule is stored in schedule_new********<----\n");
                 print_current_time();
             }else{
                 schedule_current.Clear();
                 schedule_current.ParseFromArray(local_scheduler.receive_buffer,1024);
-                cout<<"a new schedule is stored in schedule_current"<<endl;
+                local_scheduler.pLevel.P_NODE("a new schedule is stored in schedule_current\n");
                 print_current_time();
                 if(organize_current_schedule()<0)return -1;
-                cout<<"successfully organized current schedule"<<endl;
+                local_scheduler.pLevel.P_NODE("successfully organized current schedule\n");
             }
          //THIRD SITUATION : SOME CHID PROCESS HAS ENDED             
         }else if(fd_temp == sigchildfd)
@@ -668,7 +644,7 @@ int handle_event()
             struct signalfd_siginfo fdsi;
             ssize_t s = read(sigchildfd, &fdsi, sizeof(fdsi));
             if (s != sizeof(fdsi)) {
-                perror("read");
+                local_scheduler.pLevel.P_ERR("read!\n");
                 exit(1);
             }
 
@@ -676,23 +652,21 @@ int handle_event()
                 pid_t pid;
                 int status;
                 pid = waitpid(-1, &status, WNOHANG); 
-                std::cout << "Child process with PID " << pid << " has exited.\n";
+                local_scheduler.pLevel.P_NODE("Child process with PID %d has exited.\n",pid);
             
                 memset(local_scheduler.send_buffer,'\0',1024);
 
-                // string serializedMap(shmaddr);
-                // map<int, string> receivedMap = deserializeMap(serializedMap);
-                for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
-                {
-                    cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-                }
+                // for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
+                // {
+                //     cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
+                // }
                 map<int,string>::iterator iter = pid_to_taskid.find(pid);
                 if(iter!= pid_to_taskid.end())
                 {
                     strcpy(local_scheduler.send_buffer,iter->second.c_str());
                     local_scheduler.send_to_server(local_scheduler.send_buffer);
                 }else{
-                    cout<<"Don't find the correct pid"<<endl;
+                    local_scheduler.pLevel.P_ERR("Didn't find the correct pid!\n");
                 }
            }
         }else
@@ -711,13 +685,13 @@ int epoll_sigchild()
     sigaddset(&mask, SIGCHLD);
 
     if (sigprocmask(SIG_BLOCK, &mask, nullptr) == -1) {
-        perror("sigprocmask");
+        local_scheduler.pLevel.P_ERR("sigprocmask\n");
         exit(1);
     }
 
     sigchildfd = signalfd(-1, &mask, 0);
     if (sigchildfd == -1) {
-        perror("signalfd");
+        local_scheduler.pLevel.P_ERR("signalfd!\n");
         exit(1);
     }
 
@@ -726,7 +700,7 @@ int epoll_sigchild()
     event.data.fd = sigchildfd;
 
     if (epoll_ctl(local_scheduler.epoll_fd, EPOLL_CTL_ADD, sigchildfd, &event) == -1) {
-        perror("epoll_ctl");
+        local_scheduler.pLevel.P_ERR("epoll_ctl\n");
         exit(1);
     }
     return 0;
@@ -736,10 +710,10 @@ int main()
 {
     boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
-
-    server_port = pt.get<int>("port_globalscheduler.value");
+    string ip=pt.get<string>("ip_ntpServer.value");
+    int server_port = pt.get<int>("port_globalscheduler.value");
     CGROUP_PATH = pt.get<string>("path_cgroup.value");
-    server=pt.get<string>("ip_globalscheduler.value");
+    string server=pt.get<string>("ip_globalscheduler.value");
     ntp_request_interval_nsec=pt.get<long int>("ntp_request_interval.nsec");
     ntp_request_interval_sec=pt.get<long int>("ntp_request_interval.sec");
     num_cpu=pt.get<int>("num_cpus.value");
@@ -753,48 +727,37 @@ int main()
     
     taskids_exist_local.resize(num_cpu);
     
-    if(local_scheduler.sock_create()<0)
-    {
-        cout<<"sock create failed"<<endl;
-        return -1;
-    }
-    cout<<"successfull create tcp socket"<<endl;
-
-    if(local_scheduler.sock_connect(server,1234)<0)
-    {
-        cout<<"sock connect failed"<<endl;
-        return -1;
-    }
-    cout<<"successfull connect to tcp server"<<endl;
-
-    if(local_scheduler.epoll_initialisation()<0)
-    {
-        cout<<"epoll initialisation failed"<<endl;
-        return -1;
-    }
-    cout<<"successfull initialise epoll"<<endl;
+    if(local_scheduler.sock_create()<0)return -1;
     
-    if(ntp_client_initialisation()<0)
-    {
-        cout<<"ntp_client initialsation failed"<<endl;
-    }
-    cout<<"successfull initialise ntpclient"<<endl;
+    local_scheduler.pLevel.P_NODE("successfull create tcp socket\n");
+
+    if(local_scheduler.sock_connect(server,server_port)<0)return -1;
+   
+    local_scheduler.pLevel.P_NODE("successfull connect to tcp server\n");
+
+    if(local_scheduler.epoll_initialisation()<0)return -1;
+    
+    local_scheduler.pLevel.P_NODE("successfull initialise epoll\n");
+    
+    if(ntp_client_initialisation()<0)return -1;
+    
+    local_scheduler.pLevel.P_NODE("successfull initialise ntpclient\n");
 
    if(ntp_timer()<0)
    {
-        cout<<"ntp_timer failed"<<endl;
+        local_scheduler.pLevel.P_ERR("ntp_timer failed\n");
         return -1;
    }
 
    if(task_timer_initialise()<0)
    {
-        cout<<"task_timer initialise failed"<<endl;
+        local_scheduler.pLevel.P_ERR("task_timer initialise failed\n");
         return -1;
    }
 
    if(epoll_sigchild()<0)
    {
-        cout<<"failed to create sigchild fd and add it in epoll"<<endl;
+        local_scheduler.pLevel.P_ERR("failed to create sigchild fd and add it in epoll\n");
         return -1;
    }
 
@@ -805,18 +768,18 @@ int main()
         switch (read_number=epoll_wait(local_scheduler.epoll_fd,local_scheduler.events,128,-1))//time out -1 for infinite waiting
         {
             case 0:
-                cout<<"time out"<<endl;
+                local_scheduler.pLevel.P_ERR("time out!\n");
                 break;//go out of this switch but still in while loop..
 
             case -1:
-                cout<<"epoll_Wait error"<<endl;
+                local_scheduler.pLevel.P_ERR("epoll_Wait error\n");
                 close(local_scheduler.client);
                 return -1;
         
             default:
                 if(handle_event()<0)
                 {
-                    cout<<"failed to handle event"<<endl;
+                    local_scheduler.pLevel.P_ERR("failed to handle event!\n");
                     close(local_scheduler.client);
                     return -1;
                 }

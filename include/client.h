@@ -1,6 +1,6 @@
 #pragma once
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <unistd.h>
 #include <stdlib.h>
 #include <netdb.h>
@@ -13,32 +13,22 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include"MESSAGES/message.pb.h"
+#include "print_level.h"
 using namespace std;
-using namespace Message::protobuf;
 
 class Client
 {
     public:
     int client;
-    int server_port=1234;
-    int client_port;
     int epoll_fd;
-    sockaddr_in server_addr;
-    const char* ip;
     char send_buffer[1024];
     char receive_buffer[1024];
-    epoll_event ev;
     epoll_event events[128];
-
-    schedule scheduling;
+    PrintL pLevel;
 
     int sock_create();
 
-    int sock_bind();
-
     int sock_bind(int port);
-
-    int sock_connect();//give addr from command line OR define it
 
     int sock_connect(string host,int port);
 

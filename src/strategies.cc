@@ -3,10 +3,26 @@ using namespace std;
 
 Strategy strategy;
 
+vector<vector<task>> Strategy:: get_scheduleTable(strategies strategy,vector<Job_gang> job_list,int sum_cpu)
+{
+    vector<vector<task>> table;
+    switch (strategy)
+    {
+    case Roundrobin:
+        table=roundRobin(job_list,sum_cpu);
+        break;
+    
+    default:
+        //other strategy in future;
+        break;
+    }
+    return table;
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //**This scheduling method does not preserve previous scheduling. All jobs on all processors
 //  are rescheduled each round.
-//**Each task gets five seconds of run time for all clients. repeate for six times.
+//**Each task gets five seconds of run time for all clients. repeate for twice.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu){
     
