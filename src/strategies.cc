@@ -2,6 +2,12 @@
 using namespace std;
 
 Strategy strategy;
+Strategy::Strategy()
+{
+    hypperperiode_ms=0;
+    lastTaskDuration_ms=0;
+    wait_for_processors=false;
+}
 
 vector<vector<task>> Strategy:: get_scheduleTable(strategies strategy,vector<Job_gang> job_list,int sum_cpu)
 {
@@ -37,6 +43,7 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu)
     //task.set_task_id("empty");
 
     wait_for_processors = false;
+    lastTaskDuration_ms = 5000;
  
    for(int i =0;i<2;i++)
    {
@@ -87,4 +94,9 @@ int Strategy:: get_hyperperiode_ms()
 bool Strategy::get_wait_for_processors()
 {
     return wait_for_processors;
+}
+
+int Strategy:: get_lastTaskDuration_ms()
+{
+    return lastTaskDuration_ms;
 }

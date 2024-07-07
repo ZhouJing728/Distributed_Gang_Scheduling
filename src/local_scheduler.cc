@@ -89,7 +89,7 @@ xtime_vnsec_t xtm_vnsec = XTIME_INVALID_VNSEC;
 xtime_vnsec_t xtm_ltime = XTIME_INVALID_VNSEC;
 xtime_descr_t xtm_descr = { 0 };
 xtime_descr_t xtm_local = { 0 };
-x_ccstring_t host = "127.0.0.1";
+x_cstring_t host;
 x_int16_t port=123;
 x_uint32_t xut_tmout = 3000;
 
@@ -313,7 +313,7 @@ int organize_current_schedule()
 
     if(diff_usec<0)
     {
-        local_scheduler.pLevel.P_ERR("start time is already passed!\n");
+        local_scheduler.pLevel.P_ERR("start time is already passed %lld usec!\n",diff_usec);
         return -1;
     }
     //*****sum_ns = given server time - current server time*****************//
@@ -344,6 +344,7 @@ int organize_current_schedule()
 
                 insert_timeIntervals(task,i);
             }
+            local_scheduler.pLevel.P_DBG("taskset of %d taskset is %d\n",i,tasksets_local[i].size());
         }
     }
     new_schedule=false;
@@ -439,6 +440,7 @@ int timer_update()
     if(diff_usec<0)
     {
         local_scheduler.pLevel.P_ERR("start time(not the first) is already passed!\n");
+        local_scheduler.pLevel.P_DBG("current time is %lld usec later than next start time\n",diff_usec);
         return -1;
     }
     
@@ -629,6 +631,7 @@ int handle_event()
                 schedule_new.Clear();
                 schedule_new.ParseFromArray(local_scheduler.receive_buffer,1024);
                 local_scheduler.pLevel.P_NODE("*******a new schedule is stored in schedule_new********<----\n");
+                local_scheduler.pLevel.P_DBG("size of new schedule's first taskset is: %d",schedule_new.tasksets(0).tasks_size());
                 print_current_time();
             }else{
                 schedule_current.Clear();
@@ -710,6 +713,8 @@ int main()
 {
     boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
+    string str=pt.get<string>("ip_ntpServer.value");
+    host=str.c_str();
     string ip=pt.get<string>("ip_ntpServer.value");
     int server_port = pt.get<int>("port_globalscheduler.value");
     CGROUP_PATH = pt.get<string>("path_cgroup.value");

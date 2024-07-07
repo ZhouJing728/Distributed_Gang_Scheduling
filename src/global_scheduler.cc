@@ -32,12 +32,18 @@ int ntp_fd;
 
 int timer_fd;
 
+int lastTaskDuration_ms;
+
+int send_schedule_leadTimes_ms;
+
 int hyperperiode_ms;
 //true,when still has schedule to be send or job status changed
 bool need_schedule = false;
 //true, when new clients connect,
 //reset to false,when this changed has been seen by schedule stratrgy
 bool clinets_status_changed = false;
+
+bool oneTaskSchedule = false;
 
 struct itimerspec send_timer;
 
@@ -110,6 +116,7 @@ int main()
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     global_scheduler_port= pt.get<int>("port_globalscheduler.value");
     global_scheduler.max_client=pt.get<int>("max_local_num.value");
+    send_schedule_leadTimes_ms=pt.get<int>("send_schedule_leadTimes_ms.value");
 
 
     if(global_scheduler.sock_create()<0)
@@ -392,11 +399,12 @@ int update_timer()
         global_scheduler.pLevel.P_ERR("start time is already passed!\n");
         return -1;
     }
-    int64_t sum_ns=diff_usec*1000LL-10*1000*1000*1000LL;
+    lastTaskDuration_ms=mysched.get_lastTaskDuration_ms();
+    int64_t sum_ns=diff_usec*1000LL-lastTaskDuration_ms*1000*1000LL-send_schedule_leadTimes_ms*1000*1000LL;
     timer.it_value.tv_sec = sum_ns/(1000LL*1000LL*1000LL);
     timer.it_value.tv_nsec = sum_ns%(1000LL*1000LL*1000LL);
-    timer.it_interval.tv_nsec = 0;
-    timer.it_interval.tv_sec =0;
+    timer.it_interval.tv_nsec = (hyperperiode_ms%1000LL)*1000LL;
+    timer.it_interval.tv_sec =hyperperiode_ms/1000LL;
 
     if(timerfd_settime(timer_fd,0,&timer,NULL)<0)
     {
@@ -435,17 +443,31 @@ void initialise_nst()
 int update_nst()
 {
     hyperperiode_ms = mysched.get_hyperperiode_ms();
+    lastTaskDuration_ms=mysched.get_lastTaskDuration_ms();
     //*******none schedule yet or has not been sent(no client)********//
     if(!hyperperiode_ms)
     {
         next_Starttime.set_sec(next_Starttime.sec()+20);//to be more determinted
-    }else{//********has repeated schedule or new schedule********//
-        int64_t final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
-
+    
+    }else
+    {
+        int64_t final_ms;
+         //last schedule only has one task.
+        //-->send time = next hyperperode - next lastTaskDuration = current time ! 
+        //-->has nst passed risk by local scheduler
+        //-->check and send in one hyperperiode but set nst = last nst + 2 last hyper
+        if(oneTaskSchedule)
+        {
+            final_ms= next_Starttime.ms()+2*hyperperiode_ms+next_Starttime.sec()*1000LL;
+            oneTaskSchedule = false;
+        }else{//********has repeated schedule or new schedule********//
+            final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
+        }
         next_Starttime.set_sec(final_ms/1000LL);
         next_Starttime.set_ms(final_ms%1000LL);
 
         if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
+        
     }
     global_scheduler.pLevel.P_NODE("nst has been updated\n");
     struct tm *tm_info;
@@ -558,6 +580,14 @@ int get_and_send_schedule()
             return -1;
         }
         global_scheduler.pLevel.P_NODE("~~SCHEDULE TO CLIENT -%d- HAS SENT~~\n",client);
+    }
+    hyperperiode_ms = mysched.get_hyperperiode_ms();
+    lastTaskDuration_ms=mysched.get_lastTaskDuration_ms();
+    if(hyperperiode_ms==lastTaskDuration_ms)
+    {
+        oneTaskSchedule=true;
+    }else{
+        oneTaskSchedule=false;
     }
 
     return 0;
