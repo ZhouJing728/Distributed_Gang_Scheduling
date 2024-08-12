@@ -111,30 +111,30 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named LIBLAUCHER
+# Target rules for targets named Local_sched
 
 # Build rule for target.
-LIBLAUCHER: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 LIBLAUCHER
-.PHONY : LIBLAUCHER
+Local_sched: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Local_sched
+.PHONY : Local_sched
 
 # fast build rule for target.
-LIBLAUCHER/fast:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/build
-.PHONY : LIBLAUCHER/fast
+Local_sched/fast:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/build
+.PHONY : Local_sched/fast
 
 #=============================================================================
-# Target rules for targets named Job2
+# Target rules for targets named LIBLAUNCHER
 
 # Build rule for target.
-Job2: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Job2
-.PHONY : Job2
+LIBLAUNCHER: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 LIBLAUNCHER
+.PHONY : LIBLAUNCHER
 
 # fast build rule for target.
-Job2/fast:
-	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/build
-.PHONY : Job2/fast
+LIBLAUNCHER/fast:
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/build
+.PHONY : LIBLAUNCHER/fast
 
 #=============================================================================
 # Target rules for targets named LIBGLOBAL
@@ -163,17 +163,17 @@ LIBLOCAL/fast:
 .PHONY : LIBLOCAL/fast
 
 #=============================================================================
-# Target rules for targets named Job1
+# Target rules for targets named Job0
 
 # Build rule for target.
-Job1: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Job1
-.PHONY : Job1
+Job0: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Job0
+.PHONY : Job0
 
 # fast build rule for target.
-Job1/fast:
-	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/build
-.PHONY : Job1/fast
+Job0/fast:
+	$(MAKE) -f CMakeFiles/Job0.dir/build.make CMakeFiles/Job0.dir/build
+.PHONY : Job0/fast
 
 #=============================================================================
 # Target rules for targets named LIBJOB
@@ -189,30 +189,30 @@ LIBJOB/fast:
 .PHONY : LIBJOB/fast
 
 #=============================================================================
-# Target rules for targets named Job0
+# Target rules for targets named Job1
 
 # Build rule for target.
-Job0: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Job0
-.PHONY : Job0
+Job1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Job1
+.PHONY : Job1
 
 # fast build rule for target.
-Job0/fast:
-	$(MAKE) -f CMakeFiles/Job0.dir/build.make CMakeFiles/Job0.dir/build
-.PHONY : Job0/fast
+Job1/fast:
+	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/build
+.PHONY : Job1/fast
 
 #=============================================================================
-# Target rules for targets named Laucher
+# Target rules for targets named Job2
 
 # Build rule for target.
-Laucher: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Laucher
-.PHONY : Laucher
+Job2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Job2
+.PHONY : Job2
 
 # fast build rule for target.
-Laucher/fast:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/build
-.PHONY : Laucher/fast
+Job2/fast:
+	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/build
+.PHONY : Job2/fast
 
 #=============================================================================
 # Target rules for targets named Job3
@@ -241,6 +241,45 @@ Job4/fast:
 .PHONY : Job4/fast
 
 #=============================================================================
+# Target rules for targets named Infini_server
+
+# Build rule for target.
+Infini_server: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Infini_server
+.PHONY : Infini_server
+
+# fast build rule for target.
+Infini_server/fast:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/build
+.PHONY : Infini_server/fast
+
+#=============================================================================
+# Target rules for targets named Infini_client
+
+# Build rule for target.
+Infini_client: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Infini_client
+.PHONY : Infini_client
+
+# fast build rule for target.
+Infini_client/fast:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/build
+.PHONY : Infini_client/fast
+
+#=============================================================================
+# Target rules for targets named Launcher
+
+# Build rule for target.
+Launcher: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Launcher
+.PHONY : Launcher
+
+# fast build rule for target.
+Launcher/fast:
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/build
+.PHONY : Launcher/fast
+
+#=============================================================================
 # Target rules for targets named Global_sched
 
 # Build rule for target.
@@ -253,26 +292,13 @@ Global_sched/fast:
 	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/build
 .PHONY : Global_sched/fast
 
-#=============================================================================
-# Target rules for targets named Local_sched
-
-# Build rule for target.
-Local_sched: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Local_sched
-.PHONY : Local_sched
-
-# fast build rule for target.
-Local_sched/fast:
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/build
-.PHONY : Local_sched/fast
-
 MESSAGES/message.pb.o: MESSAGES/message.pb.cc.o
 
 .PHONY : MESSAGES/message.pb.o
 
 # target to build an object file
 MESSAGES/message.pb.cc.o:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.o
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/MESSAGES/message.pb.cc.o
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.o
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.o
 .PHONY : MESSAGES/message.pb.cc.o
@@ -283,7 +309,7 @@ MESSAGES/message.pb.i: MESSAGES/message.pb.cc.i
 
 # target to preprocess a source file
 MESSAGES/message.pb.cc.i:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.i
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/MESSAGES/message.pb.cc.i
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.i
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.i
 .PHONY : MESSAGES/message.pb.cc.i
@@ -294,7 +320,7 @@ MESSAGES/message.pb.s: MESSAGES/message.pb.cc.s
 
 # target to generate assembly for a file
 MESSAGES/message.pb.cc.s:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/MESSAGES/message.pb.cc.s
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/MESSAGES/message.pb.cc.s
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/MESSAGES/message.pb.cc.s
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/MESSAGES/message.pb.cc.s
 .PHONY : MESSAGES/message.pb.cc.s
@@ -434,13 +460,67 @@ src/JOBS/job4.cc.s:
 	$(MAKE) -f CMakeFiles/Job4.dir/build.make CMakeFiles/Job4.dir/src/JOBS/job4.cc.s
 .PHONY : src/JOBS/job4.cc.s
 
+src/Latency_Test/infini_client.o: src/Latency_Test/infini_client.cc.o
+
+.PHONY : src/Latency_Test/infini_client.o
+
+# target to build an object file
+src/Latency_Test/infini_client.cc.o:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/src/Latency_Test/infini_client.cc.o
+.PHONY : src/Latency_Test/infini_client.cc.o
+
+src/Latency_Test/infini_client.i: src/Latency_Test/infini_client.cc.i
+
+.PHONY : src/Latency_Test/infini_client.i
+
+# target to preprocess a source file
+src/Latency_Test/infini_client.cc.i:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/src/Latency_Test/infini_client.cc.i
+.PHONY : src/Latency_Test/infini_client.cc.i
+
+src/Latency_Test/infini_client.s: src/Latency_Test/infini_client.cc.s
+
+.PHONY : src/Latency_Test/infini_client.s
+
+# target to generate assembly for a file
+src/Latency_Test/infini_client.cc.s:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/src/Latency_Test/infini_client.cc.s
+.PHONY : src/Latency_Test/infini_client.cc.s
+
+src/Latency_Test/infini_server.o: src/Latency_Test/infini_server.cc.o
+
+.PHONY : src/Latency_Test/infini_server.o
+
+# target to build an object file
+src/Latency_Test/infini_server.cc.o:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/src/Latency_Test/infini_server.cc.o
+.PHONY : src/Latency_Test/infini_server.cc.o
+
+src/Latency_Test/infini_server.i: src/Latency_Test/infini_server.cc.i
+
+.PHONY : src/Latency_Test/infini_server.i
+
+# target to preprocess a source file
+src/Latency_Test/infini_server.cc.i:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/src/Latency_Test/infini_server.cc.i
+.PHONY : src/Latency_Test/infini_server.cc.i
+
+src/Latency_Test/infini_server.s: src/Latency_Test/infini_server.cc.s
+
+.PHONY : src/Latency_Test/infini_server.s
+
+# target to generate assembly for a file
+src/Latency_Test/infini_server.cc.s:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/src/Latency_Test/infini_server.cc.s
+.PHONY : src/Latency_Test/infini_server.cc.s
+
 src/client.o: src/client.cc.o
 
 .PHONY : src/client.o
 
 # target to build an object file
 src/client.cc.o:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.o
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/client.cc.o
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.o
 .PHONY : src/client.cc.o
 
@@ -450,7 +530,7 @@ src/client.i: src/client.cc.i
 
 # target to preprocess a source file
 src/client.cc.i:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.i
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/client.cc.i
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.i
 .PHONY : src/client.cc.i
 
@@ -460,7 +540,7 @@ src/client.s: src/client.cc.s
 
 # target to generate assembly for a file
 src/client.cc.s:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/client.cc.s
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/client.cc.s
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/client.cc.s
 .PHONY : src/client.cc.s
 
@@ -491,32 +571,32 @@ src/global_scheduler.cc.s:
 	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/src/global_scheduler.cc.s
 .PHONY : src/global_scheduler.cc.s
 
-src/laucher.o: src/laucher.cc.o
+src/launcher.o: src/launcher.cc.o
 
-.PHONY : src/laucher.o
+.PHONY : src/launcher.o
 
 # target to build an object file
-src/laucher.cc.o:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.o
-.PHONY : src/laucher.cc.o
+src/launcher.cc.o:
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/src/launcher.cc.o
+.PHONY : src/launcher.cc.o
 
-src/laucher.i: src/laucher.cc.i
+src/launcher.i: src/launcher.cc.i
 
-.PHONY : src/laucher.i
+.PHONY : src/launcher.i
 
 # target to preprocess a source file
-src/laucher.cc.i:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.i
-.PHONY : src/laucher.cc.i
+src/launcher.cc.i:
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/src/launcher.cc.i
+.PHONY : src/launcher.cc.i
 
-src/laucher.s: src/laucher.cc.s
+src/launcher.s: src/launcher.cc.s
 
-.PHONY : src/laucher.s
+.PHONY : src/launcher.s
 
 # target to generate assembly for a file
-src/laucher.cc.s:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/src/laucher.cc.s
-.PHONY : src/laucher.cc.s
+src/launcher.cc.s:
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/src/launcher.cc.s
+.PHONY : src/launcher.cc.s
 
 src/local_scheduler.o: src/local_scheduler.cc.o
 
@@ -551,7 +631,7 @@ src/print_level.o: src/print_level.cc.o
 
 # target to build an object file
 src/print_level.cc.o:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.o
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/print_level.cc.o
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/print_level.cc.o
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/print_level.cc.o
 	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/src/print_level.cc.o
@@ -563,7 +643,7 @@ src/print_level.i: src/print_level.cc.i
 
 # target to preprocess a source file
 src/print_level.cc.i:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.i
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/print_level.cc.i
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/print_level.cc.i
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/print_level.cc.i
 	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/src/print_level.cc.i
@@ -575,7 +655,7 @@ src/print_level.s: src/print_level.cc.s
 
 # target to generate assembly for a file
 src/print_level.cc.s:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/src/print_level.cc.s
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/src/print_level.cc.s
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/src/print_level.cc.s
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/src/print_level.cc.s
 	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/src/print_level.cc.s
@@ -641,20 +721,22 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... LIBLAUCHER"
-	@echo "... Job2"
-	@echo "... LIBGLOBAL"
-	@echo "... LIBLOCAL"
-	@echo "... Job1"
-	@echo "... LIBJOB"
-	@echo "... Job0"
-	@echo "... Laucher"
-	@echo "... Job3"
-	@echo "... Job4"
-	@echo "... Global_sched"
-	@echo "... Local_sched"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... Local_sched"
+	@echo "... LIBLAUNCHER"
+	@echo "... LIBGLOBAL"
+	@echo "... LIBLOCAL"
+	@echo "... Job0"
+	@echo "... LIBJOB"
+	@echo "... Job1"
+	@echo "... Job2"
+	@echo "... Job3"
+	@echo "... Job4"
+	@echo "... Infini_server"
+	@echo "... Infini_client"
+	@echo "... Launcher"
+	@echo "... Global_sched"
 	@echo "... MESSAGES/message.pb.o"
 	@echo "... MESSAGES/message.pb.i"
 	@echo "... MESSAGES/message.pb.s"
@@ -673,15 +755,21 @@ help:
 	@echo "... src/JOBS/job4.o"
 	@echo "... src/JOBS/job4.i"
 	@echo "... src/JOBS/job4.s"
+	@echo "... src/Latency_Test/infini_client.o"
+	@echo "... src/Latency_Test/infini_client.i"
+	@echo "... src/Latency_Test/infini_client.s"
+	@echo "... src/Latency_Test/infini_server.o"
+	@echo "... src/Latency_Test/infini_server.i"
+	@echo "... src/Latency_Test/infini_server.s"
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"
 	@echo "... src/global_scheduler.o"
 	@echo "... src/global_scheduler.i"
 	@echo "... src/global_scheduler.s"
-	@echo "... src/laucher.o"
-	@echo "... src/laucher.i"
-	@echo "... src/laucher.s"
+	@echo "... src/launcher.o"
+	@echo "... src/launcher.i"
+	@echo "... src/launcher.s"
 	@echo "... src/local_scheduler.o"
 	@echo "... src/local_scheduler.i"
 	@echo "... src/local_scheduler.s"

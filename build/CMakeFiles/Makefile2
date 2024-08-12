@@ -53,18 +53,20 @@ CMAKE_BINARY_DIR = /root/DGS/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/LIBLAUCHER.dir/all
-all: CMakeFiles/Job2.dir/all
+all: CMakeFiles/Local_sched.dir/all
+all: CMakeFiles/LIBLAUNCHER.dir/all
 all: CMakeFiles/LIBGLOBAL.dir/all
 all: CMakeFiles/LIBLOCAL.dir/all
-all: CMakeFiles/Job1.dir/all
-all: CMakeFiles/LIBJOB.dir/all
 all: CMakeFiles/Job0.dir/all
-all: CMakeFiles/Laucher.dir/all
+all: CMakeFiles/LIBJOB.dir/all
+all: CMakeFiles/Job1.dir/all
+all: CMakeFiles/Job2.dir/all
 all: CMakeFiles/Job3.dir/all
 all: CMakeFiles/Job4.dir/all
+all: CMakeFiles/Infini_server.dir/all
+all: CMakeFiles/Infini_client.dir/all
+all: CMakeFiles/Launcher.dir/all
 all: CMakeFiles/Global_sched.dir/all
-all: CMakeFiles/Local_sched.dir/all
 
 .PHONY : all
 
@@ -74,74 +76,76 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/LIBLAUCHER.dir/clean
-clean: CMakeFiles/Job2.dir/clean
+clean: CMakeFiles/Local_sched.dir/clean
+clean: CMakeFiles/LIBLAUNCHER.dir/clean
 clean: CMakeFiles/LIBGLOBAL.dir/clean
 clean: CMakeFiles/LIBLOCAL.dir/clean
-clean: CMakeFiles/Job1.dir/clean
-clean: CMakeFiles/LIBJOB.dir/clean
 clean: CMakeFiles/Job0.dir/clean
-clean: CMakeFiles/Laucher.dir/clean
+clean: CMakeFiles/LIBJOB.dir/clean
+clean: CMakeFiles/Job1.dir/clean
+clean: CMakeFiles/Job2.dir/clean
 clean: CMakeFiles/Job3.dir/clean
 clean: CMakeFiles/Job4.dir/clean
+clean: CMakeFiles/Infini_server.dir/clean
+clean: CMakeFiles/Infini_client.dir/clean
+clean: CMakeFiles/Launcher.dir/clean
 clean: CMakeFiles/Global_sched.dir/clean
-clean: CMakeFiles/Local_sched.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/LIBLAUCHER.dir
+# Target rules for target CMakeFiles/Local_sched.dir
 
 # All Build rule for target.
-CMakeFiles/LIBLAUCHER.dir/all:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/depend
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=20,21,22,23 "Built target LIBLAUCHER"
-.PHONY : CMakeFiles/LIBLAUCHER.dir/all
+CMakeFiles/Local_sched.dir/all: CMakeFiles/LIBLOCAL.dir/all
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/depend
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=34,35 "Built target Local_sched"
+.PHONY : CMakeFiles/Local_sched.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/LIBLAUCHER.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LIBLAUCHER.dir/all
+CMakeFiles/Local_sched.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 6
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Local_sched.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/LIBLAUCHER.dir/rule
+.PHONY : CMakeFiles/Local_sched.dir/rule
 
 # Convenience name for target.
-LIBLAUCHER: CMakeFiles/LIBLAUCHER.dir/rule
+Local_sched: CMakeFiles/Local_sched.dir/rule
 
-.PHONY : LIBLAUCHER
+.PHONY : Local_sched
 
 # clean rule for target.
-CMakeFiles/LIBLAUCHER.dir/clean:
-	$(MAKE) -f CMakeFiles/LIBLAUCHER.dir/build.make CMakeFiles/LIBLAUCHER.dir/clean
-.PHONY : CMakeFiles/LIBLAUCHER.dir/clean
+CMakeFiles/Local_sched.dir/clean:
+	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/clean
+.PHONY : CMakeFiles/Local_sched.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/Job2.dir
+# Target rules for target CMakeFiles/LIBLAUNCHER.dir
 
 # All Build rule for target.
-CMakeFiles/Job2.dir/all: CMakeFiles/LIBJOB.dir/all
-	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/depend
-	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=7,8 "Built target Job2"
-.PHONY : CMakeFiles/Job2.dir/all
+CMakeFiles/LIBLAUNCHER.dir/all:
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/depend
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=24,25,26,27 "Built target LIBLAUNCHER"
+.PHONY : CMakeFiles/LIBLAUNCHER.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/Job2.dir/rule: cmake_check_build_system
+CMakeFiles/LIBLAUNCHER.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Job2.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LIBLAUNCHER.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/Job2.dir/rule
+.PHONY : CMakeFiles/LIBLAUNCHER.dir/rule
 
 # Convenience name for target.
-Job2: CMakeFiles/Job2.dir/rule
+LIBLAUNCHER: CMakeFiles/LIBLAUNCHER.dir/rule
 
-.PHONY : Job2
+.PHONY : LIBLAUNCHER
 
 # clean rule for target.
-CMakeFiles/Job2.dir/clean:
-	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/clean
-.PHONY : CMakeFiles/Job2.dir/clean
+CMakeFiles/LIBLAUNCHER.dir/clean:
+	$(MAKE) -f CMakeFiles/LIBLAUNCHER.dir/build.make CMakeFiles/LIBLAUNCHER.dir/clean
+.PHONY : CMakeFiles/LIBLAUNCHER.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/LIBGLOBAL.dir
@@ -150,7 +154,7 @@ CMakeFiles/Job2.dir/clean:
 CMakeFiles/LIBGLOBAL.dir/all:
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/depend
 	$(MAKE) -f CMakeFiles/LIBGLOBAL.dir/build.make CMakeFiles/LIBGLOBAL.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=13,14,15,16,17 "Built target LIBGLOBAL"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=17,18,19,20,21 "Built target LIBGLOBAL"
 .PHONY : CMakeFiles/LIBGLOBAL.dir/all
 
 # Build rule for subdir invocation for target.
@@ -177,7 +181,7 @@ CMakeFiles/LIBGLOBAL.dir/clean:
 CMakeFiles/LIBLOCAL.dir/all:
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/depend
 	$(MAKE) -f CMakeFiles/LIBLOCAL.dir/build.make CMakeFiles/LIBLOCAL.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=24,25,26,27 "Built target LIBLOCAL"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=28,29,30,31 "Built target LIBLOCAL"
 .PHONY : CMakeFiles/LIBLOCAL.dir/all
 
 # Build rule for subdir invocation for target.
@@ -198,67 +202,13 @@ CMakeFiles/LIBLOCAL.dir/clean:
 .PHONY : CMakeFiles/LIBLOCAL.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/Job1.dir
-
-# All Build rule for target.
-CMakeFiles/Job1.dir/all: CMakeFiles/LIBJOB.dir/all
-	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/depend
-	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=5,6 "Built target Job1"
-.PHONY : CMakeFiles/Job1.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/Job1.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Job1.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/Job1.dir/rule
-
-# Convenience name for target.
-Job1: CMakeFiles/Job1.dir/rule
-
-.PHONY : Job1
-
-# clean rule for target.
-CMakeFiles/Job1.dir/clean:
-	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/clean
-.PHONY : CMakeFiles/Job1.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/LIBJOB.dir
-
-# All Build rule for target.
-CMakeFiles/LIBJOB.dir/all:
-	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/depend
-	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=18,19 "Built target LIBJOB"
-.PHONY : CMakeFiles/LIBJOB.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/LIBJOB.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LIBJOB.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/LIBJOB.dir/rule
-
-# Convenience name for target.
-LIBJOB: CMakeFiles/LIBJOB.dir/rule
-
-.PHONY : LIBJOB
-
-# clean rule for target.
-CMakeFiles/LIBJOB.dir/clean:
-	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/clean
-.PHONY : CMakeFiles/LIBJOB.dir/clean
-
-#=============================================================================
 # Target rules for target CMakeFiles/Job0.dir
 
 # All Build rule for target.
 CMakeFiles/Job0.dir/all: CMakeFiles/LIBJOB.dir/all
 	$(MAKE) -f CMakeFiles/Job0.dir/build.make CMakeFiles/Job0.dir/depend
 	$(MAKE) -f CMakeFiles/Job0.dir/build.make CMakeFiles/Job0.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=3,4 "Built target Job0"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=7,8 "Built target Job0"
 .PHONY : CMakeFiles/Job0.dir/all
 
 # Build rule for subdir invocation for target.
@@ -279,31 +229,85 @@ CMakeFiles/Job0.dir/clean:
 .PHONY : CMakeFiles/Job0.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/Laucher.dir
+# Target rules for target CMakeFiles/LIBJOB.dir
 
 # All Build rule for target.
-CMakeFiles/Laucher.dir/all: CMakeFiles/LIBLAUCHER.dir/all
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/depend
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=28,29 "Built target Laucher"
-.PHONY : CMakeFiles/Laucher.dir/all
+CMakeFiles/LIBJOB.dir/all:
+	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/depend
+	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=22,23 "Built target LIBJOB"
+.PHONY : CMakeFiles/LIBJOB.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/Laucher.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 6
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Laucher.dir/all
+CMakeFiles/LIBJOB.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LIBJOB.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/Laucher.dir/rule
+.PHONY : CMakeFiles/LIBJOB.dir/rule
 
 # Convenience name for target.
-Laucher: CMakeFiles/Laucher.dir/rule
+LIBJOB: CMakeFiles/LIBJOB.dir/rule
 
-.PHONY : Laucher
+.PHONY : LIBJOB
 
 # clean rule for target.
-CMakeFiles/Laucher.dir/clean:
-	$(MAKE) -f CMakeFiles/Laucher.dir/build.make CMakeFiles/Laucher.dir/clean
-.PHONY : CMakeFiles/Laucher.dir/clean
+CMakeFiles/LIBJOB.dir/clean:
+	$(MAKE) -f CMakeFiles/LIBJOB.dir/build.make CMakeFiles/LIBJOB.dir/clean
+.PHONY : CMakeFiles/LIBJOB.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Job1.dir
+
+# All Build rule for target.
+CMakeFiles/Job1.dir/all: CMakeFiles/LIBJOB.dir/all
+	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/depend
+	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=9,10 "Built target Job1"
+.PHONY : CMakeFiles/Job1.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Job1.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Job1.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
+.PHONY : CMakeFiles/Job1.dir/rule
+
+# Convenience name for target.
+Job1: CMakeFiles/Job1.dir/rule
+
+.PHONY : Job1
+
+# clean rule for target.
+CMakeFiles/Job1.dir/clean:
+	$(MAKE) -f CMakeFiles/Job1.dir/build.make CMakeFiles/Job1.dir/clean
+.PHONY : CMakeFiles/Job1.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Job2.dir
+
+# All Build rule for target.
+CMakeFiles/Job2.dir/all: CMakeFiles/LIBJOB.dir/all
+	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/depend
+	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=11,12 "Built target Job2"
+.PHONY : CMakeFiles/Job2.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Job2.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Job2.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
+.PHONY : CMakeFiles/Job2.dir/rule
+
+# Convenience name for target.
+Job2: CMakeFiles/Job2.dir/rule
+
+.PHONY : Job2
+
+# clean rule for target.
+CMakeFiles/Job2.dir/clean:
+	$(MAKE) -f CMakeFiles/Job2.dir/build.make CMakeFiles/Job2.dir/clean
+.PHONY : CMakeFiles/Job2.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/Job3.dir
@@ -312,7 +316,7 @@ CMakeFiles/Laucher.dir/clean:
 CMakeFiles/Job3.dir/all: CMakeFiles/LIBJOB.dir/all
 	$(MAKE) -f CMakeFiles/Job3.dir/build.make CMakeFiles/Job3.dir/depend
 	$(MAKE) -f CMakeFiles/Job3.dir/build.make CMakeFiles/Job3.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=9,10 "Built target Job3"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=13,14 "Built target Job3"
 .PHONY : CMakeFiles/Job3.dir/all
 
 # Build rule for subdir invocation for target.
@@ -339,7 +343,7 @@ CMakeFiles/Job3.dir/clean:
 CMakeFiles/Job4.dir/all: CMakeFiles/LIBJOB.dir/all
 	$(MAKE) -f CMakeFiles/Job4.dir/build.make CMakeFiles/Job4.dir/depend
 	$(MAKE) -f CMakeFiles/Job4.dir/build.make CMakeFiles/Job4.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=11,12 "Built target Job4"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=15,16 "Built target Job4"
 .PHONY : CMakeFiles/Job4.dir/all
 
 # Build rule for subdir invocation for target.
@@ -358,6 +362,87 @@ Job4: CMakeFiles/Job4.dir/rule
 CMakeFiles/Job4.dir/clean:
 	$(MAKE) -f CMakeFiles/Job4.dir/build.make CMakeFiles/Job4.dir/clean
 .PHONY : CMakeFiles/Job4.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Infini_server.dir
+
+# All Build rule for target.
+CMakeFiles/Infini_server.dir/all:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/depend
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=5,6 "Built target Infini_server"
+.PHONY : CMakeFiles/Infini_server.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Infini_server.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Infini_server.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
+.PHONY : CMakeFiles/Infini_server.dir/rule
+
+# Convenience name for target.
+Infini_server: CMakeFiles/Infini_server.dir/rule
+
+.PHONY : Infini_server
+
+# clean rule for target.
+CMakeFiles/Infini_server.dir/clean:
+	$(MAKE) -f CMakeFiles/Infini_server.dir/build.make CMakeFiles/Infini_server.dir/clean
+.PHONY : CMakeFiles/Infini_server.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Infini_client.dir
+
+# All Build rule for target.
+CMakeFiles/Infini_client.dir/all:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/depend
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=3,4 "Built target Infini_client"
+.PHONY : CMakeFiles/Infini_client.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Infini_client.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Infini_client.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
+.PHONY : CMakeFiles/Infini_client.dir/rule
+
+# Convenience name for target.
+Infini_client: CMakeFiles/Infini_client.dir/rule
+
+.PHONY : Infini_client
+
+# clean rule for target.
+CMakeFiles/Infini_client.dir/clean:
+	$(MAKE) -f CMakeFiles/Infini_client.dir/build.make CMakeFiles/Infini_client.dir/clean
+.PHONY : CMakeFiles/Infini_client.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Launcher.dir
+
+# All Build rule for target.
+CMakeFiles/Launcher.dir/all: CMakeFiles/LIBLAUNCHER.dir/all
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/depend
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=32,33 "Built target Launcher"
+.PHONY : CMakeFiles/Launcher.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Launcher.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 6
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Launcher.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
+.PHONY : CMakeFiles/Launcher.dir/rule
+
+# Convenience name for target.
+Launcher: CMakeFiles/Launcher.dir/rule
+
+.PHONY : Launcher
+
+# clean rule for target.
+CMakeFiles/Launcher.dir/clean:
+	$(MAKE) -f CMakeFiles/Launcher.dir/build.make CMakeFiles/Launcher.dir/clean
+.PHONY : CMakeFiles/Launcher.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/Global_sched.dir
@@ -385,33 +470,6 @@ Global_sched: CMakeFiles/Global_sched.dir/rule
 CMakeFiles/Global_sched.dir/clean:
 	$(MAKE) -f CMakeFiles/Global_sched.dir/build.make CMakeFiles/Global_sched.dir/clean
 .PHONY : CMakeFiles/Global_sched.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/Local_sched.dir
-
-# All Build rule for target.
-CMakeFiles/Local_sched.dir/all: CMakeFiles/LIBLOCAL.dir/all
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/depend
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/root/DGS/build/CMakeFiles --progress-num=30,31 "Built target Local_sched"
-.PHONY : CMakeFiles/Local_sched.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/Local_sched.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 6
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Local_sched.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /root/DGS/build/CMakeFiles 0
-.PHONY : CMakeFiles/Local_sched.dir/rule
-
-# Convenience name for target.
-Local_sched: CMakeFiles/Local_sched.dir/rule
-
-.PHONY : Local_sched
-
-# clean rule for target.
-CMakeFiles/Local_sched.dir/clean:
-	$(MAKE) -f CMakeFiles/Local_sched.dir/build.make CMakeFiles/Local_sched.dir/clean
-.PHONY : CMakeFiles/Local_sched.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

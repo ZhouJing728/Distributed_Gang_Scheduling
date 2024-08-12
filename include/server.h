@@ -29,7 +29,7 @@ class Server
     //fd of connected clients, the sequece is first connect first in.
     vector<int> clients;
     int laucher;
-    char send_buffer[1024];
+    char send_buffer[2048];
     char read_buffer[1024];
     epoll_event events[128];
     PrintL pLevel;

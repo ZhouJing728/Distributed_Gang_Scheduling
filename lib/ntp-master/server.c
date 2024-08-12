@@ -174,7 +174,7 @@ void request_process_loop(int fd)
 }
 
 
-int ntp_server(struct sockaddr_in bind_addr)
+int ntp_server(struct sockaddr_in bind_addr, int port)
 {
 	int s;
 	struct sockaddr_in sinaddr;
@@ -187,7 +187,7 @@ int ntp_server(struct sockaddr_in bind_addr)
 
 	memset(&sinaddr, 0, sizeof(sinaddr));
 	sinaddr.sin_family = AF_INET;
-	sinaddr.sin_port = htons(123);
+	sinaddr.sin_port = htons(port);
 	sinaddr.sin_addr.s_addr = bind_addr.sin_addr.s_addr;
 
 	if (0 != bind(s, (struct sockaddr *)&sinaddr, sizeof(sinaddr))) {

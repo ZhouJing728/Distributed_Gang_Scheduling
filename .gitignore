@@ -3,6 +3,10 @@ NTP/
 ntp.cc
 .history/
 build/
-.vscode
 Freezernew
 freezer.cc
+test/SI
+test/stringtoint.cc
+src/Latency_Test/
+.vscode/
+cgroup/

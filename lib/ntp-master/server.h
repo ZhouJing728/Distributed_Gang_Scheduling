@@ -18,7 +18,7 @@
 //#define UTC_NTP 2208988800U /* 1970 - 1900 */
 
 void request_process_loop(int fd);
-int ntp_server(struct sockaddr_in bind_addr);
+int ntp_server(struct sockaddr_in bind_addr,int port);
 void wait_wrapper();
 int ntp_reply(
 	int socket_fd,

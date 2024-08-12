@@ -12,6 +12,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/prctl.h>
 #include "../include/client.h"
 #include "../lib/ntp_client-Gaa/src/ntp_client.h"
@@ -38,7 +39,7 @@ struct task_local{
 
 vector<vector<task_local>> tasksets_local;
 
-vector<timeinterval> timeinervals;
+vector<timeinterval> timeintervals;
 
 string CGROUP_PATH;
 
@@ -90,7 +91,7 @@ xtime_vnsec_t xtm_ltime = XTIME_INVALID_VNSEC;
 xtime_descr_t xtm_descr = { 0 };
 xtime_descr_t xtm_local = { 0 };
 x_cstring_t host;
-x_int16_t port=123;
+x_int16_t port;
 x_uint32_t xut_tmout = 3000;
 
 
@@ -110,6 +111,7 @@ void print_current_time() {
 
     printf("CURRENT TIME :%s.%s\n", buffer, usec_buffer);
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //ntp_client_initialisation() initialise some parameter, config ntp server infomation
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -128,7 +130,7 @@ int ntp_client_initialisation()
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// ntp_timer() set a timer that times out every minute for requesting a time deviation.
+// ntp_timer() set a timer that times out every given time interval for requesting a time deviation.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int ntp_timer()
 {
@@ -139,13 +141,11 @@ int ntp_timer()
         return -1;
     }
     struct itimerspec timer;
-    //---------------------------------------//
-    //triggered every 60s after first trigger
-    //(30s after the this program started)
-    timer.it_interval.tv_sec=60;//this doesn't work
-    timer.it_interval.tv_nsec=0;
-    timer.it_value.tv_nsec=ntp_request_interval_nsec;
-    timer.it_value.tv_sec=ntp_request_interval_sec;
+
+    timer.it_interval.tv_sec = ntp_request_interval_sec;
+    timer.it_interval.tv_nsec = ntp_request_interval_nsec;
+    timer.it_value.tv_nsec = ntp_request_interval_nsec;//both tv_nsec and tv_sev to 0 means disarms the timer
+    timer.it_value.tv_sec = ntp_request_interval_sec;
 
     if(timerfd_settime(ntp_timerfd,0,&timer,NULL)<0)
     {
@@ -153,7 +153,7 @@ int ntp_timer()
         return -1;
     }
     epoll_event ev;
-    ev.events= EPOLLIN;
+    ev.events = EPOLLIN;
     ev.data.fd = ntp_timerfd;
     if(epoll_ctl(local_scheduler.epoll_fd,EPOLL_CTL_ADD,ntp_timerfd,&ev)<0)
     {
@@ -166,15 +166,9 @@ int ntp_timer()
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //ntp_timer_handler() request time deviation for once, save it in deviation in microsecons
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int ntp_timer_handler()
 {
-    uint64_t exp;
-    if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
-    {
-        local_scheduler.pLevel.P_ERR("failed read from timer\n");
-        return -1;
-    }
-
     xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);
     if (XTMVNSEC_IS_VALID(xtm_vnsec))
     {
@@ -227,8 +221,7 @@ int ntp_timer_handler()
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//task_timer() create timerfd for every tasks in current schedule with their start time, 
-//and put them into epoll 
+//task_timer() create a yet down timer, that will be used for tasks switch later,and put timerfd into epoll 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int task_timer_initialise()
 {
@@ -238,6 +231,7 @@ int task_timer_initialise()
         local_scheduler.pLevel.P_ERR("task_timer create failed!\n");
         return -1;
     }
+    //timer is down
     struct itimerspec timer;
     timer.it_interval.tv_nsec=0;
     timer.it_interval.tv_sec=0;
@@ -261,37 +255,45 @@ int task_timer_initialise()
     return 0;
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //second time value - first time value;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 long long time_diff_microseconds(struct timeval start, struct timeval end) {
     long long start_usec = start.tv_sec * 1000000LL + start.tv_usec;
     long long end_usec = end.tv_sec * 1000000LL + end.tv_usec;
     return end_usec - start_usec;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//return true when the first value < second value
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 bool compareTimeInterval(const timeinterval&a,const timeinterval &b) {
     return a.timeinterval_ms< b.timeinterval_ms;
 }
 
-void insert_timeIntervals(task task,int cpu)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//Add the core to the list of corresponding intervals. And sort the timeintervals list with intervals in ascending order.
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+void insert_timeIntervals(task task,int core)
 {
 
-    for (auto &interval : timeinervals) {
+    for (auto &interval : timeintervals) {
         if (interval.timeinterval_ms == task.relevant_swtichtime_ms()) {
-            interval.cpus.insert(interval.cpus.end(), cpu);
+            interval.cpus.insert(interval.cpus.end(), core);
             return;
         }
     }
     timeinterval ti;
-    ti.cpus.push_back(cpu);
+    ti.cpus.push_back(core);
     ti.timeinterval_ms=task.relevant_swtichtime_ms();
-    timeinervals.push_back(ti);
-    std::sort(timeinervals.begin(), timeinervals.end(), compareTimeInterval);
+    timeintervals.push_back(ti);
+    std::sort(timeintervals.begin(), timeintervals.end(), compareTimeInterval);
 
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//organize_current_schedule() set the dispatching flag, reset the position from 0, set timer for first task start
+//organize_current_schedule() set the dispatching flag, reset the position from 0, set timer for first task start, go through 
+//all tasks and organize its switch time(timeintervals from schedule start time) in timeintervals list.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int organize_current_schedule()
 {
@@ -308,6 +310,17 @@ int organize_current_schedule()
 
     ST.tv_sec=schedule_current.start_time().sec();
     ST.tv_usec=schedule_current.start_time().ms()*1000;
+
+    char buffer[128];
+    char usec_buffer[128];
+    struct tm *tm_info;
+    tm_info = localtime(&ST.tv_sec);
+
+    strftime(buffer, 30, "%Y-%m-%d %H:%M:%S", tm_info);
+
+    snprintf(usec_buffer, 21, "%06ld", ST.tv_usec);
+
+    printf("START TIME :%s.%s\n", buffer, usec_buffer);
 
     long long diff_usec = time_diff_microseconds(current_time,ST);
 
@@ -331,7 +344,7 @@ int organize_current_schedule()
     local_scheduler.pLevel.P_NODE("successful to set the first timer of a schedule\n");
     if(new_schedule){
         for(int i=0;i<num_cpu;i++)tasksets_local[i].clear();
-        timeinervals.clear();
+        timeintervals.clear();
         for(int i=0;i<schedule_current.tasksets_size();i++)
         {
             for(int j=0;j<schedule_current.tasksets(i).tasks_size();j++)
@@ -344,7 +357,7 @@ int organize_current_schedule()
 
                 insert_timeIntervals(task,i);
             }
-            local_scheduler.pLevel.P_DBG("taskset of %d taskset is %d\n",i,tasksets_local[i].size());
+            local_scheduler.pLevel.P_DBG("taskset size of %d th core is %d\n",i,tasksets_local[i].size());
         }
     }
     new_schedule=false;
@@ -354,7 +367,7 @@ int organize_current_schedule()
 void write_to_cgroup_file(const char *file_path, const char *value) {
     int fd = open(file_path, O_WRONLY);
     if (fd == -1) {
-        local_scheduler.pLevel.P_ERR("Error opening file\n");
+        local_scheduler.pLevel.P_ERR("Error opening file %s\n",file_path);
         exit(EXIT_FAILURE);
     }
 
@@ -428,14 +441,16 @@ bool check_file_empty(string id)
 
 }
 
-/**********from second task, the start time = last start time + last duration************/
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//update timer for next task switch. switch time = current schedule start time + (relative switch)interval
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int timer_update()
 {
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
     struct timeval given_time;
-    given_time.tv_sec=ST.tv_sec+timeinervals[index_timeInterval].timeinterval_ms/1000;
-    given_time.tv_usec= ST.tv_usec+(timeinervals[index_timeInterval].timeinterval_ms%1000)*1000;
+    given_time.tv_sec=ST.tv_sec+timeintervals[index_timeInterval].timeinterval_ms/1000;
+    given_time.tv_usec= ST.tv_usec+(timeintervals[index_timeInterval].timeinterval_ms%1000)*1000;
     long long diff_usec = time_diff_microseconds(current_time,given_time);
     if(diff_usec<0)
     {
@@ -445,7 +460,9 @@ int timer_update()
     }
     
     struct itimerspec timer;
-    
+    //sum_ns= (server time)nst-(server time)current time
+    //      =（client time)nst-(client time)current time
+    //      = (server time)nst-deviation(=server-client)-(Client time)current time
     int64_t sum_ns = diff_usec*1000LL-deviation_in_microsecond*1000LL;
     timer.it_value.tv_sec = sum_ns/1000000000LL;
     timer.it_value.tv_nsec = sum_ns%1000000000LL;
@@ -473,30 +490,40 @@ int task_switch(int cpu)
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
-    //vector<task_local>::iterator it = tasksets_local[cpu].begin();
+
     if(position[cpu]>0){
-        //vector<task_local>::iterator it = tasksets_local[cpu].begin();
-        //for(int i=0;i<position[cpu]-1;i++)it++;
+
         vector<task_local>taskset =tasksets_local[cpu];        
         task_local last_task = taskset[position[cpu]-1];
         if(last_task.task_id!="empty")
         {
             char buffer[128];
-            string id = last_task.task_id.substr(1);
+            string id = last_task.task_id;
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
             local_scheduler.pLevel.P_NODE("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
     /*********thaw the next task********************/
-    //it++;
+
     task_local next_task = tasksets_local[cpu][position[cpu]];
     if(next_task.task_id!="empty")
     {
+        printf("Successful implementation of scheduling!\n");
         char state[128];
-        string id = next_task.task_id.substr(1);
+        char path[128];
+        string id = next_task.task_id;
+        sprintf(path,"%s/%s",CGROUP_PATH.c_str(),id.c_str());
+        struct stat st;
+        if((stat(path,&st)<0))
+        {
+            if(mkdir(path,0777)<0)
+            {
+                perror("mkdir");
+                return -1;
+            }
+        }
         sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-        //cout<<state<<endl;
         write_to_cgroup_file(state, "THAWED");
         local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
         print_current_time();
@@ -529,7 +556,7 @@ int task_switch(int cpu)
                 char tasks[128];
                 sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
                 add_pid_to_cgroup(tasks,pid);
-                pid_to_taskid.insert(pair<int,string>(pid,id));
+                pid_to_taskid.insert(pair<int,string>(pid,next_task.task_id));
             }
         }
     }else/*********if next task is empty, skip the next step*******************/
@@ -555,16 +582,16 @@ int task_timer_handler()
         return -1;
     }
 
-    for(long unsigned int i=0;i<timeinervals[0].cpus.size();i++)
+    for(long unsigned int i=0;i<timeintervals[0].cpus.size();i++)
     {
-        if(task_switch(timeinervals[0].cpus[i])<0)
+        if(task_switch(timeintervals[0].cpus[i])<0)
         local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
     }
     
     /*********current schedule finished********************/
     /*must be the last task of all tasksets cause the current shceduler will be cleaned*/
     /*the last task still in list,because we need its switch time to update timer */
-    if(index_timeInterval==(int)timeinervals.size()-1)
+    if(index_timeInterval==(int)timeintervals.size()-1)
     {
         if(new_schedule)
         {
@@ -578,8 +605,8 @@ int task_timer_handler()
         }else{
             start_time nst;
             //start time for repeated schedule = last schedule'start time + last task's deadline
-            int i = timeinervals.size();
-            int64_t given_time_us = ST.tv_sec*1000000LL+ST.tv_usec+timeinervals[i-1].timeinterval_ms*1000LL;
+            int i = timeintervals.size();
+            int64_t given_time_us = ST.tv_sec*1000000LL+ST.tv_usec+timeintervals[i-1].timeinterval_ms*1000LL;
             nst.set_sec(given_time_us/1000000LL);
             nst.set_ms((given_time_us%1000000LL)/1000LL);
             schedule_current.clear_start_time();
@@ -587,9 +614,9 @@ int task_timer_handler()
             if(organize_current_schedule()<0)return -1;
             local_scheduler.pLevel.P_NODE("successfully organized the repeated schedule!\n");
         }
-        return 0;//now need to update timer,cause current schedule'last deadline will be updated as new schedule's first start
+        return 0;
     }
-
+    //now need to update timer,cause current schedule'last deadline will be updated as new schedule's start time
     if(timer_update()<0)
     {
         local_scheduler.pLevel.P_ERR("ntp_timer settime failed!\n");
@@ -598,6 +625,7 @@ int task_timer_handler()
     }
     return 0;
 }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -609,6 +637,12 @@ int handle_event()
         //Fist situation: ntp_timer is triggered,it is time to request a deviation!
         if(fd_temp == ntp_timerfd)
         {
+            uint64_t exp;
+            if(read(ntp_timerfd,&exp,sizeof(uint64_t))<0)
+            {
+                local_scheduler.pLevel.P_ERR("failed read from Ntptimer\n");
+                return -1;
+            }
             local_scheduler.pLevel.P_NODE("\n==============================\n""REQUSTING TIME DEVIATION\n""==============================\n");
             if(ntp_timer_handler()<0)
             {
@@ -620,7 +654,7 @@ int handle_event()
         }else if(fd_temp==local_scheduler.client&&(local_scheduler.events[i].events&EPOLLIN))
         {
             memset(local_scheduler.receive_buffer,'\0',sizeof(local_scheduler.receive_buffer));
-            if(recv(local_scheduler.client,local_scheduler.receive_buffer,1024,0)<=0)
+            if(recv(local_scheduler.client,local_scheduler.receive_buffer,sizeof(local_scheduler.receive_buffer),0)<=0)
             {
                 local_scheduler.pLevel.P_ERR("failed to receive from server, connection closed!\n");
                 return -1;
@@ -629,13 +663,13 @@ int handle_event()
             if(dispatching)
             {
                 schedule_new.Clear();
-                schedule_new.ParseFromArray(local_scheduler.receive_buffer,1024);
+                schedule_new.ParseFromArray(local_scheduler.receive_buffer,sizeof(local_scheduler.receive_buffer));
                 local_scheduler.pLevel.P_NODE("*******a new schedule is stored in schedule_new********<----\n");
                 local_scheduler.pLevel.P_DBG("size of new schedule's first taskset is: %d",schedule_new.tasksets(0).tasks_size());
                 print_current_time();
             }else{
                 schedule_current.Clear();
-                schedule_current.ParseFromArray(local_scheduler.receive_buffer,1024);
+                schedule_current.ParseFromArray(local_scheduler.receive_buffer,sizeof(local_scheduler.receive_buffer));
                 local_scheduler.pLevel.P_NODE("a new schedule is stored in schedule_current\n");
                 print_current_time();
                 if(organize_current_schedule()<0)return -1;
@@ -657,12 +691,8 @@ int handle_event()
                 pid = waitpid(-1, &status, WNOHANG); 
                 local_scheduler.pLevel.P_NODE("Child process with PID %d has exited.\n",pid);
             
-                memset(local_scheduler.send_buffer,'\0',1024);
+                memset(local_scheduler.send_buffer,'\0',sizeof(local_scheduler.receive_buffer));
 
-                // for (std::map<int, string>::iterator it = pid_to_taskid.begin(); it != pid_to_taskid.end(); ++it) 
-                // {
-                //     cout << "Key: " << it->first << ", Value: " << it->second << std::endl;
-                // }
                 map<int,string>::iterator iter = pid_to_taskid.find(pid);
                 if(iter!= pid_to_taskid.end())
                 {
@@ -715,7 +745,7 @@ int main()
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     string str=pt.get<string>("ip_ntpServer.value");
     host=str.c_str();
-    string ip=pt.get<string>("ip_ntpServer.value");
+    port=pt.get<int>("port_ntpServer.value");
     int server_port = pt.get<int>("port_globalscheduler.value");
     CGROUP_PATH = pt.get<string>("path_cgroup.value");
     string server=pt.get<string>("ip_globalscheduler.value");
@@ -765,6 +795,11 @@ int main()
         local_scheduler.pLevel.P_ERR("failed to create sigchild fd and add it in epoll\n");
         return -1;
    }
+   if(ntp_timer_handler()<0)
+    {
+        local_scheduler.pLevel.P_ERR("-----request time deviation failed------\n");
+        return -1;
+    }
 
     printf("========================\n==TCP&NTP CLIENT START==\n========================\n");
 

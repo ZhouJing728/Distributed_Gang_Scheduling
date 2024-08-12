@@ -26,13 +26,18 @@ Server global_scheduler;
 
 Strategy mysched;
 
-boost::property_tree::ptree pt;
-
 int ntp_fd;
 
 int timer_fd;
 
+int port_ntp;
+
 int lastTaskDuration_ms;
+
+//konstant task_time_slice in ms
+int duration;
+
+int num_cpu_pro_local;
 
 int send_schedule_leadTimes_ms;
 
@@ -43,12 +48,11 @@ bool need_schedule = false;
 //reset to false,when this changed has been seen by schedule stratrgy
 bool clinets_status_changed = false;
 
-bool oneTaskSchedule = false;
+string path_cgroup;
 
 struct itimerspec send_timer;
 
 start_time next_Starttime;
-//queue<Job_gang> job_queue;
 
 vector<Job_gang> job_list;
 
@@ -65,7 +69,7 @@ extern "C"{
     void ntpServer_reply();
 
     void request_process_loop(int fd);
-    int ntp_server(struct sockaddr_in bind_addr);
+    int ntp_server(struct sockaddr_in bind_addr,int port);
     void wait_wrapper();
     int ntp_reply(
         int socket_fd,
@@ -113,10 +117,15 @@ int update_nst();
 
 int main()
 {
+    boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini("../config.ini", pt);
     global_scheduler_port= pt.get<int>("port_globalscheduler.value");
     global_scheduler.max_client=pt.get<int>("max_local_num.value");
     send_schedule_leadTimes_ms=pt.get<int>("send_schedule_leadTimes_ms.value");
+    port_ntp=pt.get<int>("port_ntpServer.value");
+    path_cgroup = pt.get<string>("path_cgroup.value");
+    duration=pt.get<int>("gang_duration.value");
+    num_cpu_pro_local = pt.get<int>("num_cpus.value");
 
 
     if(global_scheduler.sock_create()<0)
@@ -256,22 +265,12 @@ int acceptNewJob(int fd)
     Job_gang job_accept;
     job_accept.ParseFromArray(global_scheduler.read_buffer,1024);
 
-    if(job_accept.requested_processors()>global_scheduler.max_client||(job_accept.requested_processors()==0))
+    if(job_accept.requested_processors()>global_scheduler.max_client*num_cpu_pro_local||(job_accept.requested_processors()==0))
     {
         global_scheduler.pLevel.P_WRN("received wrong job, discarded it~\n");
-        return -1;
+        return 0;
     }
     job_list.push_back(job_accept);
-
-    char path[128];
-    sprintf(path,"../cgroup/%d",job_accept.job_id());
-
-    struct stat st;
-    if((stat(path,&st)<0)&&mkdir(path,0755)<0)
-    {
-        perror("mkdir");
-        return -1;
-    }
 
     need_schedule = true;
 
@@ -302,7 +301,8 @@ void remove_job_by_id(int id)
 
 int finishJob(int fd)
 {
-    int id=atoi(global_scheduler.read_buffer);
+    string tid =global_scheduler.read_buffer;
+    int id = atoi(tid.c_str());
     taskid_finish[id]++;
     int num = get_rpn_by_id(id);
     if(num<0)
@@ -310,7 +310,7 @@ int finishJob(int fd)
         global_scheduler.pLevel.P_ERR("Don't find task with id %d in joblist!\n",id);
         return -1;
     }
-    global_scheduler.pLevel.P_NODE("Job with id %d has finished in %d processors\n",id,num);
+    global_scheduler.pLevel.P_NODE("Job with id %d has finished in Local node with fd: %d , and in %d processors totally\n",id,fd,taskid_finish[id]);
 
     if(taskid_finish[id]==num)
     {
@@ -319,8 +319,6 @@ int finishJob(int fd)
         need_schedule=true;
     }
     return 0;
-
-    
 }
 
 void ntpServer()
@@ -330,7 +328,7 @@ void ntpServer()
 
     bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   
-	ntp_fd=ntp_server(bind_addr);
+	ntp_fd=ntp_server(bind_addr,port_ntp);
 
 }
 
@@ -339,17 +337,14 @@ int epoll_timer()
     timer_fd = timerfd_create(CLOCK_REALTIME,0);
     if(timer_fd<0)
     {
-        global_scheduler.pLevel.P_ERR("epoll_timer create failed!\n");
+        global_scheduler.pLevel.P_ERR("timer(for get&send schedule) create failed!\n");
         return -1;
     }
-    //struct itimerspec send_timer;
-    //---------------------------------------//
-    //triggered every 20s after first trigger
-    //(10s after the this program started)
+
     send_timer.it_interval.tv_sec=20;
     send_timer.it_interval.tv_nsec=0;
     send_timer.it_value.tv_nsec=0;
-    send_timer.it_value.tv_sec=10;//this works
+    send_timer.it_value.tv_sec=10;
 
     if(timerfd_settime(timer_fd,0,&send_timer,NULL)<0)
     {
@@ -375,7 +370,7 @@ long long time_diff_microseconds(struct timeval start, struct timeval end) {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//send timer need to be triggered (about)10s before new nst.
+//send timer need to be triggered Lead_time ms before new nst.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int update_timer()
 {
@@ -396,10 +391,9 @@ int update_timer()
 
     if(diff_usec<0)
     {
-        global_scheduler.pLevel.P_ERR("start time is already passed!\n");
+        global_scheduler.pLevel.P_ERR("[update_timer] time is already passed %lld usec!\n",-diff_usec);
         return -1;
     }
-    lastTaskDuration_ms=mysched.get_lastTaskDuration_ms();
     int64_t sum_ns=diff_usec*1000LL-lastTaskDuration_ms*1000*1000LL-send_schedule_leadTimes_ms*1000*1000LL;
     timer.it_value.tv_sec = sum_ns/(1000LL*1000LL*1000LL);
     timer.it_value.tv_nsec = sum_ns%(1000LL*1000LL*1000LL);
@@ -431,13 +425,14 @@ int epoll_ntpServer()
     return 0;
 }
 
-//current time +20s
+//current time +10s+send_schedule_leadTime
 void initialise_nst()
 {
     struct timeval tv;
     gettimeofday(&tv,NULL);
-    next_Starttime.set_sec(tv.tv_sec+20);
-    next_Starttime.set_ms(tv.tv_usec/1000);
+    long long int final_ms = tv.tv_sec*1000LL+tv.tv_usec/1000LL+1+send_schedule_leadTimes_ms+10*1000;
+    next_Starttime.set_sec(final_ms/1000LL);
+    next_Starttime.set_ms(final_ms%1000LL);
 }
 
 int update_nst()
@@ -452,21 +447,17 @@ int update_nst()
     }else
     {
         int64_t final_ms;
-         //last schedule only has one task.
-        //-->send time = next hyperperode - next lastTaskDuration = current time ! 
-        //-->has nst passed risk by local scheduler
-        //-->check and send in one hyperperiode but set nst = last nst + 2 last hyper
-        if(oneTaskSchedule)
+        
+        final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
+
+        while(final_ms-next_Starttime.ms()-next_Starttime.sec()*1000LL-lastTaskDuration_ms-send_schedule_leadTimes_ms<=0)
         {
-            final_ms= next_Starttime.ms()+2*hyperperiode_ms+next_Starttime.sec()*1000LL;
-            oneTaskSchedule = false;
-        }else{//********has repeated schedule or new schedule********//
-            final_ms= next_Starttime.ms()+hyperperiode_ms+next_Starttime.sec()*1000LL;
+            final_ms= final_ms+hyperperiode_ms;
         }
         next_Starttime.set_sec(final_ms/1000LL);
         next_Starttime.set_ms(final_ms%1000LL);
 
-        if(update_timer()<0)return -1;//send timer need to be triggered 10s before nst
+        if(update_timer()<0)return -1;//send timer need to be triggered Lead_time ms before NST
         
     }
     global_scheduler.pLevel.P_NODE("nst has been updated\n");
@@ -538,9 +529,8 @@ int get_and_send_schedule()
         return 0;
     }
     ousterhaut_table.clear();
-    int num_cpu_pro_local = pt.get<int>("num_cpus.value");
     int sum_cpu =global_scheduler.clients.size()*num_cpu_pro_local;
-    ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu);
+    ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu,duration);
 
     clinets_status_changed = false;
     need_schedule = false;
@@ -570,11 +560,11 @@ int get_and_send_schedule()
         }
         common_sched.mutable_tasksets()->CopyFrom({tasksets.begin(),tasksets.end()});
 
-        memset(global_scheduler.send_buffer,'\0',1024);
+        memset(global_scheduler.send_buffer,'\0',sizeof(global_scheduler.send_buffer));
 
         global_scheduler.pLevel.P_NODE("reset send buffer\n");
-        common_sched.SerializePartialToArray(global_scheduler.send_buffer,1024);
-        if(write(global_scheduler.clients[client],global_scheduler.send_buffer,1024)<0)
+        common_sched.SerializePartialToArray(global_scheduler.send_buffer,sizeof(global_scheduler.send_buffer));
+        if(write(global_scheduler.clients[client],global_scheduler.send_buffer,sizeof(global_scheduler.send_buffer))<0)
         {
             global_scheduler.pLevel.P_ERR("failed to send schedule to client -%d-\n",client);
             return -1;
@@ -583,12 +573,6 @@ int get_and_send_schedule()
     }
     hyperperiode_ms = mysched.get_hyperperiode_ms();
     lastTaskDuration_ms=mysched.get_lastTaskDuration_ms();
-    if(hyperperiode_ms==lastTaskDuration_ms)
-    {
-        oneTaskSchedule=true;
-    }else{
-        oneTaskSchedule=false;
-    }
 
     return 0;
 

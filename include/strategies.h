@@ -22,7 +22,7 @@ class Strategy{
 
     enum strategies {
         Roundrobin,
-        Other
+        Infini_pair
     };
 
     // Strategy()
@@ -36,7 +36,7 @@ class Strategy{
     Strategy();
 
     //vector<vector<task>> ousterhaut_table;
-    vector<vector<task>> get_scheduleTable(strategies strategy,vector<Job_gang> job_list,int sum_cpu);
+    vector<vector<task>> get_scheduleTable(strategies strategy,vector<Job_gang> job_list,int sum_cpu,int duration);
 
     int get_hyperperiode_ms();
 
@@ -52,6 +52,12 @@ class Strategy{
 
     bool wait_for_processors;
     /* (five) seconds for each job(task at a local node) in turn*/
-    vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu);
+    vector<vector<task>> roundRobin(vector<Job_gang> job_list,int sum_cpu,int duration_ms);
+
+    /*use to test the latency between two compute nodes, 
+    Gang always only has two members: infini client and server,
+    one always stays on the same node,the another spread across other nodes
+    (each node only needs one core)*/
+    vector<vector<task>> infini_pair(vector<Job_gang> job_list,int sum_cpu,int duration_ms);
 
 };

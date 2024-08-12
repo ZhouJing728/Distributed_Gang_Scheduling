@@ -22,7 +22,7 @@ class Client
     int client;
     int epoll_fd;
     char send_buffer[1024];
-    char receive_buffer[1024];
+    char receive_buffer[2048];
     epoll_event events[128];
     PrintL pLevel;
 
