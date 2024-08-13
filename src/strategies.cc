@@ -47,43 +47,40 @@ vector<vector<task>> Strategy::roundRobin(vector<Job_gang> job_list,int sum_cpu,
     wait_for_processors = false;
     lastTaskDuration_ms = duration;
  
-   for(int i =0;i<2;i++)
-   {
-        for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
+    for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
+    {
+        //task.set_duration_ms(5000);
+
+        Job_gang job = *it;
+        task.set_path(job.job_path());
+
+        if(job.requested_processors()>table_row)
         {
-            //task.set_duration_ms(5000);
-
-            Job_gang job = *it;
-            task.set_path(job.job_path());
-
-            if(job.requested_processors()>table_row)
-            {
-                printf("**There aren't enough processors for job with id %d now.** \n   ---> Wating for more free processors~\n",job.job_id());
-                wait_for_processors = true;
-                continue;
-            }
-            //hypperperiode_ms=hypperperiode_ms+5000;
-            
-            int r;
-            for(r=0;r<job.requested_processors();r++)
-            {
-                int job_id = job.job_id();
-                char buffer[128];
-                sprintf(buffer,"%d",job_id);
-                task.set_task_id(buffer);
-                ousterhaut_table[r].push_back(task);
-            }
-            for(r=r;r<table_row;r++)
-            {
-                task.set_task_id("empty");
-                ousterhaut_table[r].push_back(task);
-            }
-            hypperperiode_ms=hypperperiode_ms+duration;
-            task.set_relevant_swtichtime_ms(task.relevant_swtichtime_ms()+duration);
-
+            printf("**There aren't enough processors for job with id %d now.** \n   ---> Wating for more free processors~\n",job.job_id());
+            wait_for_processors = true;
+            continue;
         }
-   }
-    
+        //hypperperiode_ms=hypperperiode_ms+5000;
+        
+        int r;
+        for(r=0;r<job.requested_processors();r++)
+        {
+            int job_id = job.job_id();
+            char buffer[128];
+            sprintf(buffer,"%d",job_id);
+            task.set_task_id(buffer);
+            ousterhaut_table[r].push_back(task);
+        }
+        for(r=r;r<table_row;r++)
+        {
+            task.set_task_id("empty");
+            ousterhaut_table[r].push_back(task);
+        }
+        hypperperiode_ms=hypperperiode_ms+duration;
+        task.set_relevant_swtichtime_ms(task.relevant_swtichtime_ms()+duration);
+
+    }
+  
     return ousterhaut_table;
 
 }

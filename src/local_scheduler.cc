@@ -566,7 +566,7 @@ int task_switch(int cpu)
 
     if((schedule_current.tasksets(cpu).tasks(position[cpu]).task_id()!="empty")&&(position[cpu]==schedule_current.tasksets(cpu).tasks_size()-1))
     {
-        id_endTask_lastSched[cpu]=next_task.task_id.substr(1);
+        id_endTask_lastSched[cpu]=next_task.task_id;
         return 0;
     }
     position[cpu]++;
