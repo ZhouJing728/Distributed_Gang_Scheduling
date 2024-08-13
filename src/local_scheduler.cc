@@ -169,54 +169,51 @@ int ntp_timer()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int ntp_timer_handler()
 {
-    xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);
-    if (XTMVNSEC_IS_VALID(xtm_vnsec))
-    {
-        xtm_ltime = time_vnsec();
-        xtm_descr = time_vtod(xtm_vnsec);
-        xtm_local = time_vtod(xtm_ltime);
-        xit_iter++;
-        printf("============================================\n");
-        printf("\n[%d] %s:%d : \n",
-                xit_iter ,
-                host,
-                port);
-        printf("\tNTP response : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
-                xtm_descr.ctx_year  ,
-                xtm_descr.ctx_month ,
-                xtm_descr.ctx_day   ,
-                xtm_descr.ctx_week  ,
-                xtm_descr.ctx_hour  ,
-                xtm_descr.ctx_minute,
-                xtm_descr.ctx_second,
-                xtm_descr.ctx_msec  );
+    deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
+    //xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);//T4(in request process)+Deviation(server-client)=server time(at T4)
+    // if (XTMVNSEC_IS_VALID(xtm_vnsec))
+    // {
+        // xtm_ltime = time_vnsec();//current timestamp(not T4)
+        // xtm_descr = time_vtod(xtm_vnsec);
+        // xtm_local = time_vtod(xtm_ltime);
+        // xit_iter++;
+        // printf("============================================\n");
+        // printf("\n[%d] %s:%d : \n",
+        //         xit_iter ,
+        //         host,
+        //         port);
+        // printf("\tNTP response : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
+        //         xtm_descr.ctx_year  ,
+        //         xtm_descr.ctx_month ,
+        //         xtm_descr.ctx_day   ,
+        //         xtm_descr.ctx_week  ,
+        //         xtm_descr.ctx_hour  ,
+        //         xtm_descr.ctx_minute,
+        //         xtm_descr.ctx_second,
+        //         xtm_descr.ctx_msec  );
 
-        printf("\tLocal time   : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
-                xtm_local.ctx_year  ,
-                xtm_local.ctx_month ,
-                xtm_local.ctx_day   ,
-                xtm_local.ctx_week  ,
-                xtm_local.ctx_hour  ,
-                xtm_local.ctx_minute,
-                xtm_local.ctx_second,
-                xtm_local.ctx_msec  );
+        // printf("\tLocal time   : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
+        //         xtm_local.ctx_year  ,
+        //         xtm_local.ctx_month ,
+        //         xtm_local.ctx_day   ,
+        //         xtm_local.ctx_week  ,
+        //         xtm_local.ctx_hour  ,
+        //         xtm_local.ctx_minute,
+        //         xtm_local.ctx_second,
+        //         xtm_local.ctx_msec  );
 
-        deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
-        printf("Jing's deviation:%lld us\n",deviation_in_microsecond/10LL);
-        printf("\tDeviation    : %lld us\n",
-                ((x_int64_t)(xtm_ltime - xtm_vnsec)) / 10LL);
-        printf("============================================\n");
+        //deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
+        local_scheduler.pLevel.P_NODE("【NTP】Deviation(standard-local):%lld us\n",deviation_in_microsecond/10LL);
+        //printf("============================================\n");
         return 0;       
-    }
-    else
-    {
-        local_scheduler.pLevel.P_ERR("\n[%d] %s:%d : errno = %d\n",
-                xit_iter + 1,
-                host,
-                port,
-                errno);
-        return -1;
-    }
+    // }else
+    // {
+    //     printf("\n[%d] %s:%d : errno = %d\n",
+    //             xit_iter + 1,
+    //             xopt_args.xntp_host,
+    //             xopt_args.xut_port,
+    //             errno);
+    // }
 
 }
 
@@ -484,9 +481,9 @@ int task_switch(int cpu)
             char buffer[128];
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
-            local_scheduler.pLevel.P_NODE("====================\nLAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n====================\n",id_endTask_lastSched[cpu].c_str());
+            local_scheduler.pLevel.P_NODE("LAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n",id_endTask_lastSched[cpu].c_str());
         }else{
-            local_scheduler.pLevel.P_NODE("====================\nLAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n====================\n");
+            local_scheduler.pLevel.P_NODE("LAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n");
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
@@ -501,7 +498,7 @@ int task_switch(int cpu)
             string id = last_task.task_id;
             sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
             write_to_cgroup_file(buffer, "FROZEN");
-            local_scheduler.pLevel.P_NODE("====================\nTask %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
+            local_scheduler.pLevel.P_NODE("Task %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
     /*********thaw the next task********************/
@@ -561,7 +558,7 @@ int task_switch(int cpu)
         }
     }else/*********if next task is empty, skip the next step*******************/
     {
-        local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n====================\n");
+        local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n");
     }
 
     if((schedule_current.tasksets(cpu).tasks(position[cpu]).task_id()!="empty")&&(position[cpu]==schedule_current.tasksets(cpu).tasks_size()-1))
@@ -752,6 +749,7 @@ int main()
     ntp_request_interval_nsec=pt.get<long int>("ntp_request_interval.nsec");
     ntp_request_interval_sec=pt.get<long int>("ntp_request_interval.sec");
     num_cpu=pt.get<int>("num_cpus.value");
+
     for(int i=0;i<num_cpu;i++)
     {
         id_endTask_lastSched.push_back("empty");

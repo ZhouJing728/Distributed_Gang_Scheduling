@@ -566,7 +566,7 @@ static xtime_vnsec_t ntp_calc_4T(xtime_vnsec_t xtm_4time[4])
 t1 is the client's timestamp of the request packet transmission,
 t2 is the server's timestamp of the request packet reception,
 t3 is the server's timestamp of the response packet transmission and
-t4 is the client's timestamp of the response packet reception.[1]: 19 
+t4 is the client's timestamp of the response packet reception.
 
 */
 static x_int64_t ntp_calc_4T_by_Jing(xtime_vnsec_t xtm_4time[4])

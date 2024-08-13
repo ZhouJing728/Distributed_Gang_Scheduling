@@ -50,6 +50,8 @@ bool clinets_status_changed = false;
 
 string path_cgroup;
 
+string test_method;
+
 struct itimerspec send_timer;
 
 start_time next_Starttime;
@@ -126,7 +128,7 @@ int main()
     path_cgroup = pt.get<string>("path_cgroup.value");
     duration=pt.get<int>("gang_duration.value");
     num_cpu_pro_local = pt.get<int>("num_cpus.value");
-
+    test_method=pt.get<string>("test_method.value");
 
     if(global_scheduler.sock_create()<0)
     {
@@ -530,8 +532,11 @@ int get_and_send_schedule()
     }
     ousterhaut_table.clear();
     int sum_cpu =global_scheduler.clients.size()*num_cpu_pro_local;
-    ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu,duration);
-
+    if(test_method=="normal")
+        ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu,duration);
+    else
+        ousterhaut_table =mysched.get_scheduleTable(mysched.Infini_pair,job_list,sum_cpu,duration);
+    
     clinets_status_changed = false;
     need_schedule = false;
 
