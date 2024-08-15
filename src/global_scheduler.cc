@@ -535,8 +535,23 @@ int get_and_send_schedule()
     if(test_method=="normal")
         ousterhaut_table =mysched.get_scheduleTable(mysched.Roundrobin,job_list,sum_cpu,duration);
     else
+    {
+        if(global_scheduler.clients.size()<2)
+        {
+            global_scheduler.pLevel.P_NODE("there is no clients available now (min 2 for ibbench mode), will reschedule and retry in next round~\n");
+            need_schedule = true;
+            return 0;
+
+        }
         ousterhaut_table =mysched.get_scheduleTable(mysched.Infini_pair,job_list,sum_cpu,duration);
+    }
     
+    if(ousterhaut_table[0].size()==0)
+    {
+        global_scheduler.pLevel.P_NODE("there is no enough clients for any task, will reschedule and retry in next round~\n");
+        need_schedule=true;
+        return 0;
+    }
     clinets_status_changed = false;
     need_schedule = false;
 

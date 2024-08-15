@@ -91,31 +91,25 @@ vector<vector<task>> Strategy::infini_pair(vector<Job_gang> job_list,int sum_cpu
     int table_row = sum_cpu;
     ousterhaut_table.resize(table_row);
 
-    task task_server;
-    task task_client;
-    task ini_Task;
-    ini_Task.set_path("./Job1");
-    ini_Task.set_relevant_swtichtime_ms(5000);
+
+    task task;
+    task.set_path("./Job1");
+    task.set_relevant_swtichtime_ms(duration_ms);
     for(int i=0;i<sum_cpu;i++)
     {
         char buffer[128];
-        sprintf(buffer,"%d",1);
-        ini_Task.set_task_id(buffer);
-        ousterhaut_table[i].push_back(ini_Task);
+        sprintf(buffer,"%d",0);
+        task.set_task_id(buffer);
+        ousterhaut_table[i].push_back(task);
     }
-    hypperperiode_ms=5000;
-
-    task_server.set_relevant_swtichtime_ms(5000+duration_ms);
-    task_client.set_relevant_swtichtime_ms(5000+duration_ms);
-
+    hypperperiode_ms=duration_ms;
     wait_for_processors = false;
-    lastTaskDuration_ms = 1000;
+    lastTaskDuration_ms = duration_ms;
 
     int iter=0;
    
     for(vector<Job_gang>::iterator it = job_list.begin();it!=job_list.end();it++)
     {
-        //task.set_duration_ms(5000);
         if(iter>=table_row-1)
         {
             printf("**There aren't enough compute node to test now.** \n ");
@@ -125,47 +119,38 @@ vector<vector<task>> Strategy::infini_pair(vector<Job_gang> job_list,int sum_cpu
         iter++;
 
         Job_gang job = *it;
+        int job_id = job.job_id();
         char buffer[128];
-        // sprintf(buffer,"%s/%s",job.job_path().c_str(),"/Infini_server");
-        // task_server.set_path(buffer);
-        //sprintf(buffer,"%s/%s",job.job_path().c_str(),"/Infini_client");
-        task_server.set_path(job.job_path());
-        task_client.set_path(job.job_path());
-        //int job_id=job.job_id();
-        sprintf(buffer,"%d%d",0,job.job_id());
-        task_server.set_task_id(buffer);
-        sprintf(buffer,"%d%d",iter,job.job_id());
-        task_client.set_task_id(buffer);
+        sprintf(buffer,"%d",job_id);
+        task.set_task_id(buffer);
+        task.set_path(job.job_path());
+        task.set_relevant_swtichtime_ms(task.relevant_swtichtime_ms()+duration_ms);
         
-        ousterhaut_table[0].push_back(task_server);
-        ousterhaut_table[iter].push_back(task_client);
+        ousterhaut_table[0].push_back(task);
+        ousterhaut_table[iter].push_back(task);
 
         int r;
         for(r=1;r<sum_cpu;r++)
         {
             if(r!=iter)
             {
-                task_client.set_task_id("empty");
-                ousterhaut_table[r].push_back(task_client);
+                task.set_task_id("empty");
+                ousterhaut_table[r].push_back(task);
             }
         }
-    
         hypperperiode_ms=hypperperiode_ms+duration_ms;
-        task_client.set_relevant_swtichtime_ms(task_client.relevant_swtichtime_ms()+duration_ms);
-        task_server.set_relevant_swtichtime_ms(task_server.relevant_swtichtime_ms()+duration_ms);
     }
-    task end_Task;
-    ini_Task.set_path("./Job2");
-    ini_Task.set_relevant_swtichtime_ms(hypperperiode_ms+1000);
+
+    task.set_path("./Job2");
+    task.set_relevant_swtichtime_ms(hypperperiode_ms+duration_ms);
     for(int i=0;i<sum_cpu;i++)
     {
         char buffer[128];
-        sprintf(buffer,"%d%d",i,0);
-        ini_Task.set_task_id(buffer);
-        ousterhaut_table[i].push_back(end_Task);
+        sprintf(buffer,"%d",1);
+        task.set_task_id(buffer);
+        ousterhaut_table[i].push_back(task);
     }
-    hypperperiode_ms=hypperperiode_ms+1000;
-   
+    hypperperiode_ms=hypperperiode_ms+duration_ms;
     
     return ousterhaut_table;
 

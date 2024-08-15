@@ -170,50 +170,10 @@ int ntp_timer()
 int ntp_timer_handler()
 {
     deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
-    //xtm_vnsec = ntpcli_req_time(xntp_this,xut_tmout);//T4(in request process)+Deviation(server-client)=server time(at T4)
-    // if (XTMVNSEC_IS_VALID(xtm_vnsec))
-    // {
-        // xtm_ltime = time_vnsec();//current timestamp(not T4)
-        // xtm_descr = time_vtod(xtm_vnsec);
-        // xtm_local = time_vtod(xtm_ltime);
-        // xit_iter++;
-        // printf("============================================\n");
-        // printf("\n[%d] %s:%d : \n",
-        //         xit_iter ,
-        //         host,
-        //         port);
-        // printf("\tNTP response : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
-        //         xtm_descr.ctx_year  ,
-        //         xtm_descr.ctx_month ,
-        //         xtm_descr.ctx_day   ,
-        //         xtm_descr.ctx_week  ,
-        //         xtm_descr.ctx_hour  ,
-        //         xtm_descr.ctx_minute,
-        //         xtm_descr.ctx_second,
-        //         xtm_descr.ctx_msec  );
-
-        // printf("\tLocal time   : [ %04d-%02d-%02d %d %02d:%02d:%02d.%03d ]\n",
-        //         xtm_local.ctx_year  ,
-        //         xtm_local.ctx_month ,
-        //         xtm_local.ctx_day   ,
-        //         xtm_local.ctx_week  ,
-        //         xtm_local.ctx_hour  ,
-        //         xtm_local.ctx_minute,
-        //         xtm_local.ctx_second,
-        //         xtm_local.ctx_msec  );
-
-        //deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
-        local_scheduler.pLevel.P_NODE("【NTP】Deviation(standard-local):%lld us\n",deviation_in_microsecond/10LL);
-        //printf("============================================\n");
-        return 0;       
-    // }else
-    // {
-    //     printf("\n[%d] %s:%d : errno = %d\n",
-    //             xit_iter + 1,
-    //             xopt_args.xntp_host,
-    //             xopt_args.xut_port,
-    //             errno);
-    // }
+   
+    local_scheduler.pLevel.P_NODE("【NTP】Deviation(standard-local):%lld us\n",deviation_in_microsecond/10LL);
+    
+    return 0;       
 
 }
 
@@ -440,6 +400,9 @@ bool check_file_empty(string id)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //update timer for next task switch. switch time = current schedule start time + (relative switch)interval
+//sum_ns= (server time)nst-(server time)current time
+//      =（client time)nst-(client time)current time
+//      = (server time)nst-deviation(=server-client)-(Client time)current time
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int timer_update()
 {
@@ -448,7 +411,7 @@ int timer_update()
     struct timeval given_time;
     given_time.tv_sec=ST.tv_sec+timeintervals[index_timeInterval].timeinterval_ms/1000;
     given_time.tv_usec= ST.tv_usec+(timeintervals[index_timeInterval].timeinterval_ms%1000)*1000;
-    long long diff_usec = time_diff_microseconds(current_time,given_time);
+    long long diff_usec = time_diff_microseconds(current_time,given_time) - deviation_in_microsecond;
     if(diff_usec<0)
     {
         local_scheduler.pLevel.P_ERR("start time(not the first) is already passed!\n");
@@ -457,10 +420,8 @@ int timer_update()
     }
     
     struct itimerspec timer;
-    //sum_ns= (server time)nst-(server time)current time
-    //      =（client time)nst-(client time)current time
-    //      = (server time)nst-deviation(=server-client)-(Client time)current time
-    int64_t sum_ns = diff_usec*1000LL-deviation_in_microsecond*1000LL;
+
+    int64_t sum_ns = diff_usec*1000LL;
     timer.it_value.tv_sec = sum_ns/1000000000LL;
     timer.it_value.tv_nsec = sum_ns%1000000000LL;
     timer.it_interval.tv_nsec = 0;
@@ -478,9 +439,9 @@ int task_switch(int cpu)
     {
         if(id_endTask_lastSched[cpu]!="empty")
         {
-            char buffer[128];
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
-            write_to_cgroup_file(buffer, "FROZEN");
+            // char buffer[128];
+            // sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
+            // write_to_cgroup_file(buffer, "FROZEN");
             local_scheduler.pLevel.P_NODE("LAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n",id_endTask_lastSched[cpu].c_str());
         }else{
             local_scheduler.pLevel.P_NODE("LAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n");
@@ -494,10 +455,10 @@ int task_switch(int cpu)
         task_local last_task = taskset[position[cpu]-1];
         if(last_task.task_id!="empty")
         {
-            char buffer[128];
+            // char buffer[128];
             string id = last_task.task_id;
-            sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-            write_to_cgroup_file(buffer, "FROZEN");
+            // sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+            // write_to_cgroup_file(buffer, "FROZEN");
             local_scheduler.pLevel.P_NODE("Task %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
@@ -507,55 +468,55 @@ int task_switch(int cpu)
     if(next_task.task_id!="empty")
     {
         printf("Successful implementation of scheduling!\n");
-        char state[128];
-        char path[128];
-        string id = next_task.task_id;
-        sprintf(path,"%s/%s",CGROUP_PATH.c_str(),id.c_str());
-        struct stat st;
-        if((stat(path,&st)<0))
-        {
-            if(mkdir(path,0777)<0)
-            {
-                perror("mkdir");
-                return -1;
-            }
-        }
-        sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-        write_to_cgroup_file(state, "THAWED");
-        local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
-        print_current_time();
-        //*****if not be executed before, it needs to get pid and store it ****//
-        if(!check_task_initialised(cpu,id))
-        {
-            taskids_exist_local[cpu].push_back(id);
-            pid_t pid = fork();
-            if (pid == -1) {
-                local_scheduler.pLevel.P_ERR("Error forking process\n");
-                exit(EXIT_FAILURE);
-            } else if (pid == 0) {//child process
-                prctl(PR_SET_PDEATHSIG,SIGKILL);
+        // char state[128];
+        // char path[128];
+        // string id = next_task.task_id;
+        // sprintf(path,"%s/%s",CGROUP_PATH.c_str(),id.c_str());
+        // struct stat st;
+        // if((stat(path,&st)<0))
+        // {
+        //     if(mkdir(path,0777)<0)
+        //     {
+        //         perror("mkdir");
+        //         return -1;
+        //     }
+        // }
+        // sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+        // write_to_cgroup_file(state, "THAWED");
+        // local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
+        // print_current_time();
+        // //*****if not be executed before, it needs to get pid and store it ****//
+        // if(!check_task_initialised(cpu,id))
+        // {
+        //     taskids_exist_local[cpu].push_back(id);
+        //     pid_t pid = fork();
+        //     if (pid == -1) {
+        //         local_scheduler.pLevel.P_ERR("Error forking process\n");
+        //         exit(EXIT_FAILURE);
+        //     } else if (pid == 0) {//child process
+        //         prctl(PR_SET_PDEATHSIG,SIGKILL);
 
-                cpu_set_t set;
-                CPU_ZERO(&set);
-                CPU_SET(cpu,&set);
+        //         cpu_set_t set;
+        //         CPU_ZERO(&set);
+        //         CPU_SET(cpu,&set);
 
-                if (sched_setaffinity(0, sizeof(set), &set) == -1) {
-                    local_scheduler.pLevel.P_ERR("sched_setaffinity!\n");
-                    exit(EXIT_FAILURE);
-                }
+        //         if (sched_setaffinity(0, sizeof(set), &set) == -1) {
+        //             local_scheduler.pLevel.P_ERR("sched_setaffinity!\n");
+        //             exit(EXIT_FAILURE);
+        //         }
 
-                const char* path = next_task.path.c_str();
-                execl(path, path, NULL);
-                local_scheduler.pLevel.P_ERR("Error executing program!\n");
-                exit(EXIT_FAILURE);
-            }else//father process here continue
-            {
-                char tasks[128];
-                sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
-                add_pid_to_cgroup(tasks,pid);
-                pid_to_taskid.insert(pair<int,string>(pid,next_task.task_id));
-            }
-        }
+        //         const char* path = next_task.path.c_str();
+        //         execl(path, path, NULL);
+        //         local_scheduler.pLevel.P_ERR("Error executing program!\n");
+        //         exit(EXIT_FAILURE);
+        //     }else//father process here continue
+        //     {
+        //         char tasks[128];
+        //         sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
+        //         add_pid_to_cgroup(tasks,pid);
+        //         pid_to_taskid.insert(pair<int,string>(pid,next_task.task_id));
+        //     }
+        // }
     }else/*********if next task is empty, skip the next step*******************/
     {
         local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n");
