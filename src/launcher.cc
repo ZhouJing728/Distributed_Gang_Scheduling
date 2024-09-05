@@ -101,7 +101,7 @@ int latency_gang(int id)
     job.set_requested_processors(2);
     memset(laucher.send_buffer,'\0',1024);
 
-    job.SerializePartialToArray(laucher.send_buffer,1024);
+    job.SerializePartialToArray(laucher.send_buffer,sizeof(laucher.send_buffer));
 
    if(laucher.send_to_server(laucher.send_buffer)<0)return -1;
 

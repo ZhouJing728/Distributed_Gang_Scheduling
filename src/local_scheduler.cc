@@ -30,6 +30,8 @@ struct timeinterval{
     vector<int> cpus;//it could be multiple cpus switch task at same time
                     //at least the first tasks
     long int timeinterval_ms;
+    vector<string> ltid;
+    vector<string> ntid;
 };
 
 struct task_local{
@@ -160,7 +162,7 @@ int ntp_timer()
         local_scheduler.pLevel.P_ERR("epoll_ctl_Add timer failed!\n");
         return -1;
     }
-    local_scheduler.pLevel.P_NODE("SUCCESSFULLY CREATE AND ADD TIMER TO EPOLL\n");
+    local_scheduler.pLevel.P_NODE("SUCCESSFULLY CREATE AND ADD NTP TIMER TO EPOLL\n");
     return 0;
 }
 
@@ -169,9 +171,9 @@ int ntp_timer()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int ntp_timer_handler()
 {
-    deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout);
+    deviation_in_microsecond = ntpcli_req_time_by_Jing(xntp_this,xut_tmout)/10LL;
    
-    local_scheduler.pLevel.P_NODE("【NTP】Deviation(standard-local):%lld us\n",deviation_in_microsecond/10LL);
+    local_scheduler.pLevel.P_NODE("【NTP】Deviation(standard-local):%lld us\n",deviation_in_microsecond);
     
     return 0;       
 
@@ -254,16 +256,12 @@ void insert_timeIntervals(task task,int core)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 int organize_current_schedule()
 {
-    //size = schedule_current.tasksets(0).tasks_size();
     dispatching = true;
     index_timeInterval = 0;
     for(int i=0;i<num_cpu;i++)position[i] = 0;
 
     /***********the start time of first task is the start time of schedule********************/
     struct itimerspec timer;
-
-    struct timeval current_time;
-    gettimeofday(&current_time, NULL);
 
     ST.tv_sec=schedule_current.start_time().sec();
     ST.tv_usec=schedule_current.start_time().ms()*1000;
@@ -279,26 +277,32 @@ int organize_current_schedule()
 
     printf("START TIME :%s.%s\n", buffer, usec_buffer);
 
-    long long diff_usec = time_diff_microseconds(current_time,ST);
+    print_current_time();
+    struct timeval current_time;
+    gettimeofday(&current_time, NULL);
+
+    long long diff_usec = time_diff_microseconds(current_time,ST)-deviation_in_microsecond;
 
     if(diff_usec<0)
     {
-        local_scheduler.pLevel.P_ERR("start time is already passed %lld usec!\n",diff_usec);
+        local_scheduler.pLevel.P_ERR("start time of current schedule is already passed %lld usec!\n",diff_usec);
         return -1;
     }
     //*****sum_ns = given server time - current server time*****************//
     //************= given server time - (current client time + deviation)***// 
     //************= diff_usec -deviation************************************//
-    int64_t sum_ns = diff_usec*1000LL-deviation_in_microsecond*1000LL;
+    int64_t sum_ns = diff_usec*1000LL;
     timer.it_value.tv_sec = sum_ns/1000000000LL;
     timer.it_value.tv_nsec = sum_ns%1000000000LL;
     timer.it_interval.tv_nsec = 0;
     timer.it_interval.tv_sec =0;
 
-    //printf("timer sec:%ld, nsec:%ld\n",timer.it_value.tv_sec,timer.it_value.tv_nsec);
+    printf("timer sec:%ld, nsec:%ld\n",timer.it_value.tv_sec,timer.it_value.tv_nsec);
 
     if(timerfd_settime(task_timerfd,0,&timer,NULL)<0)return -1;
-    local_scheduler.pLevel.P_NODE("successful to set the first timer of a schedule\n");
+    local_scheduler.pLevel.P_NODE("successful to set the first timer of a schedule with deviation %ld us\n",deviation_in_microsecond);
+    
+
     if(new_schedule){
         for(int i=0;i<num_cpu;i++)tasksets_local[i].clear();
         timeintervals.clear();
@@ -357,7 +361,7 @@ void add_pid_to_cgroup(const char *tasks_file_path, pid_t pid) {
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-//check_task_initialised() returns true, if this task has been executed at least once before position
+//check_task_initialised() returns true, if this task has been executed at least once before
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 bool check_task_initialised(int cpu, string id)
 {
@@ -414,7 +418,6 @@ int timer_update()
     long long diff_usec = time_diff_microseconds(current_time,given_time) - deviation_in_microsecond;
     if(diff_usec<0)
     {
-        local_scheduler.pLevel.P_ERR("start time(not the first) is already passed!\n");
         local_scheduler.pLevel.P_DBG("current time is %lld usec later than next start time\n",diff_usec);
         return -1;
     }
@@ -433,18 +436,43 @@ int timer_update()
     return 0;
 }
 
-int task_switch(int cpu)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//return true when Frozen state has not written by previous core's task switch 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+bool need_write_Frozen_state(string id,int index_timeInterval)
+{
+    for(vector<string>::iterator it= timeintervals[index_timeInterval].ltid.begin();it!=timeintervals[index_timeInterval].ltid.end();it++)
+    {
+        if(*it==id)return false;
+    }
+    return true;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//return true when Thawed state has not written by previous core's task switch 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+bool need_write_Thawed_state(string id,int index_timeInterval)
+{
+    for(vector<string>::iterator it= timeintervals[index_timeInterval].ntid.begin();it!=timeintervals[index_timeInterval].ntid.end();it++)
+    {
+        if(*it==id)return false;
+    }
+    return true;
+}
+
+int task_switch(int cpu,int index_timeInterval)
 {
     if(position[cpu]==0)
     {
-        if(id_endTask_lastSched[cpu]!="empty")
+        if((id_endTask_lastSched[cpu]!="empty")&&need_write_Frozen_state(id_endTask_lastSched[cpu],index_timeInterval))
         {
-            // char buffer[128];
-            // sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
-            // write_to_cgroup_file(buffer, "FROZEN");
+            char buffer[128];
+            snprintf(buffer,sizeof(buffer),"%s/%s/%s",CGROUP_PATH.c_str(),id_endTask_lastSched[cpu].c_str(),"freezer.state");
+            write_to_cgroup_file(buffer, "FROZEN");
+            timeintervals[index_timeInterval].ltid.push_back(id_endTask_lastSched[cpu]);
             local_scheduler.pLevel.P_NODE("LAST TASK WITH ID %s OF LAST SCHEDULE HAS BEEN FROZEN\n",id_endTask_lastSched[cpu].c_str());
         }else{
-            local_scheduler.pLevel.P_NODE("LAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY\n");
+            local_scheduler.pLevel.P_NODE("LAST TASK TIME SLICE OF LAST SCHEDULE IS EMPTY OR HAS BEEN FROZEN PREVIOUSLY\n");
         }
     }
     /**********frozen the last task, if last task is empty,(no task for last time slice),skip this step*********/
@@ -455,10 +483,14 @@ int task_switch(int cpu)
         task_local last_task = taskset[position[cpu]-1];
         if(last_task.task_id!="empty")
         {
-            // char buffer[128];
+            char buffer[128];
             string id = last_task.task_id;
-            // sprintf(buffer,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-            // write_to_cgroup_file(buffer, "FROZEN");
+            if(need_write_Frozen_state(id,index_timeInterval))
+            {
+                snprintf(buffer,sizeof(buffer),"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+                write_to_cgroup_file(buffer, "FROZEN");
+                timeintervals[index_timeInterval].ltid.push_back(id);
+            }
             local_scheduler.pLevel.P_NODE("Task %s at position %d has been frozen\n",id.c_str(),position[cpu]-1);
         }
     }
@@ -467,56 +499,60 @@ int task_switch(int cpu)
     task_local next_task = tasksets_local[cpu][position[cpu]];
     if(next_task.task_id!="empty")
     {
-        printf("Successful implementation of scheduling!\n");
-        // char state[128];
-        // char path[128];
-        // string id = next_task.task_id;
-        // sprintf(path,"%s/%s",CGROUP_PATH.c_str(),id.c_str());
-        // struct stat st;
-        // if((stat(path,&st)<0))
-        // {
-        //     if(mkdir(path,0777)<0)
-        //     {
-        //         perror("mkdir");
-        //         return -1;
-        //     }
-        // }
-        // sprintf(state,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
-        // write_to_cgroup_file(state, "THAWED");
-        // local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
-        // print_current_time();
-        // //*****if not be executed before, it needs to get pid and store it ****//
-        // if(!check_task_initialised(cpu,id))
-        // {
-        //     taskids_exist_local[cpu].push_back(id);
-        //     pid_t pid = fork();
-        //     if (pid == -1) {
-        //         local_scheduler.pLevel.P_ERR("Error forking process\n");
-        //         exit(EXIT_FAILURE);
-        //     } else if (pid == 0) {//child process
-        //         prctl(PR_SET_PDEATHSIG,SIGKILL);
+        //printf("Successful implementation of scheduling!\n");
+        char state[128];
+        char path[128];
+        string id = next_task.task_id;
+        snprintf(path,sizeof(path),"%s/%s",CGROUP_PATH.c_str(),id.c_str());
+        struct stat st;
+        if((stat(path,&st)<0))
+        {
+            if(mkdir(path,0777)<0)
+            {
+                perror("mkdir");
+                return -1;
+            }
+        }
+        if(need_write_Thawed_state(id,index_timeInterval))
+        {
+            snprintf(state,sizeof(state),"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"freezer.state");
+            write_to_cgroup_file(state, "THAWED");
+            timeintervals[index_timeInterval].ntid.push_back(id);
+        }
+        local_scheduler.pLevel.P_NODE("Task %s IS THAEWD AT POSITION %d NOW\n",id.c_str(),position[cpu]);
+        print_current_time();
+        //*****if not be executed before, it needs to get pid and store it ****//
+        if(!check_task_initialised(cpu,id))
+        {
+            taskids_exist_local[cpu].push_back(id);
+            pid_t pid = fork();
+            if (pid == -1) {
+                local_scheduler.pLevel.P_ERR("Error forking process\n");
+                exit(EXIT_FAILURE);
+            } else if (pid == 0) {//child process
+                prctl(PR_SET_PDEATHSIG,SIGKILL);
 
-        //         cpu_set_t set;
-        //         CPU_ZERO(&set);
-        //         CPU_SET(cpu,&set);
+                cpu_set_t set;
+                CPU_ZERO(&set);
+                CPU_SET(cpu,&set);
 
-        //         if (sched_setaffinity(0, sizeof(set), &set) == -1) {
-        //             local_scheduler.pLevel.P_ERR("sched_setaffinity!\n");
-        //             exit(EXIT_FAILURE);
-        //         }
+                if (sched_setaffinity(0, sizeof(set), &set) == -1) {
+                    local_scheduler.pLevel.P_ERR("sched_setaffinity!\n");
+                    exit(EXIT_FAILURE);
+                }
 
-        //         const char* path = next_task.path.c_str();
-        //         execl(path, path, NULL);
-        //         local_scheduler.pLevel.P_ERR("Error executing program!\n");
-        //         exit(EXIT_FAILURE);
-        //     }else//father process here continue
-        //     {
-        //         char tasks[128];
-        //         sprintf(tasks,"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
-        //         add_pid_to_cgroup(tasks,pid);
-        //         pid_to_taskid.insert(pair<int,string>(pid,next_task.task_id));
-        //     }
-        // }
+                const char* path = next_task.path.c_str();
+                execl(path, path, NULL);
+                local_scheduler.pLevel.P_ERR("Error executing program!\n");
+                exit(EXIT_FAILURE);
+            }else//father process here continue
+            {
+                char tasks[128];
+                snprintf(tasks,sizeof(tasks),"%s/%s/%s",CGROUP_PATH.c_str(),id.c_str(),"tasks");
+                add_pid_to_cgroup(tasks,pid);
+                pid_to_taskid.insert(pair<int,string>(pid,next_task.task_id));
+            }
+        }
     }else/*********if next task is empty, skip the next step*******************/
     {
         local_scheduler.pLevel.P_NODE("Next task time slice is empty!\n");
@@ -539,17 +575,36 @@ int task_timer_handler()
         local_scheduler.pLevel.P_ERR("failed read from task timer\n");
         return -1;
     }
+    bool last_interval=false;
 
-    for(long unsigned int i=0;i<timeintervals[0].cpus.size();i++)
+    if(index_timeInterval==(int)timeintervals.size()-1)
     {
-        if(task_switch(timeintervals[0].cpus[i])<0)
-        local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
+        last_interval=true;
+
+        for(long unsigned int i=0;i<timeintervals[index_timeInterval].cpus.size();i++)
+        {
+            if(task_switch(timeintervals[index_timeInterval].cpus[i],index_timeInterval)<0)
+            local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
+        }
+    }else 
+    {
+        if(timer_update()<0)
+        {
+            cout<<"failed to update timer with task position:"<<index_timeInterval<<endl;
+            return -1;
+        }
+
+        for(long unsigned int i=0;i<timeintervals[index_timeInterval-1].cpus.size();i++)
+        {
+            if(task_switch(timeintervals[index_timeInterval-1].cpus[i],index_timeInterval-1)<0)
+           
+            local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
+        }
     }
-    
     /*********current schedule finished********************/
     /*must be the last task of all tasksets cause the current shceduler will be cleaned*/
     /*the last task still in list,because we need its switch time to update timer */
-    if(index_timeInterval==(int)timeintervals.size()-1)
+    if(last_interval)//original size -1
     {
         if(new_schedule)
         {
@@ -572,15 +627,20 @@ int task_timer_handler()
             if(organize_current_schedule()<0)return -1;
             local_scheduler.pLevel.P_NODE("successfully organized the repeated schedule!\n");
         }
-        return 0;
+        //return 0;
     }
-    //now need to update timer,cause current schedule'last deadline will be updated as new schedule's start time
-    if(timer_update()<0)
-    {
-        local_scheduler.pLevel.P_ERR("ntp_timer settime failed!\n");
-        cout<<"failed to update timer with task position:"<<index_timeInterval<<endl;
-        return -1;
-    }
+    // //now need to update timer,cause current schedule'last deadline will be updated as new schedule's start time
+    // if(timer_update()<0)
+    // {
+    //     cout<<"failed to update timer with task position:"<<index_timeInterval<<endl;
+    //     return -1;
+    // }
+
+    // for(long unsigned int i=0;i<timeintervals[index_timeInterval-1].cpus.size();i++)
+    // {
+    //     if(task_switch(timeintervals[index_timeInterval-1].cpus[i])<0)
+    //     local_scheduler.pLevel.P_ERR("failed to handle task timer for cpu\n");
+    // }
     return 0;
 }
 
@@ -628,8 +688,8 @@ int handle_event()
             }else{
                 schedule_current.Clear();
                 schedule_current.ParseFromArray(local_scheduler.receive_buffer,sizeof(local_scheduler.receive_buffer));
-                local_scheduler.pLevel.P_NODE("a new schedule is stored in schedule_current\n");
-                print_current_time();
+                local_scheduler.pLevel.P_NODE("the first new schedule is stored in schedule_current\n");
+                //print_current_time();
                 if(organize_current_schedule()<0)return -1;
                 local_scheduler.pLevel.P_NODE("successfully organized current schedule\n");
             }

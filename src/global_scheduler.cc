@@ -294,10 +294,12 @@ int get_rpn_by_id(int id)
 
 void remove_job_by_id(int id)
 {
-    for(auto it=job_list.begin();it!=job_list.end();it++)
+    for(auto it=job_list.begin();it!=job_list.end();)
     {
         if(it->job_id()==id)
-        job_list.erase(it);
+            job_list.erase(it);
+        else
+            it++;
     }
 }
 
@@ -312,7 +314,7 @@ int finishJob(int fd)
         global_scheduler.pLevel.P_ERR("Don't find task with id %d in joblist!\n",id);
         return -1;
     }
-    global_scheduler.pLevel.P_NODE("Job with id %d has finished in Local node with fd: %d , and in %d processors totally\n",id,fd,taskid_finish[id]);
+    global_scheduler.pLevel.P_NODE("Job with id %d, which requested %d cores, has finished in Local node with fd: %d , and in %d processors totally\n",id,num,fd,taskid_finish[id]);
 
     if(taskid_finish[id]==num)
     {
